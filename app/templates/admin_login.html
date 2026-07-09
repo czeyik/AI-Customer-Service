@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DUDU Car Admin Login</title>
+    <link rel="stylesheet" href="/static/admin.css">
+  </head>
+  <body class="auth-page">
+    <main class="auth-panel">
+      <h1>DUDU Car Support</h1>
+      <form method="post" action="/admin/login">
+        <label>
+          Username
+          <input name="username" autocomplete="username" required>
+        </label>
+        <label>
+          Password
+          <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <label>
+          2FA code
+          <input name="totp_code" inputmode="numeric" autocomplete="one-time-code" required>
+        </label>
+        {% if error %}
+          <p class="error">{{ error }}</p>
+        {% endif %}
+        <button type="submit">Sign in</button>
+      </form>
+      <p class="hint">Development fallback 2FA is 000000 only when ADMIN_TOTP_SECRET is not set.</p>
+    </main>
+  </body>
+</html>
+

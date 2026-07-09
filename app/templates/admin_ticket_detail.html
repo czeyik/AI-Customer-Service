@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ ticket.public_id }} - DUDU Car Support</title>
+    <link rel="stylesheet" href="/static/admin.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>{{ ticket.public_id }}</h1>
+      <a href="/admin">Inbox</a>
+    </header>
+    <main class="container detail">
+      <section>
+        <h2>Ticket</h2>
+        <dl>
+          <dt>Status</dt><dd>{{ ticket.status }}</dd>
+          <dt>Urgency</dt><dd>{{ ticket.urgency }}</dd>
+          <dt>Issue</dt><dd>{{ ticket.issue_type }}</dd>
+          <dt>Role</dt><dd>{{ ticket.user_role or "unknown" }}</dd>
+          <dt>Channel</dt><dd>{{ ticket.channel }}</dd>
+          <dt>Contact</dt><dd>{{ ticket.external_user_id }}</dd>
+          <dt>Email</dt><dd>{{ ticket.email or "-" }}</dd>
+          <dt>Account ID</dt><dd>{{ ticket.account_id or "-" }}</dd>
+          <dt>Trip ID</dt><dd>{{ ticket.trip_id or "-" }}</dd>
+        </dl>
+      </section>
+      <section>
+        <h2>Description</h2>
+        <p class="description">{{ ticket.description }}</p>
+      </section>
+    </main>
+  </body>
+</html>
+
