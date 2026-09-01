@@ -1,16 +1,23 @@
 # DUDU Car AI Customer Service Chatbot
 
-Beginner-friendly MVP for a secure customer-support chatbot for DUDU Car riders and drivers.
+MVP foundation for a secure, WhatsApp-first informational support chatbot for DUDU Car riders,
+drivers, and organizations interested in business collaboration.
 
-The project is built around the requirements interview:
+The approved project direction is:
 
-- WhatsApp + Instagram first.
-- English, Bahasa Malaysia, and simplified Chinese.
-- FAQ deflection as the main success metric.
-- Complaint handling through structured ticket creation.
-- Safety and high-risk issues routed to urgent/high-priority support tickets.
-- Local/on-prem open-source LLM path through Ollama.
-- PostgreSQL, Docker Compose, and a simple protected admin inbox.
+- WhatsApp is the only public launch channel; Instagram is a future option.
+- English, Bahasa Malaysia, and Simplified Chinese.
+- FAQ deflection and accurate, approved information as the main success goals.
+- Consent-first complaint, safety, human-escalation, and partnership ticket intake.
+- A purely informational bot: no refunds, cancellations, account changes, approvals, payments, or
+  other business-state changes.
+- Hosted LLM APIs, with GLM-5.3-Flash as the primary candidate and GPT-5.6 Luna as the
+  production-safe fallback.
+- PostgreSQL, Docker Compose, secure media storage, and multiple named administrator accounts in
+  the launch target.
+
+The complete, authoritative baseline is
+[`docs/requirements-summary.md`](docs/requirements-summary.md).
 
 ## What Works In This MVP
 
@@ -21,8 +28,23 @@ The project is built around the requirements interview:
 - Prompt-injection attempts and account-changing requests are refused.
 - Sensitive uploads and risky secrets are rejected or redacted.
 - `POST /api/knowledge/documents` ingests approved FAQ/policy chunks.
-- `/webhooks/meta` verifies and receives WhatsApp/Instagram-style webhook payloads.
-- `/admin` shows a simple ticket inbox after password + 2FA login.
+- `/webhooks/meta` verifies and receives Meta-style webhook payloads; WhatsApp is the launch use.
+- `/admin` shows the current MVP ticket inbox after password + 2FA login.
+
+## Remaining Work Against The Approved Requirements
+
+The current code predates the consolidated requirements. Before launch it still needs:
+
+- Hosted GLM-5.3-Flash and GPT-5.6 Luna adapters with configurable failover; the existing Ollama
+  adapter is legacy MVP code and is not the production direction.
+- Explicit natural-language human-escalation detection.
+- Required name and email collection, ticket-specific response targets, and human-hours wording.
+- Real image/video upload, scanning, storage, and ticket retrieval rather than attachment metadata
+  alone.
+- Multiple-admin provisioning, individual administrator 2FA, and CCO-attributed knowledge
+  governance.
+- Automated deletion or anonymization after 90 days for chats and 24 months for tickets and
+  ticket attachments.
 
 ## Quick Start With Docker
 
@@ -86,31 +108,21 @@ curl -X POST http://localhost:8000/api/chat \
   }'
 ```
 
-## Local LLM
+## Hosted LLM Direction
 
-The app has an Ollama adapter but `LLM_ENABLED=false` by default. This lets the rest of the
-support system work even before the GPU server is ready.
+Production will use hosted API models through a provider-neutral adapter:
 
-When Ollama and a model are available, update `.env`:
+1. GLM-5.3-Flash as the primary candidate.
+2. GPT-5.6 Luna as the production-safe fallback.
+3. DeepSeek V4 Flash retained only as an evaluated alternative.
 
-```env
-LLM_ENABLED=true
-OLLAMA_BASE_URL=http://ollama:11434
-OLLAMA_MODEL=qwen2.5:7b-instruct
-```
-
-Then start the optional Ollama service:
-
-```bash
-docker compose --profile llm up --build
-```
-
-For a 12-16GB VRAM server, start with a smaller quantized multilingual model and evaluate it
-against real anonymized support chats before exposing it to customers.
+The current repository has only a disabled Ollama-era adapter. It remains usable for isolated
+MVP development, but it is not the approved production architecture and must be replaced before
+launch. Do not enable it and assume that the hosted-model requirement is complete.
 
 ## Safety Gate
 
-Before any real customer or driver pilot, complete
+Before any real rider, driver, or business-partner pilot, complete
 [`docs/security-launch-checklist.md`](docs/security-launch-checklist.md).
 
 The current code is an MVP foundation, not a final production contact-center platform.
