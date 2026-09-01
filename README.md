@@ -35,8 +35,7 @@ The complete, authoritative baseline is
 
 The current code predates the consolidated requirements. Before launch it still needs:
 
-- Hosted GLM-5.3-Flash and GPT-5.6 Luna adapters with configurable failover; the existing Ollama
-  adapter is legacy MVP code and is not the production direction.
+- Hosted GLM-5.3-Flash and GPT-5.6 Luna adapters with configurable failover.
 - Explicit natural-language human-escalation detection.
 - Required name and email collection, ticket-specific response targets, and human-hours wording.
 - Real image/video upload, scanning, storage, and ticket retrieval rather than attachment metadata
@@ -116,9 +115,10 @@ Production will use hosted API models through a provider-neutral adapter:
 2. GPT-5.6 Luna as the production-safe fallback.
 3. DeepSeek V4 Flash retained only as an evaluated alternative.
 
-The current repository has only a disabled Ollama-era adapter. It remains usable for isolated
-MVP development, but it is not the approved production architecture and must be replaced before
-launch. Do not enable it and assume that the hosted-model requirement is complete.
+The hosted provider adapter has not yet been implemented. Until it is available, the application
+uses a deterministic response path grounded in approved retrieved knowledge. Do not assume that
+the hosted-model requirement is complete until the primary/fallback integration and evaluation
+have passed.
 
 ## Safety Gate
 

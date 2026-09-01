@@ -3,9 +3,9 @@
 Last updated: 2 September 2026
 
 This document is the authoritative requirements baseline for the project. It consolidates the
-requirements review and supersedes earlier assumptions about an Instagram launch, a locally
-hosted Ollama model, a single administrator, network/VPN-restricted administration, and
-unconfirmed support or retention periods.
+requirements review and supersedes earlier assumptions about an Instagram launch, a single
+administrator, network/VPN-restricted administration, and unconfirmed support or retention
+periods.
 
 ## R1 — Purpose and Audiences
 
@@ -90,8 +90,7 @@ unconfirmed support or retention periods.
 
 ## R8 — Hosted LLM Direction
 
-- Replace the production preference for a locally hosted open-source model through Ollama with
-  hosted LLM API calls.
+- Use hosted LLM API calls for production.
 - Primary candidate: **GLM-5.3-Flash**, selected for its current intelligence-to-cost ratio and
   native text, image, video, and file inputs.
 - Production-safe fallback: **GPT-5.6 Luna**, selected for its speed, concise responses,

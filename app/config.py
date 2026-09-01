@@ -16,11 +16,6 @@ class Settings(BaseSettings):
     admin_totp_secret: str = ""
     admin_api_key: str = "dev-admin-api-key"
 
-    llm_provider: str = "ollama"
-    llm_enabled: bool = False
-    ollama_base_url: str = "http://localhost:11434"
-    ollama_model: str = "qwen2.5:7b-instruct"
-
     meta_verify_token: str = "dev-verify-token"
     meta_app_secret: str = ""
     meta_send_enabled: bool = False
@@ -47,4 +42,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

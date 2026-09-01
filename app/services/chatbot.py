@@ -5,7 +5,7 @@ from app.models import AuditLog, Conversation, Message
 from app.schemas import ChatRequest, ChatResponse
 from app.services.guardrails import assess_message, is_account_action_request
 from app.services.language import detect_language
-from app.services.llm import LLMClient, localized_unsure
+from app.services.answer_generation import ApprovedKnowledgeResponder, localized_unsure
 from app.services.pii import redact_sensitive
 from app.services.rate_limit import rate_limiter
 from app.services.retrieval import search_knowledge
@@ -14,7 +14,7 @@ from app.services.tickets import create_ticket, to_ticket_response
 
 class ChatbotService:
     def __init__(self) -> None:
-        self.llm = LLMClient()
+        self.answer_generator = ApprovedKnowledgeResponder()
 
     def handle(self, db: Session, request: ChatRequest, ip_address: str | None = None) -> ChatResponse:
         settings = get_settings()
@@ -106,9 +106,9 @@ class ChatbotService:
             db.commit()
             return response
 
-        llm_result = self.llm.generate_support_answer(redaction.text, language, retrieval.chunks)
+        answer = self.answer_generator.generate(language, retrieval.chunks)
         response = ChatResponse(
-            answer=llm_result.text,
+            answer=answer,
             language=language,
             confidence=retrieval.confidence,
             safety_flags=assessment.flags,
@@ -240,4 +240,3 @@ class ChatbotService:
 
 
 chatbot_service = ChatbotService()
-
