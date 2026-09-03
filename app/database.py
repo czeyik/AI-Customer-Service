@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import get_settings
-from app.models import AdminUser, Base
+from app.models import AdminUser
 
 settings = get_settings()
 
@@ -17,7 +17,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def init_db() -> None:
-    Base.metadata.create_all(bind=engine)
     with SessionLocal() as db:
         ensure_admin_user(db)
 
@@ -43,4 +42,3 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
-

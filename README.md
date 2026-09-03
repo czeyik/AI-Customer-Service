@@ -47,6 +47,9 @@ The current code predates the consolidated requirements. Before launch it still 
 
 ## Quick Start With Docker
 
+`docker-compose.yml` is development-only. Production deployment is intentionally separate and
+will promote a tested image digest and migration set through the release workflow.
+
 1. Create your local environment file:
 
    ```bash
@@ -75,6 +78,26 @@ The current code predates the consolidated requirements. Before launch it still 
 
 In development, if `ADMIN_TOTP_SECRET` is empty, the fallback 2FA code is `000000`.
 Do not use that fallback for real customer data.
+
+## Reproducible Checks And Migrations
+
+Python 3.11 is the supported runtime. `requirements.in` contains the direct dependencies and
+`requirements.txt` is the generated, hash-locked install set. Install and verify it with:
+
+```bash
+python -m pip install --require-hashes -r requirements.txt
+python -m pip check
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
+```
+
+Schema changes use Alembic. Apply all migrations before starting the application:
+
+```bash
+alembic upgrade head
+```
+
+The application does not create tables at startup. After changing SQLAlchemy models, add a
+migration and run `alembic check` against an up-to-date database before opening a pull request.
 
 ## Try The Chat API
 
