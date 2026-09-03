@@ -45,7 +45,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 
 | Wave | Gate | Focus | Status |
 | ---: | --- | --- | --- |
-| 1 | PG-01 | Approved launch contract and architecture | NOT_STARTED |
+| 1 | PG-01 | Approved launch contract and architecture | PASS |
 | 2 | PG-02 | Reproducible build, migrations, and CI | NOT_STARTED |
 | 3 | PG-03 | Stateful multilingual ticket flow | NOT_STARTED |
 | 4 | PG-04 | Reliable WhatsApp send/receive path | NOT_STARTED |
@@ -67,9 +67,9 @@ or commit them; provision secrets directly in the chosen secret manager.
 
 | Input | Required decision or information | Status | Waves |
 | --- | --- | --- | --- |
-| OI-01 | Pilot date, region, cohort, traffic/volume limits, duration, budget, success measures, rollback triggers, and go/no-go owner | UNRESOLVED | 1, 11, 12 |
+| OI-01 | Pilot date, region, cohort, traffic/volume limits, duration, budget, success measures, rollback triggers, and go/no-go owner | RESOLVED | 1, 11, 12 |
 | OI-02 | Hosting/staging platform, cloud region, domain/DNS, data residency, Git/CI/registry workflow, and resource/release owners | UNRESOLVED | 1, 2, 11 |
-| OI-03 | Human support workflow, assignees, ticket statuses/notifications, escalation contacts, admin roster, CCO identity, and recovery approver | UNRESOLVED | 1, 3, 6, 7 |
+| OI-03 | Human support workflow, assignees, ticket statuses/notifications, escalation contacts, admin roster, CCO identity, and recovery approver | RESOLVED | 1, 3, 6, 7 |
 | OI-04 | Meta Business/WABA/app/phone readiness, API version, opt-in approval, test recipients, and secure credential provisioning | UNRESOLVED | 4, 12 |
 | OI-05 | GLM/OpenAI accounts, exact enabled model IDs, data terms, regions, quotas, timeouts, availability needs, spend limits, and fallback approval | UNRESOLVED | 5, 12 |
 | OI-06 | CCO-approved knowledge and customer copy in all three languages, including bot disclosure, emergency, consent, partnership, and WhatsApp profile text | UNRESOLVED | 3, 7, 12 |
@@ -264,7 +264,40 @@ Gate update and residual risks:
 Next-wave notes:
 ```
 
-No handoffs recorded.
+### Wave 1 — 2026-09-04
+Status: PASS
+Owner decisions: Target 15 September 2026 for a 15-day invitation-only pilot in Kuala Lumpur and
+Selangor, representing Malay, Chinese, and Indian communities; Cze Yik is launch, go/no-go,
+production, infrastructure, release, recovery, privacy, security, incident, and risk owner. AWS
+Malaysia is the hosting region and GitHub is the existing Git host. Jane is support lead and CCO;
+Cze Yik and Jane are administrators and escalation contacts. Cze Yik requested recommendations
+for traffic, budget, success/rollback thresholds, ticket states, notifications, CI, registry, and
+production architecture. Those recommendations are recorded in `docs/launch-contract.md`. Cze Yik
+approved the USD 30 Lightsail architecture and its USD 70 total external-service ceiling on 4
+September 2026, then approved simplifying tickets to `open` → `in_progress` → `closed`. After the
+requested concise revision, Cze Yik accepted the combined contract and directed Wave 1 to proceed.
+Files/migrations and commit/PR/release: Added `docs/launch-contract.md`; updated this tracker. No
+migration, commit, PR, release, infrastructure change, billable resource, or live traffic.
+Verification commands/results: `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ./.venv/bin/pytest -q` passed 9
+tests in 5.70s; `./.venv/bin/pytest -q -p no:cacheprovider` passed 9 tests in 5.51s;
+`git diff --check` and launch-contract structure/content checks passed. Normal shell `pytest` was
+not on `PATH`; the repository virtual environment was used directly. After final owner revisions,
+the approval/status/required-section assertions and `git diff --check` passed, and the same 9 tests
+passed in 5.90s.
+External evidence (no secrets or customer data): On 4 September 2026, official AWS documentation
+confirmed `ap-southeast-5` is the opt-in Malaysia Region with three Availability Zones and that a
+4 GB Lightsail Linux instance with public IPv4 is USD 24/month, billed hourly. The official
+WhatsApp Business Platform pricing page confirmed per-delivered-message pricing and no charge for
+service messages inside the user-opened 24-hour service window. Exact URLs and review date are
+recorded in `docs/launch-contract.md`.
+Gate update and residual risks: PG-01 is `PASS`. The approved contract records testable scope,
+success and rollback thresholds, support workflow, component/data/release architecture, data
+classification, change rules, and owners for unresolved dependencies. OI-01 and OI-03 are
+`RESOLVED`. OI-02 remains open only for the final domain; Cze Yik owns it for Wave 11 and it does
+not block Wave 2. Later-wave OI-08 decisions remain open. The accepted single-host availability
+limit and upgrade path are explicit. Real customer traffic remains disabled.
+Next-wave notes: Wave 2 is unblocked. Use GitHub Actions, Amazon ECR, PostgreSQL migrations, and the
+approved Lightsail release target; do not provision or deploy production resources in Wave 2.
 
 ## Fresh-Chat Prompt
 
