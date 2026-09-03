@@ -46,7 +46,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | Wave | Gate | Focus | Status |
 | ---: | --- | --- | --- |
 | 1 | PG-01 | Approved launch contract and architecture | PASS |
-| 2 | PG-02 | Reproducible build, migrations, and CI | NOT_STARTED |
+| 2 | PG-02 | Reproducible build, migrations, and CI | PASS |
 | 3 | PG-03 | Stateful multilingual ticket flow | NOT_STARTED |
 | 4 | PG-04 | Reliable WhatsApp send/receive path | NOT_STARTED |
 | 5 | PG-05 | Grounded hosted LLM and failover | NOT_STARTED |
@@ -298,6 +298,45 @@ not block Wave 2. Later-wave OI-08 decisions remain open. The accepted single-ho
 limit and upgrade path are explicit. Real customer traffic remains disabled.
 Next-wave notes: Wave 2 is unblocked. Use GitHub Actions, Amazon ECR, PostgreSQL migrations, and the
 approved Lightsail release target; do not provision or deploy production resources in Wave 2.
+
+### Wave 2 — 2026-09-04
+Status: PASS
+Owner decisions: Wave 1 selected Python 3.11, GitHub Actions, Amazon ECR, PostgreSQL, and the
+approved Lightsail release target. The remaining domain decision belongs to Wave 11 and does not
+block this wave. Authorization to commit/push, open a pull request, and configure required branch
+checks was requested after three consecutive goal turns and authorized by Cze Yik on 4 September
+2026.
+Files/migrations and commit/PR/release: Added the Python version contract, direct dependency input
+and hash-locked transitive requirements, Alembic configuration and initial migration
+`f371a5ab9b0b`, production configuration validation and tests, development Compose migration
+startup, a digest-pinned application image build, Docker-context exclusions, GitHub Actions CI,
+and delivery documentation. Removed application-startup `create_all`; migrations now own schema
+creation. Commits `20cefd7` and `9dd52a5` are on branch `wave-2-delivery-foundation` in pull request
+[#1](https://github.com/czeyik/AI-Customer-Service/pull/1) against `dev`. The completed Wave 1 commit
+was synchronized to `origin/dev`. No merge, ECR publication, release, infrastructure change,
+billable resource, or live traffic occurred.
+Verification commands/results: A clean Python 3.11 image installed `requirements.txt` with
+`--require-hashes`, passed `pip check`, and passed 20 isolated tests. The image built successfully
+as `dudu-support:wave2-check`; `.env` was absent from it. Against an isolated empty PostgreSQL 16
+container, the image ran `alembic upgrade head`, reported no model/schema drift from
+`alembic check`, created eight public tables including `alembic_version`, and initialized one
+development admin after migration. `docker compose config --quiet`, `git diff --check`, and
+Actionlint 1.7.12 passed. The temporary database container/network were removed after verification.
+GitHub Actions run
+[33787943728](https://github.com/czeyik/AI-Customer-Service/actions/runs/33787943728) then passed the
+clean Python 3.11 install, dependency integrity, zero-to-head PostgreSQL migration and schema-drift
+check, 20 isolated tests, and application-image build in 45 seconds.
+External evidence (no secrets or customer data): GitHub Actions is enabled. Pull request #1 has the
+successful `test` check from the `github-actions` app on commit `9dd52a5`. Strict `test` status-check
+protection is enabled and enforced for administrators on both `dev` and `main`. The first hosted
+run also passed; its Node.js 20 deprecation annotation was eliminated by updating to
+`actions/checkout@v5` and `actions/setup-python@v6` before the final green run.
+Gate update and residual risks: PG-02 is `PASS`. The supported clean environment and fresh
+PostgreSQL migration are green in hosted CI, dependencies and the base image are integrity-pinned,
+unsafe production defaults fail closed, and development Compose remains separate from production
+deployment. Pull request #1 remains open for owner review; nothing was merged or released.
+Next-wave notes: Wave 3 is unblocked after pull request #1 is reviewed and integrated. Start from
+the integrated Wave 2 migration head and do not restore application-startup schema creation.
 
 ## Fresh-Chat Prompt
 
