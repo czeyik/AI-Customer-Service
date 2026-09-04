@@ -13,17 +13,19 @@ class ApprovedKnowledgeResponder:
         core = chunks[0].content.strip()
         if language == "ms":
             return (
-                "Berdasarkan maklumat sokongan DUDU Car yang diluluskan: "
-                f"{core}\n\nJika ini tidak menjawab soalan anda, saya boleh bantu buat tiket sokongan."
+                "Ini yang saya temui dalam maklumat sokongan DUDU Car yang diluluskan: "
+                f"{core}\n\nSaya harap ini membantu. Jika belum menjawab soalan anda, "
+                "saya boleh bantu membuat tiket sokongan."
             )
         if language == "zh":
             return (
-                "根据 DUDU Car 已批准的客服资料："
-                f"{core}\n\n如果这没有解决你的问题，我可以帮你创建客服工单。"
+                "这是我从 DUDU Car 已批准的客服资料中找到的信息："
+                f"{core}\n\n希望这能帮到你。如果仍未解决你的问题，我可以帮你创建客服工单。"
             )
         return (
-            "Based on DUDU Car's approved support information: "
-            f"{core}\n\nIf this does not answer your question, I can help create a support ticket."
+            "Here’s what I found in DUDU Car's approved support information: "
+            f"{core}\n\nI hope this helps. If it does not answer your question, "
+            "I can help create a support ticket."
         )
 
 

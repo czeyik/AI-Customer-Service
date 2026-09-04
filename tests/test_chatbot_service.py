@@ -77,7 +77,9 @@ def test_complaint_with_consent_creates_ticket(seeded_db: Session) -> None:
             user_role="rider",
             name="Demo Rider",
             email="demo@example.com",
+            phone_number="+60182935060",
             account_id="DUDU123",
+            ride_details="Trip DUDU123 on 4 September",
             consent_to_ticket=True,
         ),
     )
@@ -86,4 +88,3 @@ def test_complaint_with_consent_creates_ticket(seeded_db: Session) -> None:
     assert response.ticket.public_id.startswith("DUDU-")
     assert response.ticket.issue_type == "complaint"
     assert response.ticket.urgency == "normal"
-

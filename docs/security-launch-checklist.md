@@ -16,8 +16,8 @@ Do not use the system with real customers until these items are complete.
 - Confirm that names, email addresses, ticket records, and attachments remain in DUDU-controlled
   storage unless a specific approved model task requires them.
 - Implement and test automatic chat deletion or anonymization at 90 days.
-- Implement and test ticket and attachment deletion or anonymization at 24 months, including
-  indexes and applicable backups.
+- Implement and test ticket and attachment deletion or anonymization 36 months after ticket
+  closure, including indexes and applicable backups.
 - Confirm the system redacts payment cards, passwords, OTPs, API keys, and identity numbers before storage.
 - Confirm the bot refuses account-changing actions.
 - Confirm the bot accepts launch image/video types, enforces size limits, scans files, stores them
@@ -25,7 +25,9 @@ Do not use the system with real customers until these items are complete.
 - Run prompt-injection tests against the chat endpoint.
 - Test rider, driver, business-partner, safety, fraud, payment, account, complaint, explicit human
   escalation, and normal FAQ scenarios in all launch languages.
-- Confirm tickets cannot be created until consent, name, and email have been collected.
+- Confirm tickets cannot be created until consent, name, email, WhatsApp contact number, and a
+  brief issue description have been collected; collect ride details and supporting evidence only
+  where applicable.
 - Confirm ticket acknowledgements state the correct first-response target: normal 3–5 days, high
   1–3 days, and urgent within 24 hours.
 - Confirm customer wording states human coverage as 9:00 AM–6:00 PM every day in Malaysia time and

@@ -4,7 +4,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, EmailStr, Field
 
 Channel = Literal["web", "whatsapp", "instagram", "admin_test"]
-UserRole = Literal["rider", "driver", "unknown"]
+UserRole = Literal["rider", "driver", "business_partner", "unknown"]
+LaunchLanguage = Literal["en", "ms", "zh"]
 
 
 class AttachmentPayload(BaseModel):
@@ -19,11 +20,15 @@ class ChatRequest(BaseModel):
     external_user_id: str = Field(..., min_length=1, max_length=255)
     text: str = Field(..., min_length=1, max_length=4000)
     user_role: UserRole = "unknown"
-    preferred_language: str | None = Field(default=None, max_length=12)
+    preferred_language: LaunchLanguage | None = None
     name: str | None = Field(default=None, max_length=255)
     email: EmailStr | None = None
+    phone_number: str | None = Field(
+        default=None, max_length=32, pattern=r"^[+\d][\d ()-]{7,24}$"
+    )
     account_id: str | None = Field(default=None, max_length=255)
     trip_id: str | None = Field(default=None, max_length=120)
+    ride_details: str | None = Field(default=None, max_length=2000)
     consent_to_ticket: bool = False
     create_ticket: bool = False
     attachments: list[AttachmentPayload] = Field(default_factory=list, max_length=5)
@@ -69,4 +74,3 @@ class MetaWebhookResult(BaseModel):
     ok: bool
     processed: int
     responses: list[dict[str, Any]] = Field(default_factory=list)
-

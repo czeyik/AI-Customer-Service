@@ -47,7 +47,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | ---: | --- | --- | --- |
 | 1 | PG-01 | Approved launch contract and architecture | PASS |
 | 2 | PG-02 | Reproducible build, migrations, and CI | PASS |
-| 3 | PG-03 | Stateful multilingual ticket flow | NOT_STARTED |
+| 3 | PG-03 | Stateful multilingual ticket flow | PASS |
 | 4 | PG-04 | Reliable WhatsApp send/receive path | NOT_STARTED |
 | 5 | PG-05 | Grounded hosted LLM and failover | NOT_STARTED |
 | 6 | PG-06 | Named admins and ticket operations | NOT_STARTED |
@@ -217,7 +217,7 @@ maps to repeatable evidence.
 
 Inputs: OI-07, OI-08.
 
-- Finalize the data inventory and implement idempotent 90-day chat and 24-month ticket/media
+- Finalize the data inventory and implement idempotent 90-day chat and 36-month ticket/media
   lifecycle jobs across databases, objects, indexes, logs where applicable, and backup handling.
 - Add narrow audited legal holds, dry runs, time-controlled tests, failure alerts, and runbooks.
 
@@ -337,6 +337,55 @@ unsafe production defaults fail closed, and development Compose remains separate
 deployment. Pull request #1 remains open for owner review; nothing was merged or released.
 Next-wave notes: Wave 3 is unblocked after pull request #1 is reviewed and integrated. Start from
 the integrated Wave 2 migration head and do not restore application-startup schema creation.
+
+### Wave 3 — 2026-09-04
+Status: PASS
+Owner decisions: Cze Yik supplied `https://duducar.co/privacy-notice` and asked for concise
+English, Bahasa Malaysia, and Simplified Chinese customer copy plus chatbot-specific Privacy
+Notice additions. On 5 September, Cze Yik required the ticket flow to collect a WhatsApp contact
+number, a brief issue description, relevant ride details, and optional supporting evidence, and
+confirmed `support@duducar.co` as the privacy contact. Cze Yik also approved permanent
+ticket/attachment deletion 36 months after ticket closure and instructed that all authoritative
+sources be amended. Jane approved the original trilingual customer copy on 5 September. Cze Yik
+then requested warmer, kinder, more caring, friendly, and appropriately cheerful wording across
+all candidates. Jane approved the revised situation-adaptive trilingual wording and tone policy
+on 5 September, resolving the Wave 3 portion of OI-06. The Wave 3 privacy portion of OI-08 is
+resolved; later-wave knowledge, provider, legal-hold, backup, and operational decisions remain
+`UNRESOLVED` in the global input tracker.
+Files/migrations and commit/PR/release: Added persistent conversation intake state, mandatory
+ticket contact/consent constraints, normalized WhatsApp contact capture, brief-description and
+ride-detail collection, optional evidence metadata, stateful trilingual ticket intake, explicit
+human and partnership routing, localized safety/complaint/uncertainty/prohibited-action behaviour,
+an approved warm, kind, concise, supportive automated-assistant voice, priority and support-hours
+acknowledgements, natural-language language switching, transaction rollback, and migration
+`bd20fbc9188d`. Added `docs/wave-3-customer-copy.md`,
+`docs/privacy-notice-chatbot-addendum.md`, and focused service/API tests. Changes remain uncommitted
+on `dev`; no commit, push, PR, merge, release, external configuration, billable action, or live
+traffic occurred.
+Verification commands/results: Before the 5 September intake additions,
+`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ./.venv/bin/pytest -q` passed 62 tests in 9.94s. The
+digest-pinned Python 3.11 application image built as `dudu-support:wave3-check`; after those
+additions and the warmer, appropriately cheerful personality revision, its clean locked
+environment passed all 64 tests in 9.61s and `python -m pip check`
+reported no broken requirements. From that image, a fresh
+PostgreSQL 16 database migrated from zero to `bd20fbc9188d (head)` and `alembic check` reported
+`No new upgrade operations detected.` `git diff --check` passed. Temporary test containers and
+network were removed.
+External evidence (no secrets or customer data): The live DUDU Car Privacy Notice was reviewed on
+4 September 2026. The Malaysian Personal Data Protection Commissioner's official quick guide
+states that a privacy notice must be available in the national and English languages; its
+Personal Data Protection Standard requires permanent deletion when data is no longer needed. The
+official Malaysia government portal confirms 999 as the national emergency line. Exact URLs and
+the review date are recorded in the two Wave 3 draft documents.
+Gate update and residual risks: PG-03 is `PASS`. Technical tests prove that
+consent, name, valid email, normalized WhatsApp contact, and a non-empty issue description cannot
+be bypassed; complete and interrupted intake persists; ride/evidence intake is recorded; and
+required launch behaviour is localized in all three languages. Jane's approval of the revised
+tone policy and wording, the privacy contact, and the 90-day/36-month retention decisions are
+recorded. Actual media storage and scanning remain Wave 8 work. Real customer traffic remains
+disabled.
+Next-wave notes: Wave 4 is unblocked but has not started. It requires OI-04 before WhatsApp
+transport work begins.
 
 ## Fresh-Chat Prompt
 

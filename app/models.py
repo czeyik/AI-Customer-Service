@@ -1,7 +1,18 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Index, Integer, JSON, String, Text
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    Column,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    JSON,
+    String,
+    Text,
+)
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -34,6 +45,8 @@ class Conversation(Base, TimestampMixin):
     preferred_language = Column(String(12), default="en", nullable=False)
     user_role = Column(String(40), nullable=True)
     risk_level = Column(String(40), default="normal", nullable=False)
+    intake_state = Column(String(40), default="idle", nullable=False)
+    intake_data = Column(JSON, default=dict, nullable=False)
 
     messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan")
 
@@ -65,17 +78,28 @@ class Ticket(Base, TimestampMixin):
     urgency = Column(String(40), default="normal", nullable=False, index=True)
     channel = Column(String(40), nullable=False, index=True)
     external_user_id = Column(String(255), nullable=False, index=True)
-    name = Column(String(255), nullable=True)
-    email = Column(String(255), nullable=True)
+    name = Column(String(255), nullable=False)
+    email = Column(String(255), nullable=False)
+    phone_number = Column(String(32), nullable=False)
     account_id = Column(String(255), nullable=True)
     user_role = Column(String(40), nullable=True)
     issue_type = Column(String(80), nullable=False, index=True)
     language = Column(String(12), default="en", nullable=False)
     description = Column(Text, nullable=False)
     trip_id = Column(String(120), nullable=True)
+    ride_details = Column(Text, nullable=True)
     consent_given = Column(Boolean, default=False, nullable=False)
     attachment_count = Column(Integer, default=0, nullable=False)
     extra = Column(JSON, default=dict, nullable=False)
+
+    __table_args__ = (
+        CheckConstraint("consent_given = true", name="ck_tickets_consent_given"),
+        CheckConstraint("trim(name) <> ''", name="ck_tickets_name_required"),
+        CheckConstraint("trim(email) <> ''", name="ck_tickets_email_required"),
+        CheckConstraint("email LIKE '%_@_%._%'", name="ck_tickets_email_format"),
+        CheckConstraint("trim(phone_number) <> ''", name="ck_tickets_phone_required"),
+        CheckConstraint("trim(description) <> ''", name="ck_tickets_description_required"),
+    )
 
 
 class KnowledgeDocument(Base, TimestampMixin):
@@ -112,4 +136,3 @@ class AuditLog(Base, TimestampMixin):
     event_type = Column(String(120), nullable=False, index=True)
     ip_address = Column(String(80), nullable=True)
     details = Column(JSON, default=dict, nullable=False)
-

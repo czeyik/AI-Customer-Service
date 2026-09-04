@@ -1,6 +1,6 @@
 # DUDU Car AI Support Chatbot — Consolidated Requirements
 
-Last updated: 2 September 2026
+Last updated: 5 September 2026
 
 This document is the authoritative requirements baseline for the project. It consolidates the
 requirements review and supersedes earlier assumptions about an Instagram launch, a single
@@ -34,6 +34,9 @@ periods.
 ## R4 — Chatbot Behaviour and Human Escalation
 
 - Answer from knowledge approved by DUDU Car and use cautious, clearly qualified wording.
+- Use a polite, friendly, warm, kind, caring, concise, and emotionally supportive voice. Be
+  cheerful in routine interactions, empathetic for complaints, and calm and direct for safety
+  issues, without overstating emotions or implying a human identity.
 - Do not invent DUDU Car policies, prices, commitments, support availability, or account facts.
 - If an answer cannot be confirmed, say so and offer the ticket flow rather than guessing.
 - Acknowledge complaints empathetically and offer the appropriate ticket flow.
@@ -61,8 +64,11 @@ periods.
 ## R6 — Tickets, Response Targets, and Attachments
 
 - Obtain explicit consent before storing issue details in a support ticket.
-- Collect the user's name and email address before creating a ticket. Collect other identifiers,
-  such as trip or account ID, only when relevant and avoid unnecessary sensitive information.
+- Collect the user's name, email address, and WhatsApp contact number before creating a ticket.
+  On WhatsApp, the verified sender number may be used as the contact number. Collect a brief issue
+  description plus relevant ride details and supporting evidence where applicable. Collect other
+  identifiers, such as trip or account ID, only when relevant and avoid unnecessary sensitive
+  information.
 - Classify tickets as normal, high, or urgent and communicate the expected time to the first
   human response:
   - Normal: 3–5 days.
@@ -148,8 +154,8 @@ and launch.
 ## R11 — Retention
 
 - Retain chat messages for 90 days, then automatically delete or irreversibly anonymize them.
-- Retain tickets and their associated ticket attachments for 24 months, then delete or
-  irreversibly anonymize them according to the approved deletion procedure.
+- Retain tickets and their associated ticket attachments for 36 months after ticket closure,
+  then delete or irreversibly anonymize them according to the approved deletion procedure.
 - Retention jobs must cover primary storage, attachment storage, indexes, and applicable backups.
 - Legal holds or statutory requirements may override normal deletion only when documented and
   authorized.
@@ -172,7 +178,7 @@ and launch.
 - Ticket contact fields, priorities, response targets, coverage wording, and media attachments
   work end to end.
 - Multiple administrators and the CCO knowledge workflow are attributable and audited.
-- Automated retention jobs enforce the 90-day and 24-month periods.
+- Automated retention jobs enforce the 90-day and 36-month periods.
 - The hosted primary/fallback model configuration passes a representative DUDU evaluation before
   WhatsApp production traffic is enabled.
 

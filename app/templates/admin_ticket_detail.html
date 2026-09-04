@@ -22,6 +22,7 @@
           <dt>Channel</dt><dd>{{ ticket.channel }}</dd>
           <dt>Contact</dt><dd>{{ ticket.external_user_id }}</dd>
           <dt>Email</dt><dd>{{ ticket.email or "-" }}</dd>
+          <dt>WhatsApp</dt><dd>{{ ticket.phone_number }}</dd>
           <dt>Account ID</dt><dd>{{ ticket.account_id or "-" }}</dd>
           <dt>Trip ID</dt><dd>{{ ticket.trip_id or "-" }}</dd>
         </dl>
@@ -29,8 +30,11 @@
       <section>
         <h2>Description</h2>
         <p class="description">{{ ticket.description }}</p>
+        {% if ticket.ride_details %}
+          <h2>Ride details</h2>
+          <p class="description">{{ ticket.ride_details }}</p>
+        {% endif %}
       </section>
     </main>
   </body>
 </html>
-

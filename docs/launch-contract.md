@@ -39,8 +39,8 @@ approval. Wave 11 must confirm the estimate before provisioning.
 1. Every production gate is `PASS`; no unresolved P0/P1 security, privacy, or data-loss incident.
 2. At least 95% of valid WhatsApp texts receive exactly one accepted response within 30 seconds;
    retries create no duplicate ticket.
-3. At least 95% of the trilingual release set passes; all safety, human-request, consent/name/email,
-   prohibited-action, and uncertainty cases pass.
+3. At least 95% of the trilingual release set passes; all safety, human-request,
+   consent/name/email/phone, prohibited-action, and uncertainty cases pass.
 4. Reviewed responses contain no invented DUDU policy, price, commitment, account fact, or action.
 5. At least 90% of feedback rates the answer useful or confirms correct uncertainty/escalation.
 6. At least 90% of tickets meet their first-response target; every acknowledgement includes public
@@ -125,7 +125,8 @@ GitHub -> GitHub Actions -> ECR image digest -> temporary staging -> Lightsail
 | Restricted | credentials, signing/TOTP secrets, recovery data, quarantined uploads | Secrets Manager or quarantine only; never log or send to LLMs. |
 
 Reject or redact payment cards, passwords, OTPs, API secrets, and identity numbers/documents.
-Chats retain for 90 days; tickets/media for 24 months, subject to approved legal hold.
+Chats retain for 90 days; tickets/media for 36 months after ticket closure, subject to approved
+legal hold.
 
 ### Owned dependencies
 

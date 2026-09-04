@@ -1,15 +1,29 @@
+import re
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+from email_validator import EmailNotValidError, validate_email
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.models import AuditLog, Conversation, Message
 from app.schemas import ChatRequest, ChatResponse
-from app.services.guardrails import assess_message, is_account_action_request
-from app.services.language import detect_language
-from app.services.answer_generation import ApprovedKnowledgeResponder, localized_unsure
+from app.services.answer_generation import ApprovedKnowledgeResponder
+from app.services.guardrails import SafetyAssessment, assess_message, is_account_action_request
+from app.services.language import detect_language, selected_language
 from app.services.pii import redact_sensitive
 from app.services.rate_limit import rate_limiter
 from app.services.retrieval import search_knowledge
-from app.services.tickets import create_ticket, to_ticket_response
+from app.services.tickets import create_ticket, normalize_phone_number, to_ticket_response
+
+
+PRIVACY_NOTICE_URL = "https://duducar.co/privacy-notice"
+EMAIL_RE = re.compile(r"[^\s<>]+@[^\s<>]+")
+
+
+def human_support_is_open(now: datetime | None = None) -> bool:
+    local_now = now or datetime.now(ZoneInfo("Asia/Kuala_Lumpur"))
+    return 9 <= local_now.hour < 18
 
 
 class ChatbotService:
@@ -26,133 +40,321 @@ class ChatbotService:
                 safety_flags=["rate_limited"],
             )
 
-        language = request.preferred_language or detect_language(request.text)
-        request.preferred_language = language
-        redaction = redact_sensitive(request.text)
-        assessment = assess_message(redaction.text, request.attachments)
+        try:
+            conversation, is_new = self._get_or_create_conversation(db, request)
+            language = self._select_language(conversation, request)
+            request.preferred_language = language
+            conversation.preferred_language = language
+            if request.user_role != "unknown" or not conversation.user_role:
+                conversation.user_role = request.user_role
 
-        conversation = self._get_or_create_conversation(db, request, language)
-        db.add(
-            Message(
-                conversation_id=conversation.id,
-                direction="inbound",
-                content=redaction.text,
-                language=language,
-                safety_flags=assessment.flags + redaction.findings,
-                payload={
-                    "channel": request.channel,
-                    "ip_address": ip_address,
-                    "attachments": [attachment.model_dump() for attachment in request.attachments],
-                },
+            redaction = redact_sensitive(request.text)
+            assessment = assess_message(redaction.text, request.attachments)
+            if conversation.intake_state == "idle":
+                conversation.risk_level = assessment.urgency
+            db.add(
+                Message(
+                    conversation_id=conversation.id,
+                    direction="inbound",
+                    content=redaction.text,
+                    language=language,
+                    safety_flags=assessment.flags + redaction.findings,
+                    payload={
+                        "channel": request.channel,
+                        "ip_address": ip_address,
+                        "attachments": [item.model_dump() for item in request.attachments],
+                    },
+                )
             )
-        )
 
-        if "prompt_injection_attempt" in assessment.flags:
-            response = ChatResponse(
-                answer=self._localized_security_refusal(language),
-                language=language,
-                safety_flags=assessment.flags,
+            response = self._respond(
+                db, conversation, request, redaction.text, assessment, redaction.findings
             )
+            if is_new:
+                response.answer = f"{self._bot_identity(language)}\n\n{response.answer}"
             self._store_outbound(db, conversation.id, response)
             db.commit()
             return response
+        except Exception:
+            db.rollback()
+            raise
 
-        if "sensitive_attachment_rejected" in assessment.flags:
-            response = ChatResponse(
-                answer=self._localized_sensitive_attachment_refusal(language),
-                language=language,
-                safety_flags=assessment.flags,
-            )
-            self._store_outbound(db, conversation.id, response)
-            db.commit()
-            return response
-
-        if is_account_action_request(redaction.text):
-            response = ChatResponse(
-                answer=self._localized_no_account_actions(language),
-                language=language,
-                safety_flags=assessment.flags + ["account_action_blocked"],
-            )
-            self._store_outbound(db, conversation.id, response)
-            db.commit()
-            return response
-
-        wants_ticket = request.create_ticket or assessment.should_create_ticket
-        if wants_ticket:
-            response = self._handle_ticket_request(
-                db=db,
-                request=request,
-                description=redaction.text,
-                language=language,
-                issue_type=assessment.issue_type,
-                urgency=assessment.urgency,
-                safety_flags=assessment.flags + redaction.findings,
-            )
-            self._store_outbound(db, conversation.id, response)
-            db.commit()
-            return response
-
-        retrieval = search_knowledge(db, redaction.text, language)
-        if retrieval.confidence < settings.retrieval_min_confidence:
-            response = ChatResponse(
-                answer=localized_unsure(language),
-                language=language,
-                confidence=retrieval.confidence,
-                safety_flags=assessment.flags,
-                needs_ticket_consent=True,
-                sources=[chunk.source_title for chunk in retrieval.chunks],
-            )
-            self._store_outbound(db, conversation.id, response)
-            db.commit()
-            return response
-
-        answer = self.answer_generator.generate(language, retrieval.chunks)
-        response = ChatResponse(
-            answer=answer,
-            language=language,
-            confidence=retrieval.confidence,
-            safety_flags=assessment.flags,
-            sources=[chunk.source_title for chunk in retrieval.chunks],
-        )
-        self._store_outbound(db, conversation.id, response)
-        db.commit()
-        return response
-
-    def _handle_ticket_request(
+    def _respond(
         self,
         db: Session,
+        conversation: Conversation,
+        request: ChatRequest,
+        text: str,
+        assessment: SafetyAssessment,
+        redaction_findings: list[str],
+    ) -> ChatResponse:
+        language = request.preferred_language or "en"
+        flags = assessment.flags + redaction_findings
+
+        if "prompt_injection_attempt" in assessment.flags:
+            return ChatResponse(
+                answer=self._security_refusal(language), language=language, safety_flags=flags
+            )
+        if "sensitive_attachment_rejected" in assessment.flags:
+            return ChatResponse(
+                answer=self._sensitive_information_refusal(language),
+                language=language,
+                safety_flags=flags,
+            )
+
+        if conversation.intake_state != "idle":
+            return self._continue_intake(db, conversation, request, text, assessment, flags)
+
+        prohibited_action = is_account_action_request(text)
+        wants_ticket = request.create_ticket or assessment.should_create_ticket or prohibited_action
+        if wants_ticket:
+            issue_type = assessment.issue_type
+            if prohibited_action and issue_type == "general_faq":
+                issue_type = "prohibited_action_request"
+            return self._start_intake(
+                db,
+                conversation,
+                request,
+                text,
+                issue_type,
+                assessment.urgency,
+                flags + (["account_action_blocked"] if prohibited_action else []),
+                prohibited_action,
+            )
+
+        retrieval = search_knowledge(db, text, language)
+        if retrieval.confidence < get_settings().retrieval_min_confidence:
+            return self._start_intake(
+                db,
+                conversation,
+                request,
+                text,
+                "unconfirmed_question",
+                "normal",
+                flags,
+                False,
+                lead=self._unconfirmed(language),
+            )
+
+        return ChatResponse(
+            answer=self.answer_generator.generate(language, retrieval.chunks),
+            language=language,
+            confidence=retrieval.confidence,
+            safety_flags=flags,
+            sources=[chunk.source_title for chunk in retrieval.chunks],
+        )
+
+    def _start_intake(
+        self,
+        db: Session,
+        conversation: Conversation,
         request: ChatRequest,
         description: str,
-        language: str,
         issue_type: str,
         urgency: str,
-        safety_flags: list[str],
+        flags: list[str],
+        prohibited_action: bool,
+        lead: str | None = None,
     ) -> ChatResponse:
-        if not request.consent_to_ticket:
-            return ChatResponse(
-                answer=self._localized_consent_request(language, urgency),
-                language=language,
-                safety_flags=safety_flags,
-                needs_ticket_consent=True,
+        data = {
+            "description": description,
+            "issue_type": issue_type,
+            "urgency": urgency,
+            "safety_flags": flags,
+            "account_id": request.account_id,
+            "trip_id": request.trip_id,
+            "ride_details": None,
+            "ride_details_collected": issue_type == "partnership",
+            "evidence": [item.model_dump(mode="json") for item in request.attachments],
+            "attachment_count": len(request.attachments),
+        }
+        if issue_type == "partnership" and conversation.user_role == "unknown":
+            conversation.user_role = "business_partner"
+        conversation.risk_level = urgency
+        if request.consent_to_ticket:
+            data["consent"] = True
+            self._capture_supplied(data, request, include_attachments=False)
+            next_state = self._next_intake_state(data)
+            if next_state is None:
+                return self._create_ticket(db, conversation, request, data)
+            conversation.intake_state = next_state
+        else:
+            conversation.intake_state = "awaiting_consent"
+        data["lead_shown"] = True
+        conversation.intake_data = data
+
+        prefix = lead or self._intake_lead(
+            request.preferred_language or "en", issue_type, prohibited_action
+        )
+        prompt = self._state_prompt(request.preferred_language or "en", conversation.intake_state)
+        return ChatResponse(
+            answer=f"{prefix}\n\n{prompt}",
+            language=request.preferred_language or "en",
+            safety_flags=flags,
+            needs_ticket_consent=conversation.intake_state == "awaiting_consent",
+        )
+
+    def _continue_intake(
+        self,
+        db: Session,
+        conversation: Conversation,
+        request: ChatRequest,
+        text: str,
+        assessment: SafetyAssessment,
+        flags: list[str],
+    ) -> ChatResponse:
+        language = request.preferred_language or "en"
+        data = dict(conversation.intake_data or {})
+        if self._is_cancel(text, language) or self._consent_answer(text, language) is False:
+            conversation.intake_state = "idle"
+            conversation.intake_data = {}
+            return ChatResponse(answer=self._ticket_declined(language), language=language)
+
+        if assessment.is_safety_critical and data.get("urgency") != "urgent":
+            data.update(
+                description=f"{data.get('description', '')}\n{text}".strip(),
+                issue_type="safety_incident",
+                urgency="urgent",
+                safety_flags=sorted(set(data.get("safety_flags", []) + flags)),
             )
-        ticket = create_ticket(db, request, description, issue_type, urgency, safety_flags)
+            conversation.intake_data = data
+            conversation.risk_level = "urgent"
+            return ChatResponse(
+                answer=(
+                    f"{self._immediate_safety(language)}\n\n"
+                    f"{self._state_prompt(language, conversation.intake_state)}"
+                ),
+                language=language,
+                safety_flags=data["safety_flags"],
+                needs_ticket_consent=conversation.intake_state == "awaiting_consent",
+            )
+
+        if conversation.intake_state == "awaiting_consent":
+            consent = request.consent_to_ticket or self._consent_answer(text, language)
+            if consent is False:
+                conversation.intake_state = "idle"
+                conversation.intake_data = {}
+                return ChatResponse(answer=self._ticket_declined(language), language=language)
+            if consent is not True:
+                return ChatResponse(
+                    answer=self._state_prompt(language, "awaiting_consent"),
+                    language=language,
+                    needs_ticket_consent=True,
+                )
+            data["consent"] = True
+            self._capture_supplied(data, request)
+
+        elif conversation.intake_state == "awaiting_name":
+            name = (request.name or text).strip()
+            if not name or "@" in name or len(name) > 255:
+                return ChatResponse(
+                    answer=self._state_prompt(language, "awaiting_name"), language=language
+                )
+            data["name"] = name
+            self._capture_supplied(data, request)
+
+        elif conversation.intake_state == "awaiting_email":
+            candidate = str(request.email) if request.email else self._extract_email(text)
+            if not candidate:
+                conversation.intake_data = data
+                return ChatResponse(
+                    answer=self._state_prompt(language, "awaiting_email"), language=language
+                )
+            data["email"] = candidate
+            self._capture_supplied(data, request)
+
+        elif conversation.intake_state == "awaiting_phone":
+            candidate = normalize_phone_number(request.phone_number or text)
+            if not candidate:
+                conversation.intake_data = data
+                return ChatResponse(
+                    answer=self._state_prompt(language, "awaiting_phone"), language=language
+                )
+            data["phone_number"] = candidate
+            self._capture_supplied(data, request)
+
+        elif conversation.intake_state == "awaiting_ride_details":
+            self._capture_supplied(data, request)
+            if not data.get("ride_details_collected"):
+                data["ride_details"] = None if self._is_skip(text, language) else text.strip()
+                data["ride_details_collected"] = True
+
+        next_state = self._next_intake_state(data)
+        if next_state is None:
+            conversation.intake_data = data
+            return self._create_ticket(db, conversation, request, data)
+
+        conversation.intake_state = next_state
+        conversation.intake_data = data
+        return ChatResponse(
+            answer=self._state_prompt(language, next_state), language=language
+        )
+
+    def _create_ticket(
+        self,
+        db: Session,
+        conversation: Conversation,
+        request: ChatRequest,
+        data: dict,
+    ) -> ChatResponse:
+        ticket_request = ChatRequest(
+            channel=request.channel,
+            external_user_id=request.external_user_id,
+            text=data["description"],
+            user_role=conversation.user_role or "unknown",
+            preferred_language=conversation.preferred_language,
+            name=data["name"],
+            email=data["email"],
+            phone_number=data["phone_number"],
+            account_id=data.get("account_id"),
+            trip_id=data.get("trip_id"),
+            ride_details=data.get("ride_details"),
+            consent_to_ticket=True,
+        )
+        ticket = create_ticket(
+            db,
+            ticket_request,
+            data["description"],
+            data["issue_type"],
+            data["urgency"],
+            data.get("safety_flags", []),
+        )
+        ticket.attachment_count = data.get("attachment_count", 0)
+        ticket.extra = {
+            **(ticket.extra or {}),
+            "supporting_evidence": data.get("evidence", []),
+        }
         db.add(
             AuditLog(
                 actor=f"{request.channel}:{request.external_user_id}",
                 event_type="ticket_created",
-                details={"ticket": ticket.public_id, "urgency": urgency, "issue_type": issue_type},
+                details={
+                    "ticket": ticket.public_id,
+                    "urgency": ticket.urgency,
+                    "issue_type": ticket.issue_type,
+                },
             )
         )
+        conversation.intake_state = "idle"
+        conversation.intake_data = {}
+        answer = self._ticket_created(
+            conversation.preferred_language, ticket.public_id, ticket.urgency
+        )
+        if not data.get("lead_shown"):
+            answer = (
+                f"{self._intake_lead(conversation.preferred_language, ticket.issue_type, 'account_action_blocked' in data.get('safety_flags', []))}"
+                f"\n\n{answer}"
+            )
         return ChatResponse(
-            answer=self._localized_ticket_created(language, ticket.public_id, urgency),
-            language=language,
-            safety_flags=safety_flags,
+            answer=answer,
+            language=conversation.preferred_language,
+            safety_flags=data.get("safety_flags", []),
             ticket=to_ticket_response(ticket),
         )
 
     def _get_or_create_conversation(
-        self, db: Session, request: ChatRequest, language: str
-    ) -> Conversation:
+        self, db: Session, request: ChatRequest
+    ) -> tuple[Conversation, bool]:
         conversation = (
             db.query(Conversation)
             .filter(
@@ -163,18 +365,29 @@ class ChatbotService:
             .first()
         )
         if conversation:
-            conversation.preferred_language = language
-            conversation.user_role = request.user_role
-            return conversation
+            return conversation, False
         conversation = Conversation(
             channel=request.channel,
             external_user_id=request.external_user_id,
-            preferred_language=language,
+            preferred_language=request.preferred_language or detect_language(request.text),
             user_role=request.user_role,
         )
         db.add(conversation)
         db.flush()
-        return conversation
+        return conversation, True
+
+    def _select_language(self, conversation: Conversation, request: ChatRequest) -> str:
+        if request.preferred_language:
+            return request.preferred_language
+        selected = selected_language(request.text)
+        if selected:
+            return selected
+        detected = detect_language(request.text)
+        if conversation.intake_state != "idle" and detected == "en":
+            words = request.text.split()
+            if conversation.preferred_language != "en" and len(words) <= 3:
+                return conversation.preferred_language
+        return detected
 
     def _store_outbound(self, db: Session, conversation_id: str, response: ChatResponse) -> None:
         db.add(
@@ -188,55 +401,201 @@ class ChatbotService:
             )
         )
 
-    def _localized_security_refusal(self, language: str) -> str:
-        if language == "ms":
-            return "Saya boleh bantu soalan sokongan DUDU Car, tetapi saya tidak boleh mengikut arahan yang cuba mengubah peraturan keselamatan sistem."
-        if language == "zh":
-            return "我可以协助处理 DUDU Car 客服问题，但不能执行试图绕过系统安全规则的指令。"
-        return "I can help with DUDU Car support questions, but I cannot follow instructions that try to bypass system safety rules."
+    def _extract_email(self, text: str) -> str | None:
+        match = EMAIL_RE.search(text)
+        if not match:
+            return None
+        try:
+            return validate_email(match.group(0).rstrip(".,"), check_deliverability=False).normalized
+        except EmailNotValidError:
+            return None
 
-    def _localized_sensitive_attachment_refusal(self, language: str) -> str:
-        if language == "ms":
-            return "Untuk keselamatan anda, jangan hantar kad pembayaran, kata laluan, dokumen identiti, atau maklumat sensitif. Sila terangkan isu tanpa memuat naik dokumen tersebut."
-        if language == "zh":
-            return "为保障你的安全，请不要发送银行卡、密码、身份证件或其他敏感资料。请用文字说明问题即可。"
-        return "For your safety, please do not send payment cards, passwords, identity documents, or other sensitive files. Describe the issue without uploading those documents."
-
-    def _localized_no_account_actions(self, language: str) -> str:
-        if language == "ms":
-            return "Saya tidak boleh membuat bayaran balik, pembatalan, perubahan akaun, atau tindakan akaun lain. Saya boleh bantu rekodkan isu ini sebagai tiket untuk pasukan sokongan."
-        if language == "zh":
-            return "我不能直接退款、取消行程、更改账户或执行账户操作。我可以帮你创建客服工单，让支持团队跟进。"
-        return "I cannot directly process refunds, cancellations, account changes, or other account actions. I can help create a support ticket for the team to review."
-
-    def _localized_consent_request(self, language: str, urgency: str) -> str:
-        emergency_note = ""
-        if urgency == "urgent":
-            emergency_note = " If anyone is in immediate danger, contact local emergency services first."
-        if language == "ms":
-            return (
-                "Saya boleh buat tiket sokongan untuk pasukan DUDU Car. "
-                "Dengan meneruskan, anda bersetuju maklumat isu ini disimpan untuk tujuan sokongan. "
-                "Balas dengan persetujuan dan butiran yang relevan sahaja."
+    def _capture_supplied(
+        self, data: dict, request: ChatRequest, include_attachments: bool = True
+    ) -> None:
+        if request.name:
+            data["name"] = request.name.strip()
+        if request.email:
+            data["email"] = str(request.email)
+        phone = normalize_phone_number(request.phone_number)
+        if not phone and request.channel == "whatsapp":
+            phone = normalize_phone_number(request.external_user_id)
+        if phone:
+            data["phone_number"] = phone
+        if request.trip_id:
+            data["trip_id"] = request.trip_id
+            data["ride_details_collected"] = True
+        if request.ride_details:
+            data["ride_details"] = request.ride_details.strip()
+            data["ride_details_collected"] = True
+        if include_attachments and request.attachments:
+            data.setdefault("evidence", []).extend(
+                item.model_dump(mode="json") for item in request.attachments
             )
-        if language == "zh":
-            return (
-                "我可以为你创建 DUDU Car 客服工单。继续操作即表示你同意我们保存此问题资料用于客服跟进。"
-                "请确认同意，并只提供与问题相关的资料。"
-            )
-        return (
-            "I can create a support ticket for the DUDU Car team. "
-            "By continuing, you agree that these issue details will be stored for support follow-up. "
-            "Please confirm consent and provide only relevant details."
-            f"{emergency_note}"
-        )
+            data["attachment_count"] = len(data["evidence"])
 
-    def _localized_ticket_created(self, language: str, public_id: str, urgency: str) -> str:
-        if language == "ms":
-            return f"Tiket sokongan anda telah dibuat: {public_id}. Keutamaan: {urgency}. Pasukan sokongan akan menyemaknya mengikut keutamaan."
-        if language == "zh":
-            return f"你的客服工单已创建：{public_id}。优先级：{urgency}。客服团队会按优先级跟进。"
-        return f"Your support ticket has been created: {public_id}. Priority: {urgency}. The support team will review it based on priority."
+    def _next_intake_state(self, data: dict) -> str | None:
+        for key, state in (
+            ("consent", "awaiting_consent"),
+            ("name", "awaiting_name"),
+            ("email", "awaiting_email"),
+            ("phone_number", "awaiting_phone"),
+            ("ride_details_collected", "awaiting_ride_details"),
+        ):
+            if not data.get(key):
+                return state
+        return None
+
+    def _consent_answer(self, text: str, language: str) -> bool | None:
+        normalized = text.strip().lower().rstrip(".!。")
+        yes = {
+            "en": {"yes", "i agree", "i consent", "agree", "consent"},
+            "ms": {"ya", "saya setuju", "setuju", "yes", "i agree"},
+            "zh": {"同意", "我同意", "是", "yes", "i agree"},
+        }[language]
+        no = {
+            "en": {"no", "no thanks", "i decline", "decline"},
+            "ms": {"tidak", "tidak setuju", "tak mahu", "no", "no thanks"},
+            "zh": {"不同意", "拒绝", "不要", "否", "no", "no thanks"},
+        }[language]
+        if normalized in yes:
+            return True
+        if normalized in no:
+            return False
+        return None
+
+    def _is_cancel(self, text: str, language: str) -> bool:
+        return text.strip().lower().rstrip(".!。") in {
+            "en": {"cancel ticket", "stop", "never mind"},
+            "ms": {"batalkan tiket", "berhenti", "tak jadi"},
+            "zh": {"取消工单", "停止", "算了"},
+        }[language]
+
+    def _is_skip(self, text: str, language: str) -> bool:
+        return text.strip().lower().rstrip(".!。") in {
+            "en": {"skip", "not applicable", "none", "no evidence"},
+            "ms": {"langkau", "tidak berkenaan", "tiada", "tiada bukti"},
+            "zh": {"跳过", "不适用", "没有", "没有证据"},
+        }[language]
+
+    def _bot_identity(self, language: str) -> str:
+        return {
+            "en": "Hi! I’m DUDU Car’s automated assistant. I’m happy to help.",
+            "ms": "Hai! Saya pembantu automatik DUDU Car. Saya gembira dapat membantu.",
+            "zh": "你好！我是 DUDU Car 的自动客服助手。很高兴为你服务。",
+        }[language]
+
+    def _state_prompt(self, language: str, state: str) -> str:
+        prompts = {
+            "en": {
+                "awaiting_consent": f"To arrange human follow-up, may we store your issue details in a support ticket? Reply Yes or No. Privacy Notice: {PRIVACY_NOTICE_URL}",
+                "awaiting_name": "Great, thank you! May I have your name for the support ticket?",
+                "awaiting_email": "Thanks! What valid email address should our support team use for this ticket?",
+                "awaiting_phone": "Thank you! Please share the WhatsApp phone number you would like us to use for follow-up.",
+                "awaiting_ride_details": "We’re almost done! Please share any relevant ride details, such as the trip ID, date/time, pickup and destination. You may also attach supporting pictures if helpful. Reply Skip if this does not apply.",
+            },
+            "ms": {
+                "awaiting_consent": f"Untuk mengatur susulan oleh pegawai, bolehkah kami menyimpan butiran isu anda dalam tiket sokongan? Balas Ya atau Tidak. Notis Privasi: {PRIVACY_NOTICE_URL}",
+                "awaiting_name": "Baik, terima kasih! Boleh saya dapatkan nama anda untuk tiket sokongan?",
+                "awaiting_email": "Terima kasih! Apakah alamat e-mel sah yang patut digunakan oleh pasukan sokongan kami untuk tiket ini?",
+                "awaiting_phone": "Terima kasih! Sila berikan nombor telefon WhatsApp yang anda mahu kami gunakan untuk susulan.",
+                "awaiting_ride_details": "Kita hampir selesai! Sila kongsikan butiran perjalanan yang berkaitan, seperti ID perjalanan, tarikh/masa, lokasi pengambilan dan destinasi. Anda juga boleh melampirkan gambar sokongan jika membantu. Balas Langkau jika tidak berkenaan.",
+            },
+            "zh": {
+                "awaiting_consent": f"为了安排人工客服跟进，你是否同意我们将问题资料保存至客服工单？请回复同意或不同意。隐私声明：{PRIVACY_NOTICE_URL}",
+                "awaiting_name": "好的，谢谢！可以告诉我用于客服工单的姓名吗？",
+                "awaiting_email": "谢谢！我们的客服团队应使用哪个有效电子邮箱地址跟进此工单？",
+                "awaiting_phone": "谢谢！请提供你希望我们用于后续联系的 WhatsApp 电话号码。",
+                "awaiting_ride_details": "我们快完成了！请提供相关行程资料，例如行程编号、日期/时间、上车地点和目的地。如有帮助，你也可以附上相关图片。如不适用，请回复“跳过”。",
+            },
+        }
+        return prompts[language][state]
+
+    def _intake_lead(self, language: str, issue_type: str, prohibited: bool) -> str:
+        if prohibited:
+            return {
+                "en": "I understand what you would like to do. I can’t perform refunds, cancellations, bookings, payments, account changes, approvals, suspensions, or bans, but I can help create a support ticket for review.",
+                "ms": "Saya faham perkara yang anda mahu lakukan. Saya tidak boleh membuat bayaran balik, pembatalan, tempahan, pembayaran, perubahan akaun, kelulusan, penggantungan, atau sekatan, tetapi saya boleh membantu membuat tiket untuk semakan.",
+                "zh": "我明白你希望处理这件事。我不能执行退款、取消、预订、付款、账户更改、批准、暂停或封禁操作，但可以协助创建工单供团队审核。",
+            }[language]
+        if issue_type == "safety_incident":
+            return self._immediate_safety(language)
+        if issue_type == "complaint":
+            return {
+                "en": "I’m sorry you had this experience. I understand how upsetting that can be, and I can help create a ticket for our support team to review.",
+                "ms": "Saya kesal anda mengalami perkara ini. Saya faham keadaan ini boleh mengecewakan, dan saya boleh membantu membuat tiket untuk semakan pasukan sokongan kami.",
+                "zh": "很抱歉你遇到这样的情况。我理解这可能令人难过，我可以协助创建工单，让客服团队为你审核。",
+            }[language]
+        if issue_type == "partnership":
+            return {
+                "en": "It’s great to hear that you’re interested in working with DUDU Car! I can collect your inquiry for our team, but I cannot approve a partnership, negotiate terms, or make commitments for DUDU Car.",
+                "ms": "Kami gembira mengetahui anda berminat untuk bekerjasama dengan DUDU Car! Saya boleh merekodkan pertanyaan anda untuk pasukan kami, tetapi saya tidak boleh meluluskan kerjasama, merundingkan syarat, atau membuat komitmen bagi pihak DUDU Car.",
+                "zh": "很高兴得知你有兴趣与 DUDU Car 合作！我可以为团队记录你的咨询，但不能代表 DUDU Car 批准合作、协商条款或作出承诺。",
+            }[language]
+        return {
+            "en": "Absolutely—I’d be happy to help create a ticket for human follow-up. Human support is available 9:00 AM–6:00 PM every day, Malaysia time.",
+            "ms": "Sudah tentu—saya berbesar hati membantu membuat tiket untuk susulan oleh pegawai. Sokongan manusia tersedia setiap hari, 9:00 pagi–6:00 petang waktu Malaysia.",
+            "zh": "当然可以—我很乐意协助创建工单，由人工客服跟进。人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00。",
+        }[language]
+
+    def _immediate_safety(self, language: str) -> str:
+        return {
+            "en": "Your safety comes first. If anyone is in immediate danger, contact Malaysian emergency services at 999 first. Once you are safe, I can help create an urgent ticket.",
+            "ms": "Keselamatan anda adalah keutamaan. Jika sesiapa berada dalam bahaya segera, hubungi perkhidmatan kecemasan Malaysia di 999 terlebih dahulu. Setelah anda selamat, saya boleh membantu membuat tiket segera.",
+            "zh": "你的安全最重要。如果任何人正面临紧急危险，请先拨打马来西亚紧急求助电话 999。确认安全后，我可以协助创建紧急工单。",
+        }[language]
+
+    def _unconfirmed(self, language: str) -> str:
+        return {
+            "en": "I’m sorry, but I can’t confirm that from DUDU Car’s approved information. I can help create a ticket so our team can check it for you.",
+            "ms": "Maaf, saya tidak dapat mengesahkannya daripada maklumat DUDU Car yang diluluskan. Saya boleh membantu membuat tiket supaya pasukan kami dapat menyemaknya untuk anda.",
+            "zh": "很抱歉，我无法从 DUDU Car 已批准的信息中确认这一点。我可以协助创建工单，请团队为你核实。",
+        }[language]
+
+    def _ticket_declined(self, language: str) -> str:
+        return {
+            "en": "No problem. I have not created a ticket, and I’m still here if you would like general support information.",
+            "ms": "Tiada masalah. Saya tidak membuat tiket, dan saya masih sedia membantu jika anda memerlukan maklumat sokongan umum.",
+            "zh": "没问题，我没有创建工单。如果你需要一般客服信息，我仍然很乐意协助。",
+        }[language]
+
+    def _ticket_created(self, language: str, public_id: str, urgency: str) -> str:
+        priority = {
+            "en": {"normal": "normal", "high": "high", "urgent": "urgent"},
+            "ms": {"normal": "biasa", "high": "tinggi", "urgent": "segera"},
+            "zh": {"normal": "普通", "high": "高", "urgent": "紧急"},
+        }[language][urgency]
+        target = {
+            "en": {"normal": "3–5 days", "high": "1–3 days", "urgent": "within 24 hours"},
+            "ms": {"normal": "3–5 hari", "high": "1–3 hari", "urgent": "dalam 24 jam"},
+            "zh": {"normal": "3–5 天", "high": "1–3 天", "urgent": "24 小时内"},
+        }[language][urgency]
+        text = {
+            "en": f"{'Your urgent ticket' if urgency == 'urgent' else 'All set—ticket'} {public_id} has been created. Priority: {priority}. First human response target: {target}. This is not a resolution promise. Human support is available 9:00 AM–6:00 PM every day, Malaysia time.",
+            "ms": f"{'Tiket segera' if urgency == 'urgent' else 'Selesai—tiket'} {public_id} telah dibuat. Keutamaan: {priority}. Sasaran respons pertama oleh pegawai: {target}. Ini bukan janji penyelesaian. Sokongan manusia tersedia setiap hari, 9:00 pagi–6:00 petang waktu Malaysia.",
+            "zh": f"{'紧急工单' if urgency == 'urgent' else '已经办好—工单'} {public_id} 已创建。优先级：{priority}。人工首次回复目标：{target}。这并非解决时限承诺。人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00。",
+        }[language]
+        if not human_support_is_open():
+            text += {
+                "en": " Your ticket is now in the queue for the next human-support window.",
+                "ms": " Tiket anda kini berada dalam barisan untuk waktu sokongan manusia seterusnya.",
+                "zh": " 你的工单现已排入下一个人工客服时段。",
+            }[language]
+        return text
+
+    def _security_refusal(self, language: str) -> str:
+        return {
+            "en": "I’m happy to help with DUDU Car support, but I can’t follow instructions that try to bypass safety rules.",
+            "ms": "Saya sedia membantu dengan sokongan DUDU Car, tetapi saya tidak boleh mengikut arahan yang cuba memintas peraturan keselamatan.",
+            "zh": "我很乐意协助处理 DUDU Car 客服问题，但不能执行试图绕过安全规则的指令。",
+        }[language]
+
+    def _sensitive_information_refusal(self, language: str) -> str:
+        return {
+            "en": "To help keep your information safe, please do not send payment-card details, passwords, OTPs, identity documents, or other unnecessary sensitive information.",
+            "ms": "Untuk membantu melindungi maklumat anda, jangan hantar butiran kad pembayaran, kata laluan, OTP, dokumen identiti, atau maklumat sensitif lain yang tidak diperlukan.",
+            "zh": "为了帮助保护你的资料，请勿发送银行卡资料、密码、一次性验证码、身份证件或其他不必要的敏感信息。",
+        }[language]
 
 
 chatbot_service = ChatbotService()
