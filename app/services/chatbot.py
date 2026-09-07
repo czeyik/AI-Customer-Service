@@ -30,7 +30,14 @@ class ChatbotService:
     def __init__(self) -> None:
         self.answer_generator = ApprovedKnowledgeResponder()
 
-    def handle(self, db: Session, request: ChatRequest, ip_address: str | None = None) -> ChatResponse:
+    def handle(
+        self,
+        db: Session,
+        request: ChatRequest,
+        ip_address: str | None = None,
+        *,
+        commit: bool = True,
+    ) -> ChatResponse:
         settings = get_settings()
         limiter_key = f"{request.channel}:{request.external_user_id}"
         if not rate_limiter.allow(limiter_key, settings.rate_limit_messages_per_minute):
@@ -73,7 +80,10 @@ class ChatbotService:
             if is_new:
                 response.answer = f"{self._bot_identity(language)}\n\n{response.answer}"
             self._store_outbound(db, conversation.id, response)
-            db.commit()
+            if commit:
+                db.commit()
+            else:
+                db.flush()
             return response
         except Exception:
             db.rollback()

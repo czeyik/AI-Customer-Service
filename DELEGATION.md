@@ -48,7 +48,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 1 | PG-01 | Approved launch contract and architecture | PASS |
 | 2 | PG-02 | Reproducible build, migrations, and CI | PASS |
 | 3 | PG-03 | Stateful multilingual ticket flow | PASS |
-| 4 | PG-04 | Reliable WhatsApp send/receive path | NOT_STARTED |
+| 4 | PG-04 | Reliable WhatsApp send/receive path | IN_PROGRESS |
 | 5 | PG-05 | Grounded hosted LLM and failover | NOT_STARTED |
 | 6 | PG-06 | Named admins and ticket operations | NOT_STARTED |
 | 7 | PG-07 | CCO knowledge governance and launch corpus | NOT_STARTED |
@@ -386,6 +386,62 @@ recorded. Actual media storage and scanning remain Wave 8 work. Real customer tr
 disabled.
 Next-wave notes: Wave 4 is unblocked but has not started. It requires OI-04 before WhatsApp
 transport work begins.
+
+### Wave 4 — 2026-09-05
+Status: BLOCKED
+Owner decisions: Cze Yik approved Meta Graph API `v26.0` and the named-business WhatsApp pilot
+opt-in wording/process on 5 September 2026. Two test recipients are owner-authorized and control
+their test numbers. The Meta business number is registered, but the app remains unpublished and
+the callback setup is incomplete. No credential was supplied in chat or committed. OI-04 remains
+`UNRESOLVED` until a non-placeholder verify token, App Secret, access token, Phone Number ID, and
+public HTTPS callback are securely provisioned and the real-number test succeeds.
+Files/migrations and commit/PR/release: Added strict WhatsApp-only webhook parsing and signature
+validation, Meta message-ID idempotency, a transactional PostgreSQL inbox/outbox boundary,
+Wave 3 state integration, Graph API `v26.0` text sending, the outbound kill switch, bounded retry
+and dead-letter handling, delivery/error status updates, safe audit metadata, a worker entry point,
+and migration `72b9b57f6d1a`. Removed the Instagram request/parser path. Updated configuration,
+development commands, and focused tests. Changes remain uncommitted on `dev`; no commit, push, PR,
+merge, release, production deployment, billable action, live traffic, or pilot-user contact
+occurred.
+Verification commands/results: The clean digest-pinned Python 3.11 image built as
+`dudu-support:wave4-check`; `python -m pip check` reported no broken requirements and all 79 tests
+passed in 12.14s. The 14 focused transport checks cover plaintext callback verification,
+fail-closed invalid/missing signatures, atomic rollback, exactly-once multi-turn ticket intake
+under duplicate delivery, the disabled send switch, approved versioned endpoint, transient Meta
+errors, bounded retry exhaustion, dead letters, and signed delivery/failure updates. A fresh
+PostgreSQL 16 database migrated from zero to `72b9b57f6d1a (head)`; `alembic check` reported
+`No new upgrade operations detected.` `docker compose config --quiet`, compile checks, and
+`git diff --check` passed.
+External evidence (no secrets or customer data): Official Meta documentation reviewed on
+5 September 2026 lists Graph API `v26.0` as released 29 July 2026; documents the
+`POST /<PHONE_NUMBER_ID>/messages` endpoint, `X-Hub-Signature-256` validation, system-user access
+tokens and permissions, opt-in requirements, delivery/error status webhooks, and retryable error
+codes. Sources: `https://developers.facebook.com/docs/graph-api/changelog/versions`,
+`https://developers.facebook.com/documentation/business-messaging/whatsapp/get-started`,
+`https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens`,
+`https://developers.facebook.com/documentation/business-messaging/whatsapp/getting-opt-in`,
+`https://developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/create-webhook-endpoint`,
+`https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/send-messages`,
+and `https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes`.
+Gate update and residual risks: PG-04 is `BLOCKED`, not `PASS`. The local transport requirements
+have repeatable evidence, and outbound traffic defaults to disabled. The mandatory external exit
+check is missing: Meta cannot verify a callback or deliver real tester messages without the four
+runtime values and a public HTTPS endpoint; the owner's Meta screenshot also states that an
+unpublished app receives dashboard test webhooks only. No real Meta test number has completed a
+multi-turn ticket or confirmed outbound delivery.
+Next-wave notes: Wave 5 is blocked. Resume Wave 4 after the owner securely configures the four
+runtime values, supplies the non-secret Phone Number ID, authorizes or provides a public HTTPS
+endpoint, and publishes the Meta app as required for real tester traffic. Do not begin Wave 5.
+
+Resume update — 2026-09-07: The owner provisioned the four Meta runtime values in the ignored
+local environment file, whose permissions were tightened to owner-only, and authorized a
+temporary HTTPS tunnel. The public callback challenge passed, Meta accepted the callback,
+the `messages` field was subscribed, and one signed dashboard test webhook was accepted. The
+dashboard sample correctly created no customer inbox/outbox row. The owner requested that the
+current Wave 4 implementation be committed locally on `dev`; no push, PR, merge, release, or
+production deployment was authorized. PG-04 remains incomplete pending permanent-token/app
+publication confirmation, explicit authorization to enable outbound test traffic, and the real
+multi-turn test-number result.
 
 ## Fresh-Chat Prompt
 

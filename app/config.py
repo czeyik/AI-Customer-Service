@@ -20,7 +20,12 @@ class Settings(BaseSettings):
 
     meta_verify_token: str = "dev-verify-token"
     meta_app_secret: str = ""
+    meta_access_token: str = ""
+    meta_phone_number_id: str = ""
+    meta_graph_api_version: str = "v26.0"
     meta_send_enabled: bool = False
+    meta_send_timeout_seconds: float = 10.0
+    meta_send_max_attempts: int = 5
 
     rate_limit_messages_per_minute: int = 20
     retrieval_min_confidence: float = 0.12
@@ -71,6 +76,18 @@ class Settings(BaseSettings):
         for field, minimum in minimum_lengths.items():
             if len(getattr(self, field)) < minimum:
                 errors.append(f"{field.upper()} must be at least {minimum} characters")
+
+        if self.meta_send_enabled:
+            if len(self.meta_access_token) < 24:
+                errors.append("META_ACCESS_TOKEN must be set when META_SEND_ENABLED is true")
+            if not self.meta_phone_number_id.isdigit():
+                errors.append("META_PHONE_NUMBER_ID must be numeric when META_SEND_ENABLED is true")
+        if self.meta_graph_api_version != "v26.0":
+            errors.append("META_GRAPH_API_VERSION must be the approved v26.0")
+        if not 1 <= self.meta_send_max_attempts <= 10:
+            errors.append("META_SEND_MAX_ATTEMPTS must be between 1 and 10")
+        if not 1 <= self.meta_send_timeout_seconds <= 30:
+            errors.append("META_SEND_TIMEOUT_SECONDS must be between 1 and 30")
 
         if not self.trusted_host_list or "*" in self.trusted_host_list:
             errors.append("TRUSTED_HOSTS must contain explicit production hosts")

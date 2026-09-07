@@ -28,6 +28,24 @@ def test_unknown_environment_is_rejected() -> None:
         Settings(_env_file=None, environment="prodution")
 
 
+def test_production_send_requires_meta_transport_credentials() -> None:
+    with pytest.raises(ValidationError, match="META_ACCESS_TOKEN"):
+        Settings(_env_file=None, **(PRODUCTION_SETTINGS | {"meta_send_enabled": True}))
+
+    settings = Settings(
+        _env_file=None,
+        **(
+            PRODUCTION_SETTINGS
+            | {
+                "meta_send_enabled": True,
+                "meta_access_token": "production-meta-access-token-long",
+                "meta_phone_number_id": "123456789",
+            }
+        ),
+    )
+    assert settings.meta_graph_api_version == "v26.0"
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [

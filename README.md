@@ -28,7 +28,8 @@ The complete, authoritative baseline is
 - Prompt-injection attempts and account-changing requests are refused.
 - Sensitive uploads and risky secrets are rejected or redacted.
 - `POST /api/knowledge/documents` ingests approved FAQ/policy chunks.
-- `/webhooks/meta` verifies and receives Meta-style webhook payloads; WhatsApp is the launch use.
+- `/webhooks/meta` strictly verifies WhatsApp webhooks, deduplicates Meta message IDs, and commits
+  each Wave 3 state transition with a durable outbound queue row.
 - `/admin` shows the current MVP ticket inbox after password + 2FA login.
 
 ## Remaining Work Against The Approved Requirements
@@ -36,13 +37,11 @@ The complete, authoritative baseline is
 The current code predates the consolidated requirements. Before launch it still needs:
 
 - Hosted GLM-5.3-Flash and GPT-5.6 Luna adapters with configurable failover.
-- Explicit natural-language human-escalation detection.
-- Required name and email collection, ticket-specific response targets, and human-hours wording.
 - Real image/video upload, scanning, storage, and ticket retrieval rather than attachment metadata
   alone.
 - Multiple-admin provisioning, individual administrator 2FA, and CCO-attributed knowledge
   governance.
-- Automated deletion or anonymization after 90 days for chats and 24 months for tickets and
+- Automated deletion or anonymization after 90 days for chats and 36 months for tickets and
   ticket attachments.
 
 ## Quick Start With Docker
@@ -98,6 +97,29 @@ alembic upgrade head
 
 The application does not create tables at startup. After changing SQLAlchemy models, add a
 migration and run `alembic check` against an up-to-date database before opening a pull request.
+
+## WhatsApp Transport
+
+The approved Meta Graph API version is `v26.0`. Configure `META_APP_SECRET`,
+`META_ACCESS_TOKEN`, `META_PHONE_NUMBER_ID`, and a private `META_VERIFY_TOKEN` outside Git. The
+Meta callback URL is:
+
+```text
+https://<public-host>/webhooks/meta
+```
+
+Meta must be able to reach that URL over HTTPS; a localhost URL cannot be verified. Keep
+`META_SEND_ENABLED=false` until an authorized test window. After migrations are current, run the
+outbound worker separately:
+
+```bash
+python -m app.workers.whatsapp
+```
+
+The webhook never calls Meta inline. It stores the unique inbound message ID, Wave 3 state change,
+and reply together; the worker sends queued replies with bounded retries and moves permanent or
+exhausted failures to a dead-letter state. Raw HTTP access logging is disabled because Meta's
+verification request includes the private verify token in its query string.
 
 ## Try The Chat API
 

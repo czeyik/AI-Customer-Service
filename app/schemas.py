@@ -1,9 +1,9 @@
 from datetime import datetime
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field
 
-Channel = Literal["web", "whatsapp", "instagram", "admin_test"]
+Channel = Literal["web", "whatsapp", "admin_test"]
 UserRole = Literal["rider", "driver", "business_partner", "unknown"]
 LaunchLanguage = Literal["en", "ms", "zh"]
 
@@ -18,7 +18,7 @@ class AttachmentPayload(BaseModel):
 class ChatRequest(BaseModel):
     channel: Channel = "web"
     external_user_id: str = Field(..., min_length=1, max_length=255)
-    text: str = Field(..., min_length=1, max_length=4000)
+    text: str = Field(..., min_length=1, max_length=4096)
     user_role: UserRole = "unknown"
     preferred_language: LaunchLanguage | None = None
     name: str | None = Field(default=None, max_length=255)
@@ -73,4 +73,5 @@ class KnowledgeDocumentResponse(BaseModel):
 class MetaWebhookResult(BaseModel):
     ok: bool
     processed: int
-    responses: list[dict[str, Any]] = Field(default_factory=list)
+    duplicates: int = 0
+    status_updates: int = 0

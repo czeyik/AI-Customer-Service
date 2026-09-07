@@ -69,6 +69,38 @@ class Message(Base, TimestampMixin):
     conversation = relationship("Conversation", back_populates="messages")
 
 
+class WhatsAppInboundMessage(Base, TimestampMixin):
+    __tablename__ = "whatsapp_inbound_messages"
+
+    id = Column(String(36), primary_key=True, default=new_uuid)
+    provider_message_id = Column(String(255), unique=True, nullable=False, index=True)
+    sender = Column(String(32), nullable=False)
+    phone_number_id = Column(String(64), nullable=False)
+    message_type = Column(String(40), nullable=False)
+    payload = Column(JSON, default=dict, nullable=False)
+    processed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class WhatsAppOutboundMessage(Base, TimestampMixin):
+    __tablename__ = "whatsapp_outbound_messages"
+
+    id = Column(String(36), primary_key=True, default=new_uuid)
+    inbound_message_id = Column(
+        String(36), ForeignKey("whatsapp_inbound_messages.id"), unique=True, nullable=False
+    )
+    recipient = Column(String(32), nullable=False)
+    body = Column(Text, nullable=False)
+    status = Column(String(40), default="queued", nullable=False, index=True)
+    attempts = Column(Integer, default=0, nullable=False)
+    next_attempt_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    provider_message_id = Column(String(255), unique=True, nullable=True, index=True)
+    last_error_code = Column(String(80), nullable=True)
+    sent_at = Column(DateTime, nullable=True)
+    delivered_at = Column(DateTime, nullable=True)
+    read_at = Column(DateTime, nullable=True)
+    failed_at = Column(DateTime, nullable=True)
+
+
 class Ticket(Base, TimestampMixin):
     __tablename__ = "tickets"
 
