@@ -32,8 +32,17 @@ class AdminUser(Base, TimestampMixin):
 
     id = Column(String(36), primary_key=True, default=new_uuid)
     username = Column(String(120), unique=True, nullable=False, index=True)
+    display_name = Column(String(255), nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    phone_number = Column(String(32), nullable=True)
     password_hash = Column(String(255), nullable=False)
+    totp_secret_ref = Column(String(255), unique=True, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
+    is_cco = Column(Boolean, default=False, nullable=False)
+    is_recovery_approver = Column(Boolean, default=False, nullable=False)
+    notify_new_tickets = Column(Boolean, default=False, nullable=False)
+    notify_urgent_tickets = Column(Boolean, default=False, nullable=False)
+    auth_version = Column(Integer, default=1, nullable=False)
 
 
 class Conversation(Base, TimestampMixin):
@@ -107,6 +116,7 @@ class Ticket(Base, TimestampMixin):
     id = Column(String(36), primary_key=True, default=new_uuid)
     public_id = Column(String(40), unique=True, nullable=False, index=True)
     status = Column(String(40), default="open", nullable=False, index=True)
+    assigned_admin_id = Column(String(36), ForeignKey("admin_users.id"), nullable=True, index=True)
     urgency = Column(String(40), default="normal", nullable=False, index=True)
     channel = Column(String(40), nullable=False, index=True)
     external_user_id = Column(String(255), nullable=False, index=True)
@@ -123,6 +133,10 @@ class Ticket(Base, TimestampMixin):
     consent_given = Column(Boolean, default=False, nullable=False)
     attachment_count = Column(Integer, default=0, nullable=False)
     extra = Column(JSON, default=dict, nullable=False)
+    closed_at = Column(DateTime, nullable=True)
+
+    assigned_admin = relationship("AdminUser")
+    notes = relationship("TicketNote", back_populates="ticket", cascade="all, delete-orphan")
 
     __table_args__ = (
         CheckConstraint("consent_given = true", name="ck_tickets_consent_given"),
@@ -131,7 +145,44 @@ class Ticket(Base, TimestampMixin):
         CheckConstraint("email LIKE '%_@_%._%'", name="ck_tickets_email_format"),
         CheckConstraint("trim(phone_number) <> ''", name="ck_tickets_phone_required"),
         CheckConstraint("trim(description) <> ''", name="ck_tickets_description_required"),
+        CheckConstraint(
+            "status IN ('open', 'in_progress', 'closed')", name="ck_tickets_status"
+        ),
     )
+
+
+class TicketNote(Base, TimestampMixin):
+    __tablename__ = "ticket_notes"
+
+    id = Column(String(36), primary_key=True, default=new_uuid)
+    ticket_id = Column(String(36), ForeignKey("tickets.id"), nullable=False, index=True)
+    author_admin_id = Column(String(36), ForeignKey("admin_users.id"), nullable=False, index=True)
+    body = Column(Text, nullable=False)
+
+    ticket = relationship("Ticket", back_populates="notes")
+    author = relationship("AdminUser")
+
+
+class SupportNotification(Base, TimestampMixin):
+    __tablename__ = "support_notifications"
+
+    id = Column(String(36), primary_key=True, default=new_uuid)
+    ticket_id = Column(String(36), ForeignKey("tickets.id"), nullable=False, index=True)
+    recipient_admin_id = Column(
+        String(36), ForeignKey("admin_users.id"), nullable=True, index=True
+    )
+    channel = Column(String(20), nullable=False)
+    recipient = Column(String(255), nullable=False)
+    event_type = Column(String(80), nullable=False, index=True)
+    status = Column(String(20), default="pending", nullable=False, index=True)
+    attempts = Column(Integer, default=0, nullable=False)
+    next_attempt_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    last_error = Column(String(255), nullable=True)
+    sent_at = Column(DateTime, nullable=True)
+    payload = Column(JSON, default=dict, nullable=False)
+
+    ticket = relationship("Ticket")
+    recipient_admin = relationship("AdminUser")
 
 
 class KnowledgeDocument(Base, TimestampMixin):

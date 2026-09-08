@@ -50,7 +50,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 3 | PG-03 | Stateful multilingual ticket flow | PASS |
 | 4 | PG-04 | Reliable WhatsApp send/receive path | PASS |
 | 5 | PG-05 | Grounded hosted LLM and outage fallback | PASS |
-| 6 | PG-06 | Named admins and ticket operations | NOT_STARTED |
+| 6 | PG-06 | Named admins and ticket operations | PASS |
 | 7 | PG-07 | CCO knowledge governance and launch corpus | NOT_STARTED |
 | 8 | PG-08 | Secure image/video pipeline | NOT_STARTED |
 | 9 | PG-09 | Application security | NOT_STARTED |
@@ -507,6 +507,60 @@ smoke test, and Meta outbound traffic remains disabled. The full approved trilin
 release-quality/cost evaluation remain Wave 7 and Wave 12 work respectively.
 Next-wave notes: Wave 6 is unblocked after these changes are reviewed and integrated. Do not send
 customer text or add model tools when extending the adapter. Wave 6 has not started.
+
+### Wave 6 — 2026-09-09
+Status: PASS
+Owner decisions: OI-03 was already resolved by the approved Wave 1 launch contract. Cze Yik and
+Jane are the named administrators and escalation contacts; Jane is support lead, ticket-assignment
+owner, and CCO; Cze Yik is the admin-recovery approver. The approved lifecycle remains `open` →
+`in_progress` → `closed`, with assignment separate from status, waiting-for-customer represented
+as an internal note, and a new customer reply reopening a closed ticket. Jane receives
+new/reassigned-ticket email; urgent-ticket notifications target Jane and Cze Yik by email and,
+when configured with an approved template, WhatsApp. Customer material status updates use approved
+localized WhatsApp templates. Cze Yik's 4 September approval of the combined launch contract and
+ticket lifecycle remains the recorded support-owner acceptance; no owner decision changed here.
+Files/migrations and commit/PR/release: Added named administrator identity, individual TOTP secret
+references, CCO and recovery-authority attribution, active/disabled state, session revocation,
+authenticated provisioning/disable/recovery commands, and login/management audit events. Added
+ticket assignment, constrained status transitions, closure timestamps, attributable internal
+notes, customer-reply reopening, the admin operations UI, CSRF protection on mutations, durable
+email/WhatsApp notification records, bounded notification delivery/dead-letter handling, and Meta
+approved-template sending. Migration `11d254641917` disables the legacy shared account while
+preserving its audit identity and requires explicit named-account provisioning. Updated runtime
+configuration, environment example, README, and current-gap documentation. Changes remain
+uncommitted on `dev`; no commit, push, PR, merge, release, production deployment, credential
+change, real administrator provisioning, external notification, billable action, or public traffic
+occurred.
+Verification commands/results: The clean digest-pinned Python 3.11 image built as
+`dudu-support:wave6-check`; `python -m pip check` reported no broken requirements and all 94 tests
+passed in 24.37s. Four focused Wave 6 tests prove two distinct named admins with separate password
+and TOTP checks, CCO/recovery authority, audited bootstrap and second-admin provisioning,
+fail-closed no-fallback 2FA, authenticated login, CSRF rejection, disable/recovery and session
+version invalidation, last/self-disable guards, assignment, valid-only status transitions,
+closure/reopening, attributable notes, correct normal/urgent recipients, localized approved-template
+selection, successful email/WhatsApp adapters, and notification dead-letter handling. A disposable
+PostgreSQL 16 database upgraded from zero to `11d254641917 (head)` and `alembic check` reported
+`No new upgrade operations detected.` A second disposable database migrated through the Wave 5
+head with a legacy active shared admin row, then upgraded successfully; the row remained present
+but was disabled with a non-login legacy TOTP reference. Compile checks, the admin management CLI
+entry point, and `git diff --check` passed. Temporary database containers were removed.
+External evidence (no secrets or customer data): Meta's official WhatsApp Business Platform Cloud
+API collection and Meta-hosted SDK reference were reviewed on 9 September 2026. They confirm that
+an existing approved/enabled template is sent with a template name, deterministic language code,
+and component parameters through the Cloud API. Sources:
+`https://www.postman.com/meta/whatsapp-business-platform/documentation/wlk6lh4/whatsapp-cloud-api`
+and `https://whatsapp.github.io/WhatsApp-Nodejs-SDK/api-reference/messages/template/`. The transport
+continues to use the Wave 4-approved Graph API `v26.0` endpoint.
+Gate update and residual risks: PG-06 is `PASS`. The tested workflow meets the approved lifecycle,
+and the two test administrators are individually managed and attributable. TOTP values are not
+stored in PostgreSQL; the CLI emits each value once for storage under its database reference in
+AWS Secrets Manager. The named production accounts, support mailbox credentials, administrator
+contact values, and Meta-approved template names still require secure provisioning in the target
+environment before notification delivery is enabled. Both notification and Meta send kill switches
+remain false by default, and no live delivery was attempted.
+Next-wave notes: Wave 7 is unblocked but has not started. Use `AdminUser.is_cco` and the authenticated
+named-admin session for CCO knowledge actions; remove the shared knowledge API key rather than
+adding a second authorization path. Do not store TOTP material in the database or knowledge audit.
 
 ## Fresh-Chat Prompt
 

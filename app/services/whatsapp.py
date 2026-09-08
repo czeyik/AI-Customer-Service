@@ -35,6 +35,34 @@ class MetaWhatsAppClient:
         self.settings = settings or get_settings()
 
     def send_text(self, recipient: str, body: str) -> str:
+        return self._send(
+            recipient,
+            {"type": "text", "text": {"preview_url": False, "body": body}},
+        )
+
+    def send_template(
+        self, recipient: str, template_name: str, language: str, parameters: list[str]
+    ) -> str:
+        return self._send(
+            recipient,
+            {
+                "type": "template",
+                "template": {
+                    "name": template_name,
+                    "language": {"code": language},
+                    "components": [
+                        {
+                            "type": "body",
+                            "parameters": [
+                                {"type": "text", "text": parameter} for parameter in parameters
+                            ],
+                        }
+                    ],
+                },
+            },
+        )
+
+    def _send(self, recipient: str, message: dict[str, Any]) -> str:
         url = (
             f"https://graph.facebook.com/{self.settings.meta_graph_api_version}/"
             f"{self.settings.meta_phone_number_id}/messages"
@@ -44,8 +72,7 @@ class MetaWhatsAppClient:
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
                 "to": recipient,
-                "type": "text",
-                "text": {"preview_url": False, "body": body},
+                **message,
             }
         ).encode()
         request = Request(

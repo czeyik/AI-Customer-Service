@@ -75,6 +75,21 @@ input {
   color: var(--text);
 }
 
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 11px 12px;
+  font: inherit;
+  color: var(--text);
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
 button {
   border: 0;
   border-radius: 6px;
@@ -164,6 +179,27 @@ th {
   gap: 20px;
 }
 
+.notifications {
+  margin-bottom: 20px;
+}
+
+.operations {
+  display: grid;
+  gap: 18px;
+}
+
+.operations form {
+  grid-template-columns: minmax(220px, 1fr) auto;
+  align-items: end;
+  margin: 0;
+}
+
+article + article {
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
 section {
   padding: 20px;
 }
@@ -204,4 +240,3 @@ dd {
     grid-template-columns: 1fr;
   }
 }
-

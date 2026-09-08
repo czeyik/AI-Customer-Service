@@ -29,7 +29,8 @@ The complete, authoritative baseline is
 - `POST /api/knowledge/documents` ingests approved FAQ/policy chunks.
 - `/webhooks/meta` strictly verifies WhatsApp webhooks, deduplicates Meta message IDs, and commits
   each Wave 3 state transition with a durable outbound queue row.
-- `/admin` shows the current MVP ticket inbox after password + 2FA login.
+- `/admin` provides the named-administrator ticket inbox, assignment, status, and internal-note
+  workflow after password + individual 2FA login.
 
 ## Remaining Work Against The Approved Requirements
 
@@ -38,8 +39,7 @@ The current code predates the consolidated requirements. Before launch it still 
 - DUDU-specific trilingual release evaluation of the hosted model and outage fallback.
 - Real image/video upload, scanning, storage, and ticket retrieval rather than attachment metadata
   alone.
-- Multiple-admin provisioning, individual administrator 2FA, and CCO-attributed knowledge
-  governance.
+- CCO-attributed, versioned knowledge governance.
 - Automated deletion or anonymization after 90 days for chats and 36 months for tickets and
   ticket attachments.
 
@@ -74,8 +74,7 @@ will promote a tested image digest and migration set through the release workflo
    - Health check: http://localhost:8000/health
    - Admin inbox: http://localhost:8000/admin
 
-In development, if `ADMIN_TOTP_SECRET` is empty, the fallback 2FA code is `000000`.
-Do not use that fallback for real customer data.
+Administrator accounts are provisioned explicitly; there is no shared or fallback 2FA code.
 
 ## Reproducible Checks And Migrations
 
@@ -119,6 +118,37 @@ The webhook never calls Meta inline. It stores the unique inbound message ID, Wa
 and reply together; the worker sends queued replies with bounded retries and moves permanent or
 exhausted failures to a dead-letter state. Raw HTTP access logging is disabled because Meta's
 verification request includes the private verify token in its query string.
+
+## Administration and ticket operations
+
+Provision the first named administrator from a trusted operator shell after migrations. Omit
+`--actor` only for this bootstrap account; every later action authenticates and audits the acting
+administrator:
+
+```bash
+python scripts/manage_admin.py provision czeyik \
+  --display-name "Cze Yik" --email <address> --phone-number <number> \
+  --recovery-approver --notify-urgent
+python scripts/manage_admin.py provision jane \
+  --display-name "Jane" --email <address> --phone-number <number> --actor czeyik \
+  --cco --notify-new --notify-urgent
+```
+
+The command prints each authenticator URI and TOTP mapping once. Store the mapping in AWS Secrets
+Manager and inject it as `ADMIN_TOTP_SECRETS`; it is never stored in the database. Disable or
+recover an account with `manage_admin.py disable` or `manage_admin.py recover` and an authenticated
+`--actor`. Recovery is limited to the designated recovery approver, rotates both credentials, and
+invalidates existing sessions.
+
+Ticket changes create attributable audit events and durable notification records. Configure SMTP
+and approved Meta template names, then enable `NOTIFICATION_SEND_ENABLED` and run:
+
+```bash
+python -m app.workers.notifications
+```
+
+WhatsApp delivery also obeys `META_SEND_ENABLED`; both switches remain off until an authorized
+test or traffic window.
 
 ## Try The Chat API
 

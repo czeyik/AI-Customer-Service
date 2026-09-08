@@ -19,18 +19,14 @@ def verify_password(password: str, password_hash: str) -> bool:
     return bcrypt.checkpw(password_bytes, password_hash.encode("utf-8"))
 
 
-def verify_totp(code: str) -> bool:
-    settings = get_settings()
-    if settings.admin_totp_secret:
-        return pyotp.TOTP(settings.admin_totp_secret).verify(code, valid_window=1)
-    if settings.is_production:
-        return False
-    return code == "000000"
+def verify_totp(secret_ref: str, code: str) -> bool:
+    secret = get_settings().admin_totp_secrets.get(secret_ref)
+    return bool(secret and pyotp.TOTP(secret).verify(code, valid_window=1))
 
 
-def make_session_token(username: str) -> str:
+def make_session_token(admin_id: str, auth_version: int, csrf_token: str) -> str:
     signer = URLSafeTimedSerializer(get_settings().secret_key)
-    return signer.dumps({"username": username})
+    return signer.dumps({"admin_id": admin_id, "auth_version": auth_version, "csrf": csrf_token})
 
 
 def read_session_token(token: str, max_age_seconds: int = 60 * 60 * 12) -> dict[str, Any] | None:
@@ -39,7 +35,7 @@ def read_session_token(token: str, max_age_seconds: int = 60 * 60 * 12) -> dict[
         data = signer.loads(token, max_age=max_age_seconds)
     except (BadSignature, SignatureExpired):
         return None
-    if not isinstance(data, dict) or "username" not in data:
+    if not isinstance(data, dict) or not {"admin_id", "auth_version", "csrf"} <= data.keys():
         return None
     return data
 

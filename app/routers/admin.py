@@ -1,3 +1,4 @@
+import secrets
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
@@ -7,8 +8,9 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
-from app.models import AdminUser, Ticket
+from app.models import AdminUser, AuditLog, SupportNotification, Ticket
 from app.security import make_session_token, read_session_token, verify_password, verify_totp
+from app.services.ticket_operations import add_ticket_note, assign_ticket, update_ticket_status
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parents[1] / "templates"))
@@ -21,10 +23,16 @@ def get_current_admin(request: Request, db: Session = Depends(get_db)) -> AdminU
     data = read_session_token(token)
     if not data:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid session")
-    admin = db.query(AdminUser).filter(AdminUser.username == data["username"]).first()
-    if not admin or not admin.is_active:
+    admin = db.get(AdminUser, data["admin_id"])
+    if not admin or not admin.is_active or admin.auth_version != data["auth_version"]:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive admin")
     return admin
+
+
+def require_csrf(request: Request, csrf_token: str) -> None:
+    data = read_session_token(request.cookies.get("dudu_admin_session", ""))
+    if not data or not secrets.compare_digest(data["csrf"], csrf_token):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid CSRF token")
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -41,7 +49,22 @@ def login(
     db: Session = Depends(get_db),
 ) -> RedirectResponse | HTMLResponse:
     admin = db.query(AdminUser).filter(AdminUser.username == username).first()
-    if not admin or not verify_password(password, admin.password_hash) or not verify_totp(totp_code):
+    valid = bool(
+        admin
+        and admin.is_active
+        and verify_password(password, admin.password_hash)
+        and verify_totp(admin.totp_secret_ref, totp_code)
+    )
+    db.add(
+        AuditLog(
+            actor=admin.username if admin else username[:120],
+            event_type="admin_login_succeeded" if valid else "admin_login_failed",
+            ip_address=request.client.host if request.client else None,
+            details={"admin_id": admin.id} if admin else {},
+        )
+    )
+    db.commit()
+    if not valid:
         return templates.TemplateResponse(
             "admin_login.html",
             {"request": request, "error": "Invalid username, password, or 2FA code."},
@@ -50,7 +73,7 @@ def login(
     response = RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(
         "dudu_admin_session",
-        make_session_token(username),
+        make_session_token(admin.id, admin.auth_version, secrets.token_urlsafe(32)),
         httponly=True,
         samesite="lax",
         secure=get_settings().is_production,
@@ -70,10 +93,20 @@ def logout() -> RedirectResponse:
 def dashboard(
     request: Request,
     db: Session = Depends(get_db),
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
 ) -> HTMLResponse:
     tickets = db.query(Ticket).order_by(Ticket.created_at.desc()).limit(100).all()
-    return templates.TemplateResponse("admin_dashboard.html", {"request": request, "tickets": tickets})
+    notifications = (
+        db.query(SupportNotification)
+        .filter_by(recipient_admin_id=admin.id, status="pending")
+        .order_by(SupportNotification.created_at.desc())
+        .limit(20)
+        .all()
+    )
+    return templates.TemplateResponse(
+        "admin_dashboard.html",
+        {"request": request, "tickets": tickets, "notifications": notifications},
+    )
 
 
 @router.get("/tickets/{public_id}", response_class=HTMLResponse)
@@ -81,10 +114,80 @@ def ticket_detail(
     public_id: str,
     request: Request,
     db: Session = Depends(get_db),
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
 ) -> HTMLResponse:
     ticket = db.query(Ticket).filter(Ticket.public_id == public_id).first()
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found")
-    return templates.TemplateResponse("admin_ticket_detail.html", {"request": request, "ticket": ticket})
+    session = read_session_token(request.cookies["dudu_admin_session"])
+    admins = db.query(AdminUser).filter_by(is_active=True).order_by(AdminUser.display_name).all()
+    return templates.TemplateResponse(
+        "admin_ticket_detail.html",
+        {
+            "request": request,
+            "ticket": ticket,
+            "admins": admins,
+            "admin": admin,
+            "csrf": session["csrf"],
+        },
+    )
 
+
+def _ticket_or_404(db: Session, public_id: str) -> Ticket:
+    ticket = db.query(Ticket).filter_by(public_id=public_id).first()
+    if not ticket:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found")
+    return ticket
+
+
+@router.post("/tickets/{public_id}/assign", response_model=None)
+def assign(
+    public_id: str,
+    request: Request,
+    assignee_id: str = Form(...),
+    csrf_token: str = Form(...),
+    db: Session = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin),
+) -> RedirectResponse:
+    require_csrf(request, csrf_token)
+    assignee = db.get(AdminUser, assignee_id)
+    if not assignee:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid assignee")
+    assign_ticket(db, ticket=_ticket_or_404(db, public_id), assignee=assignee, actor=admin)
+    return RedirectResponse(f"/admin/tickets/{public_id}", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post("/tickets/{public_id}/status", response_model=None)
+def change_status(
+    public_id: str,
+    request: Request,
+    new_status: str = Form(...),
+    csrf_token: str = Form(...),
+    db: Session = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin),
+) -> RedirectResponse:
+    require_csrf(request, csrf_token)
+    try:
+        update_ticket_status(
+            db, ticket=_ticket_or_404(db, public_id), new_status=new_status, actor=admin
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return RedirectResponse(f"/admin/tickets/{public_id}", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post("/tickets/{public_id}/notes", response_model=None)
+def add_note(
+    public_id: str,
+    request: Request,
+    body: str = Form(...),
+    csrf_token: str = Form(...),
+    db: Session = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin),
+) -> RedirectResponse:
+    require_csrf(request, csrf_token)
+    try:
+        add_ticket_note(db, ticket=_ticket_or_404(db, public_id), body=body, actor=admin)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return RedirectResponse(f"/admin/tickets/{public_id}", status_code=status.HTTP_303_SEE_OTHER)

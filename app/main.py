@@ -6,7 +6,6 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.database import init_db
 from app.routers import admin, chat, health, knowledge, webhooks_meta
 
 settings = get_settings()
@@ -32,9 +31,3 @@ app.include_router(chat.router)
 app.include_router(knowledge.router)
 app.include_router(webhooks_meta.router)
 app.include_router(admin.router)
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    init_db()
-

@@ -15,6 +15,7 @@ from app.services.pii import redact_sensitive
 from app.services.rate_limit import rate_limiter
 from app.services.retrieval import search_knowledge
 from app.services.tickets import create_ticket, normalize_phone_number, to_ticket_response
+from app.services.ticket_operations import reopen_closed_ticket_for_customer
 
 
 PRIVACY_NOTICE_URL = "https://duducar.co/privacy-notice"
@@ -49,6 +50,9 @@ class ChatbotService:
 
         try:
             conversation, is_new = self._get_or_create_conversation(db, request)
+            reopen_closed_ticket_for_customer(
+                db, channel=request.channel, external_user_id=request.external_user_id
+            )
             language = self._select_language(conversation, request)
             request.preferred_language = language
             conversation.preferred_language = language

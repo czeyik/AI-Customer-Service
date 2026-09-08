@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,10 +13,16 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./dudu_support.db"
     secret_key: str = "change-me-in-production"
 
-    admin_username: str = "admin"
-    admin_initial_password: str = "change-me-now"
-    admin_totp_secret: str = ""
+    admin_totp_secrets: dict[str, str] = Field(default_factory=dict)
     admin_api_key: str = "dev-admin-api-key"
+    notification_send_enabled: bool = False
+    notification_max_attempts: int = 5
+    smtp_host: str = ""
+    smtp_port: int = 465
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_from_address: str = ""
+    notification_template_names: dict[str, str] = Field(default_factory=dict)
 
     meta_verify_token: str = "dev-verify-token"
     meta_app_secret: str = ""
@@ -63,8 +69,6 @@ class Settings(BaseSettings):
 
         unsafe_values = {
             "secret_key": {"", "change-me-in-production", "change-this-to-a-long-random-string"},
-            "admin_initial_password": {"", "change-me-now"},
-            "admin_totp_secret": {""},
             "admin_api_key": {"", "dev-admin-api-key", "change-this-admin-api-key"},
             "meta_verify_token": {"", "dev-verify-token", "change-this-meta-verify-token"},
             "meta_app_secret": {""},
@@ -75,7 +79,6 @@ class Settings(BaseSettings):
 
         minimum_lengths = {
             "secret_key": 32,
-            "admin_initial_password": 12,
             "admin_api_key": 24,
             "meta_verify_token": 24,
             "meta_app_secret": 24,
@@ -83,6 +86,24 @@ class Settings(BaseSettings):
         for field, minimum in minimum_lengths.items():
             if len(getattr(self, field)) < minimum:
                 errors.append(f"{field.upper()} must be at least {minimum} characters")
+
+        if not self.admin_totp_secrets:
+            errors.append("ADMIN_TOTP_SECRETS must contain per-user secret references")
+        if self.notification_send_enabled:
+            if not all(
+                (self.smtp_host, self.smtp_username, self.smtp_password, self.smtp_from_address)
+            ):
+                errors.append("SMTP settings must be set when NOTIFICATION_SEND_ENABLED is true")
+            required_templates = {
+                "ticket_status_changed.en",
+                "ticket_status_changed.ms",
+                "ticket_status_changed.zh",
+                "urgent_ticket_created.en",
+            }
+            if not required_templates <= self.notification_template_names.keys():
+                errors.append("NOTIFICATION_TEMPLATE_NAMES must contain all launch templates")
+        if not 1 <= self.notification_max_attempts <= 10:
+            errors.append("NOTIFICATION_MAX_ATTEMPTS must be between 1 and 10")
 
         if self.meta_send_enabled:
             if len(self.meta_access_token) < 24:

@@ -16,6 +16,7 @@
         <h2>Ticket</h2>
         <dl>
           <dt>Status</dt><dd>{{ ticket.status }}</dd>
+          <dt>Assigned</dt><dd>{{ ticket.assigned_admin.display_name if ticket.assigned_admin else "Unassigned" }}</dd>
           <dt>Urgency</dt><dd>{{ ticket.urgency }}</dd>
           <dt>Issue</dt><dd>{{ ticket.issue_type }}</dd>
           <dt>Role</dt><dd>{{ ticket.user_role or "unknown" }}</dd>
@@ -34,6 +35,36 @@
           <h2>Ride details</h2>
           <p class="description">{{ ticket.ride_details }}</p>
         {% endif %}
+      </section>
+      <section class="operations">
+        <h2>Operations</h2>
+        <form method="post" action="/admin/tickets/{{ ticket.public_id }}/assign">
+          <input type="hidden" name="csrf_token" value="{{ csrf }}">
+          <label>Assign to
+            <select name="assignee_id" required>
+              {% for option in admins %}<option value="{{ option.id }}" {% if ticket.assigned_admin_id == option.id %}selected{% endif %}>{{ option.display_name }}</option>{% endfor %}
+            </select>
+          </label>
+          <button type="submit">Assign</button>
+        </form>
+        {% if ticket.status != "closed" %}
+          <form method="post" action="/admin/tickets/{{ ticket.public_id }}/status">
+            <input type="hidden" name="csrf_token" value="{{ csrf }}">
+            <input type="hidden" name="new_status" value="{{ 'in_progress' if ticket.status == 'open' else 'closed' }}">
+            <button type="submit">Move to {{ 'in progress' if ticket.status == 'open' else 'closed' }}</button>
+          </form>
+        {% endif %}
+        <form method="post" action="/admin/tickets/{{ ticket.public_id }}/notes">
+          <input type="hidden" name="csrf_token" value="{{ csrf }}">
+          <label>Internal note<textarea name="body" maxlength="4000" required></textarea></label>
+          <button type="submit">Add note</button>
+        </form>
+      </section>
+      <section>
+        <h2>Internal notes</h2>
+        {% for note in ticket.notes|sort(attribute='created_at', reverse=true) %}
+          <article><strong>{{ note.author.display_name }}</strong> · {{ note.created_at.strftime("%Y-%m-%d %H:%M") }}<p class="description">{{ note.body }}</p></article>
+        {% else %}<p class="hint">No internal notes.</p>{% endfor %}
       </section>
     </main>
   </body>

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Ticket
 from app.schemas import ChatRequest, TicketResponse
+from app.services.ticket_operations import queue_new_ticket_notifications
 
 
 PHONE_RE = re.compile(r"^[+\d][\d ()-]{7,24}$")
@@ -72,6 +73,7 @@ def create_ticket(
     )
     db.add(ticket)
     db.flush()
+    queue_new_ticket_notifications(db, ticket)
     return ticket
 
 
