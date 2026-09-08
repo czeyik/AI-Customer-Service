@@ -1,6 +1,6 @@
 # DUDU Car AI Support Chatbot — Consolidated Requirements
 
-Last updated: 5 September 2026
+Last updated: 9 September 2026
 
 This document is the authoritative requirements baseline for the project. It consolidates the
 requirements review and supersedes earlier assumptions about an Instagram launch, a single
@@ -99,12 +99,12 @@ periods.
 - Use hosted LLM API calls for production.
 - Primary candidate: **GLM-5.3-Flash**, selected for its current intelligence-to-cost ratio and
   native text, image, video, and file inputs.
-- Production-safe fallback: **GPT-5.6 Luna**, selected for its speed, concise responses,
-  controllable reasoning, mature API surface, and clearer production data controls.
+- Provider-outage fallback: use the deterministic approved-knowledge response; no second hosted
+  provider is approved for the pilot.
 - Evaluated alternative: **DeepSeek V4 Flash**. Retain it in comparative tests, but do not make it
   the launch default unless DUDU-specific evaluation shows a material advantage.
-- Access models through a provider-neutral application adapter so the primary and fallback can
-  be changed through configuration without rewriting chatbot or ticket logic.
+- Access the model through a provider-neutral application adapter so it can be changed without
+  rewriting chatbot or ticket logic.
 - Ground generated answers in DUDU-approved retrieved knowledge. Provider-hosted web search must
   not replace the approved knowledge base for DUDU policies.
 - Minimize personal data sent to an LLM. Keep names, email addresses, attachments, and ticket
@@ -123,7 +123,6 @@ media and extra reasoning tokens:
 | Model | Planning cost per 1,000 replies | Planning treatment |
 | --- | ---: | --- |
 | GLM-5.3-Flash | $0.45 at list price | Use list price; do not budget from temporary promotions. |
-| GPT-5.6 Luna | $0.76 | Use as the stable fallback baseline. |
 | DeepSeek V4 Flash | $0.64 off-peak / $1.28 peak | Budget peak pricing for Malaysia daytime traffic. |
 
 Prices and model behaviour are external dependencies and must be rechecked before procurement
@@ -179,14 +178,14 @@ and launch.
   work end to end.
 - Multiple administrators and the CCO knowledge workflow are attributable and audited.
 - Automated retention jobs enforce the 90-day and 36-month periods.
-- The hosted primary/fallback model configuration passes a representative DUDU evaluation before
+- The hosted model and deterministic outage fallback pass a representative DUDU evaluation before
   WhatsApp production traffic is enabled.
 
 ## Current MVP Gap Notice
 
 The requirements above describe the approved target, not the current implementation state. The
 current MVP already provides basic chat, retrieval, tickets, guardrails, Meta webhooks, and an
-administrator inbox, but it still requires implementation work for hosted GLM/Luna adapters,
+administrator inbox, but it still requires implementation work for a hosted GLM adapter,
 explicit natural-language human escalation, required ticket contact fields, real media storage,
 per-ticket response wording, multiple-admin provisioning and per-admin 2FA, CCO knowledge
 versioning, and automated retention enforcement.

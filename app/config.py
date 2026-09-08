@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     meta_send_timeout_seconds: float = 10.0
     meta_send_max_attempts: int = 5
 
+    llm_enabled: bool = False
+    zai_api_key: str = ""
+    llm_model: str = "glm-5.3-flash"
+    llm_timeout_seconds: float = 8.0
+    llm_max_input_chars: int = 8000
+    llm_max_output_tokens: int = 300
+
     rate_limit_messages_per_minute: int = 20
     retrieval_min_confidence: float = 0.12
     chat_log_retention_days: int = 90
@@ -88,6 +95,19 @@ class Settings(BaseSettings):
             errors.append("META_SEND_MAX_ATTEMPTS must be between 1 and 10")
         if not 1 <= self.meta_send_timeout_seconds <= 30:
             errors.append("META_SEND_TIMEOUT_SECONDS must be between 1 and 30")
+
+        if not self.llm_enabled:
+            errors.append("LLM_ENABLED must be true")
+        if len(self.zai_api_key) < 16:
+            errors.append("ZAI_API_KEY must be set")
+        if self.llm_model != "glm-5.3-flash":
+            errors.append("LLM_MODEL must be the approved glm-5.3-flash")
+        if not 1 <= self.llm_timeout_seconds <= 8:
+            errors.append("LLM_TIMEOUT_SECONDS must be between 1 and 8")
+        if not 1 <= self.llm_max_input_chars <= 8000:
+            errors.append("LLM_MAX_INPUT_CHARS must be between 1 and 8000")
+        if not 1 <= self.llm_max_output_tokens <= 300:
+            errors.append("LLM_MAX_OUTPUT_TOKENS must be between 1 and 300")
 
         if not self.trusted_host_list or "*" in self.trusted_host_list:
             errors.append("TRUSTED_HOSTS must contain explicit production hosts")

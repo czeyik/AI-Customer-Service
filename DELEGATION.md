@@ -31,7 +31,7 @@ Critical blockers:
 - WhatsApp receives messages but cannot send replies; webhook processing is not idempotent.
 - WhatsApp ticket intake is stateless and cannot collect consent, name, and email across messages.
 - Human escalation, partnership intake, required acknowledgements, and real media are incomplete.
-- Hosted primary/fallback LLM integration and release evaluation do not exist.
+- Hosted LLM release evaluation does not yet exist.
 - Knowledge is English-only, shared-key published, unversioned, and not CCO-attributable.
 - Administration uses a shared TOTP configuration and lacks an operational ticket workflow.
 - Retention jobs, production security evidence, CI/migrations, infrastructure, monitoring,
@@ -49,7 +49,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 2 | PG-02 | Reproducible build, migrations, and CI | PASS |
 | 3 | PG-03 | Stateful multilingual ticket flow | PASS |
 | 4 | PG-04 | Reliable WhatsApp send/receive path | PASS |
-| 5 | PG-05 | Grounded hosted LLM and failover | NOT_STARTED |
+| 5 | PG-05 | Grounded hosted LLM and outage fallback | PASS |
 | 6 | PG-06 | Named admins and ticket operations | NOT_STARTED |
 | 7 | PG-07 | CCO knowledge governance and launch corpus | NOT_STARTED |
 | 8 | PG-08 | Secure image/video pipeline | NOT_STARTED |
@@ -71,7 +71,7 @@ or commit them; provision secrets directly in the chosen secret manager.
 | OI-02 | Hosting/staging platform, cloud region, domain/DNS, data residency, Git/CI/registry workflow, and resource/release owners | UNRESOLVED | 1, 2, 11 |
 | OI-03 | Human support workflow, assignees, ticket statuses/notifications, escalation contacts, admin roster, CCO identity, and recovery approver | RESOLVED | 1, 3, 6, 7 |
 | OI-04 | Meta Business/WABA/app/phone readiness, API version, opt-in approval, test recipients, and secure credential provisioning | RESOLVED | 4, 12 |
-| OI-05 | GLM/OpenAI accounts, exact enabled model IDs, data terms, regions, quotas, timeouts, availability needs, spend limits, and fallback approval | UNRESOLVED | 5, 12 |
+| OI-05 | Z.AI account, exact enabled model ID, data terms, region, quotas, timeout, availability needs, spend limit, and outage fallback approval | RESOLVED | 5, 12 |
 | OI-06 | CCO-approved knowledge and customer copy in all three languages, including bot disclosure, emergency, consent, partnership, and WhatsApp profile text | UNRESOLVED | 3, 7, 12 |
 | OI-07 | Allowed media types/sizes, private object store, malware scanner, reviewer access policy, signed-link lifetime, and media-analysis policy | UNRESOLVED | 8, 10, 11 |
 | OI-08 | Privacy notice, controller/contact, deletion versus anonymization, legal holds, backup retention, incident owner, security owner, secret manager, scan policy, and risk approver | UNRESOLVED | 3, 9, 10, 11, 12 |
@@ -151,15 +151,16 @@ Inputs: OI-04.
 Exit: a real Meta test number completes one multi-turn ticket exactly once, including retry and
 invalid-signature tests.
 
-### Wave 5 — Hosted LLM and Failover
+### Wave 5 — Hosted LLM and Outage Fallback
 
 Inputs: OI-05 and provider-related OI-08 decisions.
 
-- Verify exact current models and implement a provider-neutral primary/fallback adapter with
-  timeouts, limits, telemetry, data minimization, grounding checks, and deterministic fallback.
-- Add contract tests and authorized live smoke tests for both providers and failure paths.
+- Verify the exact current model and implement a provider-neutral adapter with timeouts, limits,
+  telemetry, data minimization, grounding checks, and deterministic outage fallback.
+- Add contract tests and an authorized live smoke test for the configured provider and failure
+  paths.
 
-Exit: both configured models and total-provider-outage fallback pass with no unnecessary personal
+Exit: the configured model and total-provider-outage fallback pass with no unnecessary personal
 data sent or logged.
 
 ### Wave 6 — Administration and Ticket Operations
@@ -460,6 +461,52 @@ traffic beyond the authorized testers occurred. After collecting evidence, `META
 was returned to `false`, the outbound worker and temporary tunnel were stopped, and only the local
 API/database development services remained running. PG-04 is `PASS`; Wave 5 is unblocked but was
 not started.
+
+### Wave 5 — 2026-09-09
+Status: PASS
+Owner decisions: Cze Yik approved Z.AI `glm-5.3-flash` as the only hosted pilot model and removed
+GPT-5.6 Luna from the approved requirements. The deterministic approved-knowledge responder is
+the provider-outage fallback. Cze Yik approved an eight-second timeout, 8,000-character total
+prompt limit, 300-token output limit, no model tools or hosted web search, the existing USD 15
+hosted-LLM pilot ceiling, and Z.AI API processing in Singapore under its API DPA. Only approved
+support knowledge may be sent; customer messages, names, telephone numbers, email addresses,
+external user IDs, ticket data, and attachments remain in DUDU-controlled storage. The ignored
+local `ZAI_API_KEY` was provisioned with owner-only file permissions. Cze Yik explicitly
+authorized one billable synthetic live smoke call on 9 September 2026.
+Files/migrations and commit/PR/release: Added the provider-neutral text-generation contract, Z.AI
+chat-completions client, fail-closed production configuration, bounded provider request/response,
+content-free telemetry, cited-output validation, unsafe/ungrounded rejection, and deterministic
+outage fallback. Added focused provider, grounding, outage, configuration, and end-to-end
+data-minimization tests; updated the environment example, README, privacy-notice draft, approved
+requirements, and security checklist for the owner-approved single-provider decision. No schema
+migration was needed. Changes remain uncommitted on `dev`; no push, PR, merge, release,
+production deployment, public traffic, or pilot-user contact occurred.
+Verification commands/results: The clean digest-pinned Python 3.11 image built as
+`dudu-support:wave5-check`; `python -m pip check` reported no broken requirements, all 91 tests
+passed in 15.24s, and compile checks passed. The tests prove the eight-second and 300-token API
+contract, absence of tools, exact-model response validation, bounded prompt and provider response,
+safe telemetry, invalid citation/number/commitment rejection, total-provider-outage fallback, and
+that a FAQ containing a name, email, telephone number, and external user ID sends none of them to
+the hosted provider. `docker compose config --quiet` and `git diff --check` passed.
+External evidence (no secrets or customer data): Official Z.AI chat-completions documentation
+reviewed on 9 September 2026 confirmed the HTTPS endpoint, bearer authentication, synchronous JSON
+responses, `max_tokens`, JSON response format, usage telemetry, finish reasons, and references to
+GLM-5.3-FLASH. The parameter enum did not consistently list the Flash identifier, so the
+authorized live call supplied stronger account-specific evidence: `glm-5.3-flash` returned a
+grounded response with a provider request ID in 1,826 ms using 196 prompt and 23 completion tokens.
+The synthetic request contained one public fare sentence and no customer data. Z.AI's API DPA,
+also reviewed on 9 September, states that API customer data is generally processed in Singapore,
+API content is processed in real time and not stored, and API end-user content is not used to
+develop or improve services without explicit agreement. Sources:
+`https://docs.z.ai/api-reference/llm/chat-completion` and
+`https://docs.z.ai/legal-agreement/privacy-policy`.
+Gate update and residual risks: PG-05 is `PASS`. The configured hosted model and complete-provider
+outage path both pass, and repeatable tests prove that no customer identifiers reach provider
+payloads or telemetry. `LLM_ENABLED` remains false in the local development environment after the
+smoke test, and Meta outbound traffic remains disabled. The full approved trilingual corpus and
+release-quality/cost evaluation remain Wave 7 and Wave 12 work respectively.
+Next-wave notes: Wave 6 is unblocked after these changes are reviewed and integrated. Do not send
+customer text or add model tools when extending the adapter. Wave 6 has not started.
 
 ## Fresh-Chat Prompt
 

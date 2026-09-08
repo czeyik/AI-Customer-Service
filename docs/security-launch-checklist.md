@@ -11,8 +11,9 @@ Do not use the system with real customers until these items are complete.
   settings.
 - Do not make network allowlisting or VPN access a launch dependency; validate the
   internet-accessible administrator interface with the other required controls in place.
-- Configure hosted LLM access with GLM-5.3-Flash as primary and GPT-5.6 Luna as fallback. Confirm
-  provider contracts, data handling, failover, timeout, and spend limits before enabling traffic.
+- Configure hosted LLM access with GLM-5.3-Flash and the deterministic approved-knowledge outage
+  fallback. Confirm provider contracts, data handling, timeout, and spend limits before enabling
+  traffic.
 - Confirm that names, email addresses, ticket records, and attachments remain in DUDU-controlled
   storage unless a specific approved model task requires them.
 - Implement and test automatic chat deletion or anonymization at 90 days.

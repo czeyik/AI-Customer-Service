@@ -35,11 +35,10 @@ to request general support information.
 ### Add under Section III — Transmission of Personal Data
 
 We use service providers to operate the chatbot, including WhatsApp/Meta, secure hosting and
-storage providers, and approved artificial-intelligence providers acting on our instructions.
-We limit information disclosed to what is needed for the service. Names, email addresses, ticket
-records, and attachments are not sent to an artificial-intelligence provider unless a specific
-use has been separately assessed and approved. Where a provider processes data outside Malaysia,
-we apply the safeguards required by applicable law.
+storage providers, and Z.AI acting on our instructions. Z.AI processes approved support knowledge
+in Singapore to draft answers. Customer messages, names, telephone numbers, email addresses,
+ticket records, identifiers, and attachments are not sent to Z.AI. We apply the safeguards
+required by applicable law to this processing outside Malaysia.
 
 ### Add under Section IV — Storage of Personal Data
 
@@ -82,12 +81,11 @@ maklumat sokongan umum.
 ### Tambah di bawah Bahagian III — Penghantaran Data Peribadi
 
 Kami menggunakan penyedia perkhidmatan untuk mengendalikan chatbot, termasuk WhatsApp/Meta,
-penyedia pengehosan dan storan selamat, serta penyedia kecerdasan buatan yang diluluskan dan
-bertindak mengikut arahan kami. Kami mengehadkan maklumat yang didedahkan kepada perkara yang
-diperlukan untuk perkhidmatan tersebut. Nama, alamat e-mel, rekod tiket, dan lampiran tidak
-dihantar kepada penyedia kecerdasan buatan melainkan penggunaan tertentu telah dinilai dan
-diluluskan secara berasingan. Jika penyedia memproses data di luar Malaysia, kami menggunakan
-perlindungan yang dikehendaki oleh undang-undang yang terpakai.
+penyedia pengehosan dan storan selamat, serta Z.AI yang bertindak mengikut arahan kami. Z.AI
+memproses maklumat sokongan yang diluluskan di Singapura untuk menyediakan draf jawapan. Mesej
+pelanggan, nama, nombor telefon, alamat e-mel, rekod tiket, pengecam, dan lampiran tidak dihantar
+kepada Z.AI. Kami menggunakan perlindungan yang dikehendaki oleh undang-undang yang terpakai bagi
+pemprosesan di luar Malaysia ini.
 
 ### Tambah di bawah Bahagian IV — Penyimpanan Data Peribadi
 
@@ -109,15 +107,17 @@ dan mungkin menghalang kami daripada membuat atau meneruskan tiket sokongan.
 
 1. Update the live notice's privacy-rights contact from `duducarmalaysia@gmail.com` to the
    owner-confirmed `support@duducar.co`.
-2. After Wave 5 provider selection, name any provider where required and confirm cross-border
-   transfer wording against its actual processing region and contract.
-3. Record the notice effective date and publish both English and Bahasa Malaysia versions.
-4. Translate the remainder of the existing English-only notice into Bahasa Malaysia; publishing
+2. Record the notice effective date and publish both English and Bahasa Malaysia versions.
+3. Translate the remainder of the existing English-only notice into Bahasa Malaysia; publishing
    only the bilingual chatbot addition does not meet the regulator's bilingual-notice guidance.
 
 Retention and privacy-contact decisions confirmed by Cze Yik on 5 September 2026: chat messages
 expire 90 days after each message; tickets and attachments expire 36 months after ticket closure;
 the privacy contact is `support@duducar.co`.
+
+Provider decision confirmed by Cze Yik on 9 September 2026: Z.AI with GLM-5.3-Flash is the only
+hosted pilot model; API content is processed in Singapore under Z.AI's API DPA, and only approved
+support knowledge—not customer messages or identifiers—is sent.
 
 ## References reviewed
 

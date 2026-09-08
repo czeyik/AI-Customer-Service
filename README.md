@@ -11,8 +11,7 @@ The approved project direction is:
 - Consent-first complaint, safety, human-escalation, and partnership ticket intake.
 - A purely informational bot: no refunds, cancellations, account changes, approvals, payments, or
   other business-state changes.
-- Hosted LLM APIs, with GLM-5.3-Flash as the primary candidate and GPT-5.6 Luna as the
-  production-safe fallback.
+- Hosted GLM-5.3-Flash, with a deterministic approved-knowledge outage fallback.
 - PostgreSQL, Docker Compose, secure media storage, and multiple named administrator accounts in
   the launch target.
 
@@ -36,7 +35,7 @@ The complete, authoritative baseline is
 
 The current code predates the consolidated requirements. Before launch it still needs:
 
-- Hosted GLM-5.3-Flash and GPT-5.6 Luna adapters with configurable failover.
+- DUDU-specific trilingual release evaluation of the hosted model and outage fallback.
 - Real image/video upload, scanning, storage, and ticket retrieval rather than attachment metadata
   alone.
 - Multiple-admin provisioning, individual administrator 2FA, and CCO-attributed knowledge
@@ -154,16 +153,15 @@ curl -X POST http://localhost:8000/api/chat \
 
 ## Hosted LLM Direction
 
-Production will use hosted API models through a provider-neutral adapter:
+Production uses the hosted model through a provider-neutral adapter:
 
-1. GLM-5.3-Flash as the primary candidate.
-2. GPT-5.6 Luna as the production-safe fallback.
-3. DeepSeek V4 Flash retained only as an evaluated alternative.
+1. GLM-5.3-Flash as the approved hosted model.
+2. The deterministic approved-knowledge responder during provider outages or rejected output.
+3. DeepSeek V4 Flash retained only as an evaluated alternative, not a pilot provider.
 
-The hosted provider adapter has not yet been implemented. Until it is available, the application
-uses a deterministic response path grounded in approved retrieved knowledge. Do not assume that
-the hosted-model requirement is complete until the primary/fallback integration and evaluation
-have passed.
+Set `LLM_ENABLED=true` and provision `ZAI_API_KEY` outside Git. Calls have an eight-second timeout,
+bounded input/output, no tools, and receive approved knowledge rather than customer messages.
+Invalid, unsafe, ungrounded, or failed responses use the deterministic approved-knowledge path.
 
 ## Safety Gate
 
