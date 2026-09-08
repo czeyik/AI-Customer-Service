@@ -48,7 +48,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 1 | PG-01 | Approved launch contract and architecture | PASS |
 | 2 | PG-02 | Reproducible build, migrations, and CI | PASS |
 | 3 | PG-03 | Stateful multilingual ticket flow | PASS |
-| 4 | PG-04 | Reliable WhatsApp send/receive path | IN_PROGRESS |
+| 4 | PG-04 | Reliable WhatsApp send/receive path | PASS |
 | 5 | PG-05 | Grounded hosted LLM and failover | NOT_STARTED |
 | 6 | PG-06 | Named admins and ticket operations | NOT_STARTED |
 | 7 | PG-07 | CCO knowledge governance and launch corpus | NOT_STARTED |
@@ -70,7 +70,7 @@ or commit them; provision secrets directly in the chosen secret manager.
 | OI-01 | Pilot date, region, cohort, traffic/volume limits, duration, budget, success measures, rollback triggers, and go/no-go owner | RESOLVED | 1, 11, 12 |
 | OI-02 | Hosting/staging platform, cloud region, domain/DNS, data residency, Git/CI/registry workflow, and resource/release owners | UNRESOLVED | 1, 2, 11 |
 | OI-03 | Human support workflow, assignees, ticket statuses/notifications, escalation contacts, admin roster, CCO identity, and recovery approver | RESOLVED | 1, 3, 6, 7 |
-| OI-04 | Meta Business/WABA/app/phone readiness, API version, opt-in approval, test recipients, and secure credential provisioning | UNRESOLVED | 4, 12 |
+| OI-04 | Meta Business/WABA/app/phone readiness, API version, opt-in approval, test recipients, and secure credential provisioning | RESOLVED | 4, 12 |
 | OI-05 | GLM/OpenAI accounts, exact enabled model IDs, data terms, regions, quotas, timeouts, availability needs, spend limits, and fallback approval | UNRESOLVED | 5, 12 |
 | OI-06 | CCO-approved knowledge and customer copy in all three languages, including bot disclosure, emergency, consent, partnership, and WhatsApp profile text | UNRESOLVED | 3, 7, 12 |
 | OI-07 | Allowed media types/sizes, private object store, malware scanner, reviewer access policy, signed-link lifetime, and media-analysis policy | UNRESOLVED | 8, 10, 11 |
@@ -442,6 +442,24 @@ current Wave 4 implementation be committed locally on `dev`; no push, PR, merge,
 production deployment was authorized. PG-04 remains incomplete pending permanent-token/app
 publication confirmation, explicit authorization to enable outbound test traffic, and the real
 multi-turn test-number result.
+
+Completion update — 2026-09-09: Status: PASS. The owner replaced the expired token with a valid
+non-expiring system-user token for the expected Meta app, confirmed the required WhatsApp
+permissions, corrected the registered Phone Number ID, published the app, and explicitly
+authorized outbound testing to the two owner-controlled testers. The callback was verified over
+a temporary HTTPS tunnel and the app was subscribed to the WABA that owns the registered business
+number. One authorized tester completed the five-turn human-support intake. Database evidence
+showed five unique Meta inbound message IDs, five outbound rows with provider IDs, all five final
+delivery states `read`, one ticket, one `ticket_created` audit, and the conversation returned to
+`idle`; no duplicate ticket or message processing occurred. The retry, retry-exhaustion,
+dead-letter, invalid/missing-signature, atomic-rollback, and duplicate-delivery paths remain covered
+by the 14 focused transport tests. The clean Wave 4 image passed all 79 tests in 12.78s and
+`python -m pip check`; `docker compose config --quiet` and `git diff --check` passed. Implementation
+commit `da714d5` remains local on `dev`; no push, PR, merge, release, production deployment, or
+traffic beyond the authorized testers occurred. After collecting evidence, `META_SEND_ENABLED`
+was returned to `false`, the outbound worker and temporary tunnel were stopped, and only the local
+API/database development services remained running. PG-04 is `PASS`; Wave 5 is unblocked but was
+not started.
 
 ## Fresh-Chat Prompt
 
