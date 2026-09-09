@@ -6,7 +6,7 @@ import struct
 import tempfile
 import zlib
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import BinaryIO
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlparse
@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.models import AuditLog, MediaAttachment, Ticket
+from app.services.object_storage import delete_all_versions
 
 
 ALLOWED_MEDIA = {
@@ -180,7 +181,68 @@ class PrivateObjectStore:
         )
 
     def delete(self, key: str) -> None:
-        self.client.delete_object(Bucket=self.settings.media_bucket, Key=key)
+        delete_all_versions(self.client, self.settings.media_bucket, key)
+
+    def list(self, prefix: str):
+        continuation = None
+        while True:
+            arguments = {"Bucket": self.settings.media_bucket, "Prefix": prefix}
+            if continuation:
+                arguments["ContinuationToken"] = continuation
+            page = self.client.list_objects_v2(**arguments)
+            yield from page.get("Contents", [])
+            if not page.get("IsTruncated"):
+                return
+            continuation = page["NextContinuationToken"]
+
+
+def reconcile_orphaned_media(
+    db: Session,
+    storage: PrivateObjectStore | None = None,
+    *,
+    now: datetime | None = None,
+) -> int:
+    now = now or datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)
+    storage = storage or PrivateObjectStore()
+    linked = {
+        key
+        for (key,) in db.query(MediaAttachment.object_key)
+        .filter(MediaAttachment.object_key.isnot(None))
+        .all()
+    }
+    removed = 0
+    failures = 0
+    # ponytail: scan the prefix directly for the pilot; use S3 Inventory above 10,000 objects.
+    for item in storage.list("approved/"):
+        modified = item["LastModified"]
+        if modified.tzinfo is None:
+            modified = modified.replace(tzinfo=timezone.utc)
+        key = item["Key"]
+        if key in linked or modified > now - timedelta(hours=24):
+            continue
+        subject = hashlib.sha256(key.encode()).hexdigest()[:24]
+        try:
+            storage.delete(key)
+            event = "orphaned_media_deleted"
+            removed += 1
+        except Exception:
+            event = "orphaned_media_delete_failed"
+            failures += 1
+        db.add(
+            AuditLog(
+                actor="media-reconciler",
+                event_type=event,
+                subject_type="object",
+                subject_id=subject,
+                details={"key_hash": subject},
+            )
+        )
+    db.commit()
+    if failures:
+        raise MediaProcessingError("orphan_cleanup_failed")
+    return removed
 
 
 def process_next_media(

@@ -48,3 +48,9 @@ jobs:
         run: python -m pytest -q
       - name: Build application image
         run: docker build --tag dudu-support:${{ github.sha }} .
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+      - name: Prove ARM64 release image and tests
+        run: |
+          docker buildx build --platform linux/arm64 --target test --output type=cacheonly .
+          docker buildx build --platform linux/arm64 --file infra/production/Dockerfile.clamav \
+            --target test --output type=cacheonly .

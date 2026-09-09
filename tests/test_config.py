@@ -81,6 +81,8 @@ def test_production_send_requires_meta_transport_credentials() -> None:
         ("chat_log_retention_days", 91),
         ("ticket_retention_months", 35),
         ("backup_retention_days", 36),
+        ("backup_interval_minutes", 61),
+        ("backup_prefix", "postgresql"),
         ("privacy_owner_username", "shared-admin"),
         ("retention_batch_size", 0),
     ],

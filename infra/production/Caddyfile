@@ -1,0 +1,11 @@
+{
+	email {$CADDY_EMAIL}
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+{$APP_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy api:8000
+}

@@ -1,0 +1,19 @@
+FROM alpine:3.22@sha256:14358309a308569c32bdc37e2e0e9694be33a9d99e68afb0f5ff33cc1f695dce AS runtime
+
+RUN apk upgrade --no-cache \
+    && apk add --no-cache ca-certificates clamav clamav-daemon \
+    && mkdir -p /run/clamav /var/lib/clamav \
+    && chown -R clamav:clamav /run/clamav /var/lib/clamav
+
+COPY infra/production/clamd.conf /etc/clamav/clamd.conf
+
+USER clamav
+EXPOSE 3310
+
+FROM runtime AS test
+
+RUN clamd --version && clamscan --version && freshclam --version
+
+FROM runtime AS final
+
+CMD ["sh", "-c", "freshclam --quiet || exit 1; freshclam --daemon --foreground=true & exec clamd --foreground=true"]

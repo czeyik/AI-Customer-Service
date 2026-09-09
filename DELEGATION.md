@@ -55,7 +55,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 8 | PG-08 | Secure image/video pipeline | PASS |
 | 9 | PG-09 | Application security | PASS |
 | 10 | PG-10 | Privacy, retention, and deletion | PASS |
-| 11 | PG-11 | Production platform and operations | NOT_STARTED |
+| 11 | PG-11 | Production platform and operations | PASS |
 | 12 | PG-12 | Release validation and pilot activation | NOT_STARTED |
 
 Valid statuses: `NOT_STARTED`, `IN_PROGRESS`, `BLOCKED`, `PASS`.
@@ -68,14 +68,14 @@ or commit them; provision secrets directly in the chosen secret manager.
 | Input | Required decision or information | Status | Waves |
 | --- | --- | --- | --- |
 | OI-01 | Pilot date, region, cohort, traffic/volume limits, duration, budget, success measures, rollback triggers, and go/no-go owner | RESOLVED | 1, 11, 12 |
-| OI-02 | Hosting/staging platform, cloud region, domain/DNS, data residency, Git/CI/registry workflow, and resource/release owners | UNRESOLVED | 1, 2, 11 |
+| OI-02 | Hosting/staging platform, cloud region, domain/DNS, data residency, Git/CI/registry workflow, and resource/release owners | RESOLVED | 1, 2, 11 |
 | OI-03 | Human support workflow, assignees, ticket statuses/notifications, escalation contacts, admin roster, CCO identity, and recovery approver | RESOLVED | 1, 3, 6, 7 |
 | OI-04 | Meta Business/WABA/app/phone readiness, API version, opt-in approval, test recipients, and secure credential provisioning | RESOLVED | 4, 12 |
 | OI-05 | Z.AI account, exact enabled model ID, data terms, region, quotas, timeout, availability needs, spend limit, and outage fallback approval | RESOLVED | 5, 12 |
 | OI-06 | CCO-approved knowledge and customer copy in all three languages, including bot disclosure, emergency, consent, partnership, and WhatsApp profile text | RESOLVED | 3, 7, 12 |
 | OI-07 | Allowed media types/sizes, private object store, malware scanner, reviewer access policy, signed-link lifetime, and media-analysis policy | RESOLVED | 8, 10, 11 |
 | OI-08 | Privacy notice, controller/contact, deletion versus anonymization, legal holds, backup retention, incident owner, security owner, secret manager, scan policy, and risk approver | RESOLVED | 3, 9, 10, 11, 12 |
-| OI-09 | Logging/metrics/error tools, alerts, on-call roster, SLOs, maintenance window, RPO/RTO, and incident/operational escalation path | UNRESOLVED | 11, 12 |
+| OI-09 | Logging/metrics/error tools, alerts, on-call roster, SLOs, maintenance window, RPO/RTO, and incident/operational escalation path | RESOLVED | 11, 12 |
 
 When an owner input is resolved, update its status and record the decision in the wave handoff.
 Do not silently decide legal, privacy, budget, credential, risk-acceptance, or go-live questions.
@@ -741,6 +741,42 @@ expiry, scheduler, failure-alert routing, and restore traffic gate in the intend
 it must not alter the approved periods silently. Real customer traffic remains disabled.
 Next-wave notes: Wave 11 has not started. Its remaining owner inputs are OI-02 and OI-09; obtain
 the hosting/CI ownership and observability/on-call/SLO/RPO/RTO decisions before starting it.
+
+### Wave 11 — 2026-09-10
+Status: PASS
+Owner decisions: Cze Yik approved `support.duducaradmin.com`, one AWS account with separately
+isolated staging and production resources, AWS-native observability, and email-only alerts to
+`support@duducar.co`. Cze Yik owns infrastructure, releases, incidents, and critical on-call;
+Jane receives support-impact alerts. The SLO is 99% availability and 95% of valid messages
+answered within 30 seconds; RPO is one hour, RTO is four hours, and the maintenance window is
+2:00–4:00 AM Malaysia time. The approved host is EC2 `t4g.small` with a USD 20 monthly ceiling;
+promotion to `t4g.medium` requires explicit approval after a failed capacity test.
+Files/migrations and commit/PR/release: Added the AWS CloudFormation foundation, budget, and
+environment stacks; production Compose/runtime, provisioning, deployment, rollback, monitoring,
+backup, and load-test tooling; the digest-gated release workflow; object-storage, readiness, and
+combined-worker support; focused operations tests; and `docs/wave-11-production-platform.md`.
+Production was deployed dark. Changes remain uncommitted on `dev`; no commit, push, PR, merge,
+real customer traffic, or Wave 12 release occurred.
+Verification commands/results: The final ARM64 image passed 146 tests with two opt-in integration
+tests skipped. Bash, Compose, Actionlint, CloudFormation linting, drift detection, and
+`git diff --check` passed. The scan-clean final application and ClamAV digest pair passed isolated
+staging TLS/readiness, 1,000/1,000 requests at 0.796-second p95, dependency failure/recovery,
+encrypted PostgreSQL restore plus retention in 13 seconds, and pair-aware deploy, rollback, and
+roll-forward. The encrypted AWS Backup recovery point has 35-day expiry. Production readiness is
+HTTP 200 with valid TLS; all five alarms are `OK`; the only active project instance is the
+production `t4g.small`. Temporary staging and every retained billable artifact were deleted.
+External evidence (no secrets or customer data): Current AWS pricing, service characteristics,
+OIDC, IAM-role, and backup documentation are linked in `docs/wave-11-production-platform.md`.
+The verified steady-state price basis is approximately USD 19.54/month; the USD 20 budget and
+USD 10/15/18 notifications are active. Cze Yik confirmed the production SNS subscription, and a
+CloudWatch `OK` → `ALARM` routing test recorded a successful SNS action to the confirmed endpoint
+before the alarm was reset to `OK`.
+Gate update and residual risks: PG-11 is `PASS`. Dark production, alerts, restore, retention after
+restore, RPO/RTO, capacity, dependency recovery, rollback, least privilege, encryption, TLS/DNS,
+and the cost ceiling passed in the intended AWS account. Usage-driven charges require continued
+budget monitoring. Meta and notification sends remain disabled and no real customer traffic ran.
+Next-wave notes: Wave 12 has not started. Keep production dark until its release validation,
+go/no-go decision, and pilot activation gate pass.
 
 ## Fresh-Chat Prompt
 

@@ -21,18 +21,29 @@ gates in `DELEGATION.md` must pass first.
 
 ### Budget
 
-External-service ceiling: **USD 70**, excluding staff, domain, and existing account costs.
+External-service ceiling: **USD 70**, excluding staff, domain, and existing account costs. AWS
+infrastructure has a separate hard operating ceiling of **USD 20 per month**.
 
 | Area | Limit |
 | --- | ---: |
-| AWS Lightsail and supporting AWS services | USD 30 |
+| AWS EC2 and supporting AWS services | USD 20 |
 | Hosted LLMs | USD 15 |
 | WhatsApp and email | USD 10 |
-| Reserve for retries, extra logs/media scans, test templates, or brief release overlap | USD 15 |
+| Reserve for retries, extra logs/media scans, test templates, or brief release overlap | USD 25 |
 
-AWS alerts: USD 15 forecast, USD 25 actual, USD 29 actual. Total-spend alerts: USD 35, USD 55,
-and USD 65. At USD 65, pause enrolment; at USD 70, disable outbound traffic pending Cze Yik's
-approval. Wave 11 must confirm the estimate before provisioning.
+AWS alerts: USD 10 forecast, USD 15 actual, and USD 18 actual. At USD 18, terminate staging and
+freeze infrastructure expansion. At USD 20, disable outbound traffic and stop nonessential AWS
+resources after a successful backup pending Cze Yik's approval. Total-spend alerts remain USD 35,
+USD 55, and USD 65. At USD 65, pause enrolment; at USD 70, disable outbound traffic pending Cze
+Yik's approval. Budgets and alarms are controls, not instantaneous billing cut-offs, so the owner
+reviews daily cost during the pilot.
+
+The production-only 730-hour price basis verified on 10 September 2026 is approximately USD 19.54:
+USD 13.94 EC2, USD 3.65 public IPv4, USD 1.38 gp3, USD 0.40 Secrets Manager, and USD 0.16 for the
+first snapshot's 3.59 GiB of billed blocks. CloudWatch usage stays within its published free tier
+at the approved scale. Staging is temporary and must be deleted with its retained storage after
+validation; growth in snapshots, logs, transfer, S3, or requests is governed by the USD 10/15/18
+alerts and daily review.
 
 ### Success criteria
 
@@ -45,7 +56,8 @@ approval. Wave 11 must confirm the estimate before provisioning.
 5. At least 90% of feedback rates the answer useful or confirms correct uncertainty/escalation.
 6. At least 90% of tickets meet their first-response target; every acknowledgement includes public
    ID, priority, target, and support hours.
-7. Pilot availability is at least 99%, excluding evidenced Meta outages, and spend is at most USD 70.
+7. Pilot availability is at least 99%, excluding evidenced Meta outages; AWS spend is at most
+   USD 20 per month and total external-service spend is at most USD 70.
 
 ### Non-goals
 
@@ -80,13 +92,14 @@ approved WhatsApp template when required.
   or uncontrolled duplicates.
 - Pause or roll back after 15 minutes above 5% failures/duplicates, p95 latency above 30 seconds,
   complete LLM and deterministic-fallback failure, availability below 99%, or forecast spend above
-  USD 65/actual spend at USD 70.
+  USD 65/actual spend at USD 70. The AWS-specific USD 18/20 actions in the budget section apply
+  first.
 - Preserve inbound events for replay. Resume only after staging passes and Cze Yik approves.
 
 ## Architecture
 
 ```text
-WhatsApp -> Meta -> Route 53 -> Lightsail static IP -> Caddy TLS -> FastAPI
+WhatsApp -> Meta -> Route 53 -> EC2 Elastic IP -> Caddy TLS -> FastAPI
                                                                   |
                                                      PostgreSQL queue/data
                                                         |             |
@@ -96,24 +109,32 @@ WhatsApp -> Meta -> Route 53 -> Lightsail static IP -> Caddy TLS -> FastAPI
                                                    \    |    /
                                                     Meta outbound
 
-GitHub -> GitHub Actions -> ECR image digest -> temporary staging -> Lightsail
+GitHub -> GitHub Actions OIDC -> ECR image digest -> temporary EC2 staging -> EC2 production
 ```
 
 - AWS Malaysia (`ap-southeast-5`); customer data, logs, media, dumps, and snapshots remain there.
   Meta and approved LLM calls are explicit external processing.
-- One 4 GB Lightsail host runs Caddy, API, worker, and PostgreSQL containers. Only HTTPS is public;
-  SSH is restricted break-glass access. There is no direct EC2, RDS, Fargate, SQS, NAT Gateway,
+- One Graviton `t4g.small` EC2 instance with an encrypted gp3 volume runs Caddy, API, workers,
+  ClamAV, and PostgreSQL containers. Only HTTP/HTTPS is public; administration uses AWS Systems
+  Manager Session Manager, with no public SSH port. There is no RDS, Fargate, SQS, NAT Gateway,
   load balancer, or WAF charge.
 - PostgreSQL atomically stores unique provider message IDs and queue rows. The worker uses row
   locking, bounded retries, and dead-letter rows.
-- Private Lightsail object storage holds quarantined/approved media. Names, email, tickets, and
-  media are not sent to an LLM by default.
-- Staging uses a temporary Lightsail host in a separate AWS account. Production stays dark until
-  Wave 12. Infrastructure uses CloudFormation where supported plus a versioned host bootstrap.
+- Private Amazon S3 storage holds quarantined/approved media and encrypted database backups, with
+  lifecycle expiry capped at 35 days for backups. The EC2 instance profile grants only the needed
+  object prefixes; no AWS access keys are stored on the host. Names, email, tickets, and media are
+  not sent to an LLM by default.
+- Staging uses temporary, separately named EC2 resources, IAM roles, secrets, storage, and data in
+  the same AWS account as production. Production stays dark until Wave 12. GitHub Actions receives
+  short-lived AWS credentials through repository-scoped OIDC and promotes an immutable ECR digest.
+- AWS Secrets Manager holds runtime secrets; CloudWatch receives bounded structured logs and
+  metrics; Systems Manager provides operator access. Daily snapshots and hourly PostgreSQL backups
+  target the approved one-hour RPO and four-hour RTO.
 
-> **ponytail:** One host/Availability Zone is accepted for this 100-participant, 1,000-message/day
-> pilot. Host/zone failure may interrupt service until restore. Upgrade to multi-AZ RDS and multiple
-> Fargate tasks behind an ALB when higher availability or capacity is required.
+> **ponytail:** One 2 GB host/Availability Zone is accepted for this 100-participant,
+> 1,000-message/day pilot only after the Wave 11 capacity test passes. Host/zone failure may
+> interrupt service until restore. Promotion to `t4g.medium` requires Cze Yik's explicit approval;
+> upgrade to multi-AZ RDS and multiple application tasks when higher availability is required.
 
 ### Data classes
 
@@ -132,9 +153,9 @@ legal hold.
 
 | Dependency | Owner | Due |
 | --- | --- | --- |
-| AWS accounts, Malaysia/Lightsail enablement, billing, ECR and GitHub OIDC | Cze Yik | Waves 2/11 |
+| AWS account, Malaysia EC2 enablement, billing, ECR and GitHub OIDC | Cze Yik | Waves 2/11 |
 | GitHub protections and Actions | Cze Yik | Wave 2 |
-| Domain and Route 53 | Cze Yik | Wave 11 |
+| `support.duducaradmin.com` and Route 53 | Cze Yik | Wave 11 |
 | Meta WABA/app/number, API version and credentials | Cze Yik | Wave 4 |
 | GLM/OpenAI accounts, models, terms and quotas | Cze Yik | Wave 5 |
 | Support mailbox and WhatsApp templates | Jane; Cze Yik provisions | Wave 6 |
@@ -145,9 +166,13 @@ legal hold.
 ## Approval state
 
 Approved by Cze Yik on 4 September 2026: the combined contract, including scope, thresholds,
-notifications, change rules, USD 30 Lightsail design, USD 70 total ceiling, and ticket lifecycle.
+notifications, change rules, USD 70 total ceiling, and ticket lifecycle. Architecture amendment
+approved by Cze Yik on 10 September 2026: one AWS account with isolated staging/production,
+`support.duducaradmin.com`, EC2 `t4g.small` as the initial production size, and a USD 20 monthly AWS
+ceiling. Promotion to `t4g.medium` requires separate approval after failed capacity evidence.
 
 Sources checked 4 September 2026: `docs/requirements-summary.md`,
 `docs/security-launch-checklist.md`, [AWS Regions](https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions.html),
-[AWS Lightsail pricing](https://aws.amazon.com/lightsail/pricing/), and
-[WhatsApp pricing](https://whatsappbusiness.com/products/platform-pricing/).
+and [WhatsApp pricing](https://whatsappbusiness.com/products/platform-pricing/). Amendment sources
+checked 10 September 2026: [AWS EC2 T4g](https://aws.amazon.com/ec2/instance-types/t4/) and
+[Amazon VPC pricing](https://aws.amazon.com/vpc/pricing/).

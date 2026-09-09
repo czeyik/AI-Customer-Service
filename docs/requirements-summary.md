@@ -183,7 +183,7 @@ and launch.
 
 ## Current MVP Gap Notice
 
-The requirements above describe the approved target, not the current implementation state. The
-current MVP already provides basic chat, governed trilingual retrieval, tickets, guardrails, Meta
-webhooks, hosted GLM generation, and an administrator inbox, but it still requires real media
-storage and automated retention enforcement.
+The requirements above describe the approved target. The current implementation provides chat,
+governed trilingual retrieval, tickets, guardrails, Meta webhooks, hosted GLM generation,
+administrator operations, secure media storage, and automated retention. Production-platform
+proof remains Wave 11 work, and release validation plus pilot activation remains Wave 12 work.

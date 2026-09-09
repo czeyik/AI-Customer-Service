@@ -6,8 +6,8 @@ Approved by Cze Yik on 9 September 2026.
 
 - Accept JPEG and PNG images up to 5 MB, and MP4 and 3GP videos up to 16 MB.
 - Keep automated image/video analysis disabled. Media never enters PostgreSQL or an LLM.
-- Store clean objects in one private Lightsail bucket in AWS Malaysia (`ap-southeast-5`). Attach
-  the same-region Lightsail instance to the bucket instead of creating long-lived access keys.
+- Store clean objects in one private Amazon S3 bucket in AWS Malaysia (`ap-southeast-5`). Grant the
+  EC2 instance profile only the required object-prefix actions instead of creating access keys.
 - Scan every object with ClamAV before it receives an `approved/` object key.
 - Permit review only through an active named-administrator session. Each request is audited and
   redirects to an object URL that expires after five minutes.
@@ -26,17 +26,16 @@ and scans it with ClamAV's `INSTREAM` protocol. Only then is it written under a 
 key and linked to the conversation's ticket. Temporary scanner or storage failures retry three
 times with bounded backoff; exhausted failures remain inaccessible.
 
-The bucket must use **All objects are private** plus account-level S3 Block Public Access. AWS
-documents that Lightsail bucket data is server-side encrypted with AWS-managed keys and that
-attached same-region instances can access buckets without stored bucket credentials.
+The bucket must use S3 Block Public Access and server-side encryption. The EC2 instance role uses
+temporary credentials and grants access only to the required media and backup prefixes.
 
 ## External references verified 9 September 2026
 
 - Meta WhatsApp media retrieval and supported-media documentation:
   `https://developers.facebook.com/docs/whatsapp/cloud-api/reference/media`
-- AWS Lightsail bucket security:
-  `https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-bucket-security-best-practices.html`
-- AWS Lightsail instance resource access:
-  `https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-configuring-bucket-resource-access.html`
+- Amazon S3 security best practices:
+  `https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html`
+- EC2 IAM roles:
+  `https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html`
 - ClamAV `INSTREAM` protocol:
   `https://docs.clamav.net/manual/Usage/ClamdProtocol.html`

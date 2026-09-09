@@ -159,9 +159,9 @@ an S3 endpoint override. Run the worker separately:
 python -m app.workers.media
 ```
 
-The application uses the Lightsail instance attachment for AWS credentials; do not create bucket
-access keys for production. The bucket remains private and Lightsail encrypts objects with
-AWS-managed keys. Media is never sent to the hosted LLM.
+The application uses the EC2 instance role for S3 credentials; do not create access keys for
+production. The bucket remains private and uses server-side encryption. Media is never sent to
+the hosted LLM.
 
 ## Administration and ticket operations
 
@@ -207,6 +207,16 @@ Production runs the worker daily. Backups expire after at most 35 days, and ever
 complete a zero-failure `--once` pass before traffic is enabled. Legal holds are managed only by
 the named privacy owner through `scripts/manage_legal_hold.py`. The inventory and runbook are in
 [`docs/wave-10-privacy-data-lifecycle.md`](docs/wave-10-privacy-data-lifecycle.md).
+
+## Production platform
+
+Wave 11 uses one AWS account with isolated staging and production CloudFormation stacks. The
+initial production host is an ARM64 EC2 `t4g.small`; the AWS ceiling is USD 20 per month and any
+promotion to `t4g.medium` requires explicit owner approval. Runtime access uses an EC2 role and
+Systems Manager, secrets stay in Secrets Manager, and releases promote immutable ECR digests while
+Meta outbound traffic remains disabled. The architecture, deployment, restore, rollback, alerting,
+and capacity gates are in
+[`docs/wave-11-production-platform.md`](docs/wave-11-production-platform.md).
 
 ## Try The Chat API
 

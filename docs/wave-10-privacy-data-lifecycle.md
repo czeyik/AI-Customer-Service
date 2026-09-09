@@ -22,7 +22,7 @@ Approved by Cze Yik on 9 September 2026.
 | PostgreSQL WhatsApp inbound/outbound | Sender/recipient, redacted webhook text, reply and provider IDs | Privacy owner | Permanent deletion at 90 days; retained media metadata is detached first |
 | PostgreSQL `tickets`, notes, notifications | Contact details, issue, internal notes and delivery payloads | Support owner; privacy owner for lifecycle | Permanent deletion 36 calendar months after closure |
 | PostgreSQL `media_attachments` | Provider/integrity/object metadata | Privacy owner | Unlinked chat media at 90 days; ticket media at ticket expiry |
-| Private Lightsail object bucket | Approved image/video bytes | Privacy owner | Object deletion must succeed before its metadata or ticket is removed |
+| Private Amazon S3 bucket | Approved image/video bytes | Privacy owner | Object deletion must succeed before its metadata or ticket is removed |
 | PostgreSQL indexes | Index entries for the rows above | Database owner | Removed transactionally with each database row; no separate search service exists |
 | PostgreSQL subject audit records | Ticket, attachment, notification, and hold identifiers | Security/privacy owner | Customer-subject and hold audit rows are removed with their retained subject |
 | Application logs | Event names and internal IDs only; no chat, ticket content, contact details, or object URLs | Security owner | Platform log storage/expiry is configured in Wave 11; chat webhook IP audit rows expire at 90 days |

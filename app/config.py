@@ -58,6 +58,8 @@ class Settings(BaseSettings):
     chat_log_retention_days: int = 90
     ticket_retention_months: int = 36
     backup_retention_days: int = 35
+    backup_interval_minutes: int = 60
+    backup_prefix: str = "backups/postgresql"
     privacy_owner_username: str = "czeyik"
     retention_batch_size: int = 100
     trusted_hosts: str = "*"
@@ -184,6 +186,10 @@ class Settings(BaseSettings):
             errors.append("TICKET_RETENTION_MONTHS must be the approved 36 months")
         if self.backup_retention_days != 35:
             errors.append("BACKUP_RETENTION_DAYS must be the approved 35 days")
+        if self.backup_interval_minutes != 60:
+            errors.append("BACKUP_INTERVAL_MINUTES must be the approved 60 minutes")
+        if not self.backup_prefix.startswith("backups/") or ".." in self.backup_prefix:
+            errors.append("BACKUP_PREFIX must be below backups/")
         if self.privacy_owner_username != "czeyik":
             errors.append("PRIVACY_OWNER_USERNAME must be the approved privacy owner")
         if not 1 <= self.retention_batch_size <= 1000:
