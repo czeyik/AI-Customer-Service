@@ -19,6 +19,7 @@ STOPWORDS = {
     "are",
     "how",
     "what",
+    "policy",
     "can",
     "i",
     "you",
@@ -28,9 +29,11 @@ STOPWORDS = {
     "untuk",
     "ini",
     "itu",
+    "polisi",
     "的",
     "了",
 }
+CHINESE_STOPWORDS = {"政策", "是什么"}
 
 
 @dataclass(frozen=True)
@@ -54,7 +57,11 @@ def tokenize(text: str) -> set[str]:
     tokens: set[str] = set()
     for token in re.findall(r"[a-zA-Z0-9]+|[\u4e00-\u9fff]+", text.lower()):
         if "\u4e00" <= token[0] <= "\u9fff":
-            tokens.update(token[index : index + 2] for index in range(len(token) - 1))
+            tokens.update(
+                bigram
+                for index in range(len(token) - 1)
+                if (bigram := token[index : index + 2]) not in CHINESE_STOPWORDS
+            )
         elif token not in STOPWORDS and len(token) > 1:
             tokens.add(token)
     return tokens

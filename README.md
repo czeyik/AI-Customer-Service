@@ -261,6 +261,15 @@ Set `LLM_ENABLED=true` and provision `ZAI_API_KEY` outside Git. Calls have an ei
 bounded input/output, no tools, and receive approved knowledge rather than customer messages.
 Invalid, unsafe, ungrounded, or failed responses use the deterministic approved-knowledge path.
 
+Run the repeatable Wave 12 trilingual outage evaluation with:
+
+```bash
+python scripts/release_eval.py --mode outage
+```
+
+The authorized hosted-model command, evidence fields, go/no-go record, and activation procedure
+are in [`docs/wave-12-release-validation.md`](docs/wave-12-release-validation.md).
+
 ## Safety Gate
 
 Before any real rider, driver, or business-partner pilot, complete

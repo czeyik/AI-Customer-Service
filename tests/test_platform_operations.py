@@ -178,6 +178,9 @@ def test_production_platform_keeps_budget_access_and_traffic_guards() -> None:
     assert "CPUCredits: standard" in environment
     assert "FromPort: 22" not in environment
     assert "HttpTokens: required" in environment
+    assert 'IpProtocol: "-1"' not in environment
+    assert "SSEAlgorithm: aws:kms" in environment
+    assert "KmsMasterKeyId: alias/aws/sns" in environment
     assert "Amount: 20" in budget
     assert "META_SEND_ENABLED=(false|0)" in deployment
     assert "releases/$app_release-$clamav_release" in deployment

@@ -56,7 +56,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 9 | PG-09 | Application security | PASS |
 | 10 | PG-10 | Privacy, retention, and deletion | PASS |
 | 11 | PG-11 | Production platform and operations | PASS |
-| 12 | PG-12 | Release validation and pilot activation | NOT_STARTED |
+| 12 | PG-12 | Release validation and pilot activation | IN_PROGRESS |
 
 Valid statuses: `NOT_STARTED`, `IN_PROGRESS`, `BLOCKED`, `PASS`.
 
@@ -777,6 +777,71 @@ and the cost ceiling passed in the intended AWS account. Usage-driven charges re
 budget monitoring. Meta and notification sends remain disabled and no real customer traffic ran.
 Next-wave notes: Wave 12 has not started. Keep production dark until its release validation,
 go/no-go decision, and pilot activation gate pass.
+
+### Wave 12 — 2026-09-10
+Status: IN_PROGRESS
+Owner decisions at the initial blocked checkpoint: The previously approved pilot contract, owners,
+Meta/Z.AI choices, content, privacy controls, platform and operational thresholds remained
+authoritative. Authorization had not yet been received to push/freeze the release candidate,
+create temporary staging, make the 15 billable hosted-model evaluation calls, contact the two
+owner-controlled testers, enable real WhatsApp text/media or activate the pilot. Production also
+needed Cze Yik and Jane provisioned
+through the trusted operator path; credentials, TOTP values and personal contact details must not
+be supplied in chat. Cze Yik must either accept the documented Trivy findings through 30 September
+2026 with himself as owner and remediation required before broader launch, or approve a revised
+architecture and budget.
+Files/migrations and commit/PR/release: Marked Wave 12 in progress and added
+`docs/wave-12-release-validation.md`, the 36-case `scripts/release_eval.py`, and focused release
+tests. Fixed false grounding of unrelated policy questions in the shared retrieval tokenizer and
+included the approved corpus in the release image so seed/evaluation commands work there. Narrowed
+the proposed production egress from all protocols to required TCP 443/465, enabled free AWS-managed
+KMS encryption for S3/SNS, and added platform assertions. Updated the README and security evidence
+map. No migration, commit, push, PR, release-candidate freeze, staging deployment, production
+deployment, billable model generation, outbound message, tester contact, pilot activation or live
+traffic occurred.
+Verification commands/results: The clean Python 3.11 container suite passed 149 tests with two
+opt-in integrations skipped. The deterministic provider-outage evaluation passed all 36 English,
+Bahasa Malaysia and Simplified Chinese cases; all 15 grounded-answer calls traversed the adapter,
+failed deliberately, and safely used approved-corpus fallback at 0.004-second local p95. Focused
+release/retrieval/platform tests passed 15/15; compilation, dependency integrity, Compose parsing,
+CloudFormation validation, Actionlint and `git diff --check` passed. Gitleaks found no leak across
+22 commits; pip-audit found no known dependency vulnerability; Bandit found no high-severity,
+high-confidence issue; the application image had no high/critical Trivy finding; and ZAP had zero
+high-risk alert. The Trivy source gate remains red on two AWS-0104 critical findings for required
+public TCP 443/465 egress and one AWS-0136 high finding for AWS-managed rather than customer-managed
+SNS KMS encryption. Production preflight returned readiness 200 with valid TLS, five healthy
+containers, all five project alarms `OK`, no queued outbound/media work, and usable current and
+rollback digest pairs; both send switches were false. The fresh production database contained zero
+active administrators and zero active knowledge documents, so admin review and grounded production
+responses cannot pass yet.
+External evidence (no secrets or customer data): Meta's current official opt-in, service-window and
+media documentation was reviewed on 10 September 2026 and still matches the approved named-business
+opt-in, 24-hour response window, JPEG/PNG 5 MB and MP4/3GPP 16 MB controls; exact URLs are in
+`docs/wave-12-release-validation.md`. An authenticated non-generation Z.AI models query confirmed
+that the configured account exposes exact model `glm-5.3-flash`; no paid inference ran. Official
+AWS guidance confirms that dynamic-hostname egress filtering requires a Network Firewall-style
+DNS/SNI architecture, AWS-managed SNS KMS encryption is supported, and a customer-managed KMS key
+costs USD 1/month before requests. This would exceed the verified USD 19.54 basis under the USD 20
+ceiling; sources are recorded in the Wave 12 document.
+Gate update and residual risks: PG-12 is `BLOCKED`, not `PASS`. PG-01 through PG-11 remain `PASS`.
+The release cannot satisfy the approved no-unaccepted-high/critical-finding rule, production admin
+and corpus checks, hosted-model evaluation, real WhatsApp text/media/admin test, documented
+go/no-go, cohort activation or observation window without the owner actions above. Production
+remains dark with real customer traffic disabled.
+Next-wave notes: There is no Wave 13. Resume Wave 12 only after the owner records the scan decision,
+authorizes the enumerated external validation actions, confirms current non-secret Z.AI input and
+output prices, and provisions both named production administrators securely. Then publish the 24
+approved corpus records through Jane, freeze and push one reviewed SHA, run CI/security and exact
+digest staging, complete hosted/WhatsApp/media/admin/failure checks, hold the go/no-go, and activate
+only the approved cohort if every gate passes.
+
+Resume update — 2026-09-10: Cze Yik accepted, through 30 September 2026, the two narrowly scoped
+pilot exceptions for required public TCP 443/465 egress (AWS-0104) and AWS-managed SNS encryption
+(AWS-0136), with remediation required before a broader launch. The exceptions expire on 1 October
+2026. He also authorized freezing and pushing the release candidate, temporary staging, 15
+billable Z.AI evaluation calls, contact with the two owner-controlled testers, and real WhatsApp
+text/media validation. This is validation authorization only; final production cohort activation
+still requires the completed evidence and documented go/no-go decision. Wave 12 is resumed.
 
 ## Fresh-Chat Prompt
 

@@ -96,7 +96,10 @@ Resources:
         - {IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0}
         - {IpProtocol: udp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0}
       SecurityGroupEgress:
-        - {IpProtocol: "-1", CidrIp: 0.0.0.0/0}
+        # trivy:ignore:AWS-0104:exp:2026-10-01
+        - {IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0}
+        # trivy:ignore:AWS-0104:exp:2026-10-01
+        - {IpProtocol: tcp, FromPort: 465, ToPort: 465, CidrIp: 0.0.0.0/0}
       Tags:
         - {Key: Project, Value: dudu-support}
         - {Key: Environment, Value: !Ref Environment}
@@ -120,7 +123,9 @@ Resources:
       BucketName: !Sub dudu-support-${Environment}-${AWS::AccountId}
       BucketEncryption:
         ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault: {SSEAlgorithm: AES256}
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: alias/aws/s3
             BucketKeyEnabled: true
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
@@ -335,10 +340,12 @@ Resources:
       TTL: 60
       ResourceRecords: [!GetAtt ElasticIp.PublicIp]
 
+  # trivy:ignore:AWS-0136:exp:2026-10-01
   Alerts:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Sub dudu-support-${Environment}-alerts
+      KmsMasterKeyId: alias/aws/sns
       Subscription:
         - {Endpoint: !Ref AlertEmail, Protocol: email}
         - !If

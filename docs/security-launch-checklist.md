@@ -61,7 +61,7 @@ for their assigned waves even when the application control is present.
 | Priority and first-response acknowledgement | PASS_W3 | `tests/test_ticket_intake.py::test_acknowledgement_has_priority_target_and_hours` |
 | Human hours wording | PASS_W3 | `tests/test_ticket_intake.py::test_outside_hours_wording` and trilingual flow tests |
 | CCO authenticated/versioned/audited knowledge changes | PASS_W7 | `tests/test_knowledge_governance.py` |
-| Current Meta messaging/media policy review | OPEN_W12 | Release-candidate policy review |
+| Current Meta messaging/media policy review | PASS_W12 | `docs/wave-12-release-validation.md` |
 
 The Wave 9 threat model, approved scan gates, residual boundary, and tool versions are in
 `docs/wave-9-application-security.md`.
