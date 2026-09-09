@@ -50,8 +50,8 @@ for their assigned waves even when the application control is present.
 | HTTPS, secure cookies, sessions, CSRF, and internet-accessible admin controls | APP_PASS; TLS_OPEN_W11 | `tests/test_application_security.py`, `tests/test_admin_ticket_operations.py`, `tests/test_knowledge_governance.py` |
 | GLM configuration and deterministic outage fallback | PASS_W5 | `tests/test_config.py`, `tests/test_llm.py`, `tests/test_chatbot_service.py` |
 | LLM data minimization | APP_PASS | `tests/test_chatbot_service.py`, `tests/test_llm.py` |
-| 90-day chat lifecycle | OPEN_W10 | Wave 10 retention job and tests |
-| 36-month ticket/media lifecycle and backups | OPEN_W10_W11 | Wave 10 lifecycle tests and Wave 11 backup evidence |
+| 90-day chat lifecycle | PASS_W10 | `tests/test_data_lifecycle.py`, `docs/wave-10-privacy-data-lifecycle.md` |
+| 36-month ticket/media lifecycle and backups | LIFECYCLE_PASS_W10; BACKUP_DEPLOY_OPEN_W11 | `tests/test_data_lifecycle.py`; Wave 11 backup evidence |
 | Payment-card, credential, API-secret, and identity-number redaction | APP_PASS | `tests/test_application_security.py`, `tests/test_language_pii_guardrails.py` |
 | Account-changing action refusal | APP_PASS | `tests/test_ticket_intake.py` trilingual prohibited-action cases |
 | Media type/size/scan/private storage/sensitive-upload controls | PASS_W8 | `tests/test_media_pipeline.py`, `tests/test_media_integrations.py` |

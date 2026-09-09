@@ -289,6 +289,8 @@ def process_next_media(
         AuditLog(
             actor="media-worker",
             event_type=event,
+            subject_type="attachment",
+            subject_id=attachment.id,
             details={
                 "attachment_id": attachment.id,
                 "status": attachment.status,
@@ -336,6 +338,8 @@ def delete_attachment(
         AuditLog(
             actor=actor,
             event_type="media_deleted",
+            subject_type="attachment",
+            subject_id=attachment.id,
             details={"attachment_id": attachment.id, "ticket_id": attachment.ticket_id},
         )
     )

@@ -56,6 +56,10 @@ class Settings(BaseSettings):
     rate_limit_max_keys: int = 10_000
     retrieval_min_confidence: float = 0.12
     chat_log_retention_days: int = 90
+    ticket_retention_months: int = 36
+    backup_retention_days: int = 35
+    privacy_owner_username: str = "czeyik"
+    retention_batch_size: int = 100
     trusted_hosts: str = "*"
     cors_origins: str = ""
 
@@ -174,6 +178,16 @@ class Settings(BaseSettings):
             errors.append("RATE_LIMIT_ADMIN_WINDOW_SECONDS must be between 60 and 3600")
         if not 100 <= self.rate_limit_max_keys <= 100_000:
             errors.append("RATE_LIMIT_MAX_KEYS must be between 100 and 100000")
+        if self.chat_log_retention_days != 90:
+            errors.append("CHAT_LOG_RETENTION_DAYS must be the approved 90 days")
+        if self.ticket_retention_months != 36:
+            errors.append("TICKET_RETENTION_MONTHS must be the approved 36 months")
+        if self.backup_retention_days != 35:
+            errors.append("BACKUP_RETENTION_DAYS must be the approved 35 days")
+        if self.privacy_owner_username != "czeyik":
+            errors.append("PRIVACY_OWNER_USERNAME must be the approved privacy owner")
+        if not 1 <= self.retention_batch_size <= 1000:
+            errors.append("RETENTION_BATCH_SIZE must be between 1 and 1000")
         if errors:
             raise ValueError("Invalid production configuration: " + "; ".join(errors))
         return self

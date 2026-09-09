@@ -367,8 +367,10 @@ class ChatbotService:
         }
         db.add(
             AuditLog(
-                actor=f"{request.channel}:{request.external_user_id}",
+                actor="customer",
                 event_type="ticket_created",
+                subject_type="ticket",
+                subject_id=ticket.id,
                 details={
                     "ticket": ticket.public_id,
                     "urgency": ticket.urgency,

@@ -112,6 +112,8 @@ def process_next_notification(
         AuditLog(
             actor="notification-worker",
             event_type=event_type,
+            subject_type="ticket",
+            subject_id=notification.ticket_id,
             details={
                 "notification_id": notification.id,
                 "ticket_id": notification.ticket_id,

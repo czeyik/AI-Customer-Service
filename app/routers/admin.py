@@ -206,6 +206,8 @@ def review_media(
             actor=admin.username,
             event_type="media_review_link_issued",
             ip_address=request.client.host if request.client else None,
+            subject_type="attachment",
+            subject_id=attachment.id,
             details={"attachment_id": attachment.id, "ticket_id": attachment.ticket_id},
         )
     )

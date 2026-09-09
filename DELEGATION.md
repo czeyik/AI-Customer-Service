@@ -54,7 +54,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 7 | PG-07 | CCO knowledge governance and launch corpus | PASS |
 | 8 | PG-08 | Secure image/video pipeline | PASS |
 | 9 | PG-09 | Application security | PASS |
-| 10 | PG-10 | Privacy, retention, and deletion | NOT_STARTED |
+| 10 | PG-10 | Privacy, retention, and deletion | PASS |
 | 11 | PG-11 | Production platform and operations | NOT_STARTED |
 | 12 | PG-12 | Release validation and pilot activation | NOT_STARTED |
 
@@ -74,7 +74,7 @@ or commit them; provision secrets directly in the chosen secret manager.
 | OI-05 | Z.AI account, exact enabled model ID, data terms, region, quotas, timeout, availability needs, spend limit, and outage fallback approval | RESOLVED | 5, 12 |
 | OI-06 | CCO-approved knowledge and customer copy in all three languages, including bot disclosure, emergency, consent, partnership, and WhatsApp profile text | RESOLVED | 3, 7, 12 |
 | OI-07 | Allowed media types/sizes, private object store, malware scanner, reviewer access policy, signed-link lifetime, and media-analysis policy | RESOLVED | 8, 10, 11 |
-| OI-08 | Privacy notice, controller/contact, deletion versus anonymization, legal holds, backup retention, incident owner, security owner, secret manager, scan policy, and risk approver | UNRESOLVED | 3, 9, 10, 11, 12 |
+| OI-08 | Privacy notice, controller/contact, deletion versus anonymization, legal holds, backup retention, incident owner, security owner, secret manager, scan policy, and risk approver | RESOLVED | 3, 9, 10, 11, 12 |
 | OI-09 | Logging/metrics/error tools, alerts, on-call roster, SLOs, maintenance window, RPO/RTO, and incident/operational escalation path | UNRESOLVED | 11, 12 |
 
 When an owner input is resolved, update its status and record the decision in the wave handoff.
@@ -701,6 +701,46 @@ and backup lifecycle remain Wave 10/11 work. Real customer traffic remains disab
 Next-wave notes: Wave 10 has not started and is blocked on the remaining OI-08 owner decisions for
 deletion versus anonymization, narrow legal holds, backup retention and deletion propagation.
 Obtain and record those decisions before starting Wave 10.
+
+### Wave 10 — 2026-09-09
+Status: PASS
+Owner decisions: Cze Yik confirmed permanent deletion rather than anonymization: each chat copy
+expires after 90 days, and a closed ticket plus its attachments expires after 36 calendar months.
+Only Cze Yik, as the named privacy owner, may create or release a legal hold; each hold is limited
+to one conversation or ticket and requires a reason, case/reference, future expiry, and audit.
+Cze Yik approved the recommended maximum 35-day backup retention and required retention to run
+successfully before a restored environment can serve traffic. Together with the previously
+recorded controller/contact, incident/security/risk owners, AWS Secrets Manager, and scan policy,
+these decisions resolve OI-08.
+Files/migrations and commit/PR/release: Added migration `c81d4e2a7f10`, indexed audit subjects,
+narrow legal holds, fail-closed production lifecycle settings, and a bounded daily retention
+worker. The worker permanently removes 90-day messages, WhatsApp copies, stale conversation
+state, unlinked media metadata/objects and applicable webhook IP audits; at 36 calendar months
+after closure it removes the ticket, notes, notifications, audit/index entries, attachment
+metadata, and objects. Object deletion precedes database deletion; failures preserve metadata,
+write an audit alert, emit an error, exit non-zero, and safely retry. Added authenticated
+privacy-owner hold management, dry runs, restore-gate commands, the complete owned-data inventory,
+and `docs/wave-10-privacy-data-lifecycle.md`. Changes remain uncommitted on `dev`; no commit, push,
+PR, merge, release, deployment, backup change, live deletion, customer traffic, or pilot-user
+contact occurred.
+Verification commands/results: The clean `dudu-support:wave10-final` image built successfully;
+`python -m pip check` reported no broken requirements, compilation passed, and all 135 tests passed
+with two opt-in integration tests skipped in 76.10 seconds. Lifecycle tests use an injected clock
+and object store to prove the exact 90-day and 36-calendar-month edges, dry-run non-deletion,
+retained-ticket detachment, permanent object/database/index coverage, owner-only audited holds,
+object failure alerting, retry, and a repeated no-op pass. A fresh PostgreSQL 16 database migrated
+from zero to `c81d4e2a7f10 (head)`; `alembic check` reported `No new upgrade operations detected`,
+and the opt-in PostgreSQL lifecycle test passed against that database. Gitleaks scanned all 20
+commits with no leak; Bandit reported no high-severity/high-confidence issue; and Trivy 0.74.0
+reported no high/critical source or image vulnerability, secret, or misconfiguration finding.
+`git diff --check` passed. The disposable database, container, and network were removed.
+Gate update and residual risks: PG-10 is `PASS`. Every application-owned customer-data store has
+an owner and lifecycle, and the backup exception has a fixed maximum lifetime plus a mandatory
+post-restore deletion gate. Wave 11 must configure and prove the 35-day database/object backup
+expiry, scheduler, failure-alert routing, and restore traffic gate in the intended AWS account;
+it must not alter the approved periods silently. Real customer traffic remains disabled.
+Next-wave notes: Wave 11 has not started. Its remaining owner inputs are OI-02 and OI-09; obtain
+the hosting/CI ownership and observability/on-call/SLO/RPO/RTO decisions before starting it.
 
 ## Fresh-Chat Prompt
 

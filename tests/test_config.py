@@ -78,6 +78,11 @@ def test_production_send_requires_meta_transport_credentials() -> None:
         ("llm_max_output_tokens", 301),
         ("trusted_hosts", "*"),
         ("cors_origins", "*"),
+        ("chat_log_retention_days", 91),
+        ("ticket_retention_months", 35),
+        ("backup_retention_days", 36),
+        ("privacy_owner_username", "shared-admin"),
+        ("retention_batch_size", 0),
     ],
 )
 def test_production_configuration_rejects_unsafe_values(field: str, value: str) -> None:

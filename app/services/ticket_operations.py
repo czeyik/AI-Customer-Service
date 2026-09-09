@@ -13,6 +13,8 @@ def _audit(db: Session, actor: AdminUser, event_type: str, ticket: Ticket, **det
         AuditLog(
             actor=actor.username,
             event_type=event_type,
+            subject_type="ticket",
+            subject_id=ticket.id,
             details={"ticket_id": ticket.id, "public_id": ticket.public_id, **details},
         )
     )
@@ -81,8 +83,10 @@ def reopen_closed_ticket_for_customer(
     ticket.closed_at = None
     db.add(
         AuditLog(
-            actor=f"{channel}:{external_user_id}",
+            actor="customer",
             event_type="ticket_reopened_by_customer",
+            subject_type="ticket",
+            subject_id=ticket.id,
             details={"ticket_id": ticket.id, "public_id": ticket.public_id},
         )
     )

@@ -37,6 +37,8 @@ The complete, authoritative baseline is
   objects. Active administrators receive audited five-minute review links from the ticket page.
 - PostgreSQL-backed hashed rate limits are shared across application processes and bounded by an
   expiring active-key cap; administrator sign-in has a stricter attempt window.
+- A bounded lifecycle worker permanently deletes chats after 90 days and closed tickets plus
+  media after 36 calendar months, while audited privacy-owner holds pause only their named record.
 - Production enables HTTPS redirect, HSTS, secure session cookies, restrictive browser headers,
   explicit hosts/CORS, disabled API documentation, non-root containers, and fail-closed AWS
   Secrets Manager configuration.
@@ -46,8 +48,7 @@ The complete, authoritative baseline is
 The current code predates the consolidated requirements. Before launch it still needs:
 
 - DUDU-specific trilingual release evaluation of the hosted model and outage fallback.
-- Automated deletion or anonymization after 90 days for chats and 36 months for tickets and
-  ticket attachments.
+- Production infrastructure, backup/restore proof, and release validation.
 
 ## Quick Start With Docker
 
@@ -192,6 +193,20 @@ python -m app.workers.notifications
 
 WhatsApp delivery also obeys `META_SEND_ENABLED`; both switches remain off until an authorized
 test or traffic window.
+
+## Privacy and retention
+
+Preview or run one bounded lifecycle pass with:
+
+```bash
+python -m app.workers.retention --dry-run
+python -m app.workers.retention --once
+```
+
+Production runs the worker daily. Backups expire after at most 35 days, and every restore must
+complete a zero-failure `--once` pass before traffic is enabled. Legal holds are managed only by
+the named privacy owner through `scripts/manage_legal_hold.py`. The inventory and runbook are in
+[`docs/wave-10-privacy-data-lifecycle.md`](docs/wave-10-privacy-data-lifecycle.md).
 
 ## Try The Chat API
 

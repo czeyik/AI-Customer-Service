@@ -164,9 +164,9 @@ class MediaAttachment(Base, TimestampMixin):
     id = Column(String(36), primary_key=True, default=new_uuid)
     provider_media_id = Column(String(255), unique=True, nullable=False, index=True)
     inbound_message_id = Column(
-        String(36), ForeignKey("whatsapp_inbound_messages.id"), unique=True, nullable=False
+        String(36), ForeignKey("whatsapp_inbound_messages.id"), unique=True, nullable=True
     )
-    conversation_id = Column(String(36), ForeignKey("conversations.id"), nullable=False, index=True)
+    conversation_id = Column(String(36), ForeignKey("conversations.id"), nullable=True, index=True)
     ticket_id = Column(String(36), ForeignKey("tickets.id"), nullable=True, index=True)
     media_type = Column(String(20), nullable=False)
     declared_mime_type = Column(String(120), nullable=False)
@@ -299,7 +299,35 @@ class AuditLog(Base, TimestampMixin):
     actor = Column(String(255), nullable=False, index=True)
     event_type = Column(String(120), nullable=False, index=True)
     ip_address = Column(String(80), nullable=True)
+    subject_type = Column(String(40), nullable=True, index=True)
+    subject_id = Column(String(36), nullable=True, index=True)
     details = Column(JSON, default=dict, nullable=False)
+
+
+class LegalHold(Base, TimestampMixin):
+    __tablename__ = "legal_holds"
+
+    id = Column(String(36), primary_key=True, default=new_uuid)
+    subject_type = Column(String(20), nullable=False, index=True)
+    subject_id = Column(String(36), nullable=False, index=True)
+    reason = Column(String(500), nullable=False)
+    reference = Column(String(120), nullable=False)
+    expires_at = Column(DateTime, nullable=False, index=True)
+    created_by_admin_id = Column(
+        String(36), ForeignKey("admin_users.id"), nullable=False, index=True
+    )
+    released_at = Column(DateTime, nullable=True)
+    released_by_admin_id = Column(String(36), ForeignKey("admin_users.id"), nullable=True)
+
+    created_by = relationship("AdminUser", foreign_keys=[created_by_admin_id])
+    released_by = relationship("AdminUser", foreign_keys=[released_by_admin_id])
+
+    __table_args__ = (
+        CheckConstraint(
+            "subject_type IN ('conversation', 'ticket')", name="ck_legal_hold_subject_type"
+        ),
+        UniqueConstraint("subject_type", "subject_id", name="uq_legal_hold_subject"),
+    )
 
 
 class RateLimitBucket(Base):
