@@ -61,6 +61,7 @@ class Conversation(Base, TimestampMixin):
     intake_data = Column(JSON, default=dict, nullable=False)
 
     messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan")
+    attachments = relationship("MediaAttachment", back_populates="conversation")
 
     __table_args__ = (
         Index("ix_conversation_channel_external_user", "channel", "external_user_id"),
@@ -120,6 +121,7 @@ class Ticket(Base, TimestampMixin):
     public_id = Column(String(40), unique=True, nullable=False, index=True)
     status = Column(String(40), default="open", nullable=False, index=True)
     assigned_admin_id = Column(String(36), ForeignKey("admin_users.id"), nullable=True, index=True)
+    conversation_id = Column(String(36), ForeignKey("conversations.id"), nullable=True, index=True)
     urgency = Column(String(40), default="normal", nullable=False, index=True)
     channel = Column(String(40), nullable=False, index=True)
     external_user_id = Column(String(255), nullable=False, index=True)
@@ -139,7 +141,9 @@ class Ticket(Base, TimestampMixin):
     closed_at = Column(DateTime, nullable=True)
 
     assigned_admin = relationship("AdminUser")
+    conversation = relationship("Conversation")
     notes = relationship("TicketNote", back_populates="ticket", cascade="all, delete-orphan")
+    attachments = relationship("MediaAttachment", back_populates="ticket")
 
     __table_args__ = (
         CheckConstraint("consent_given = true", name="ck_tickets_consent_given"),
@@ -150,6 +154,43 @@ class Ticket(Base, TimestampMixin):
         CheckConstraint("trim(description) <> ''", name="ck_tickets_description_required"),
         CheckConstraint(
             "status IN ('open', 'in_progress', 'closed')", name="ck_tickets_status"
+        ),
+    )
+
+
+class MediaAttachment(Base, TimestampMixin):
+    __tablename__ = "media_attachments"
+
+    id = Column(String(36), primary_key=True, default=new_uuid)
+    provider_media_id = Column(String(255), unique=True, nullable=False, index=True)
+    inbound_message_id = Column(
+        String(36), ForeignKey("whatsapp_inbound_messages.id"), unique=True, nullable=False
+    )
+    conversation_id = Column(String(36), ForeignKey("conversations.id"), nullable=False, index=True)
+    ticket_id = Column(String(36), ForeignKey("tickets.id"), nullable=True, index=True)
+    media_type = Column(String(20), nullable=False)
+    declared_mime_type = Column(String(120), nullable=False)
+    detected_mime_type = Column(String(120), nullable=True)
+    provider_sha256 = Column(String(128), nullable=True)
+    sha256 = Column(String(64), nullable=True, index=True)
+    size_bytes = Column(Integer, nullable=True)
+    status = Column(String(20), default="queued", nullable=False, index=True)
+    attempts = Column(Integer, default=0, nullable=False)
+    next_attempt_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    object_key = Column(String(500), unique=True, nullable=True)
+    scan_result = Column(String(80), nullable=True)
+    failure_code = Column(String(80), nullable=True)
+    approved_at = Column(DateTime, nullable=True)
+    deleted_at = Column(DateTime, nullable=True)
+
+    conversation = relationship("Conversation", back_populates="attachments")
+    ticket = relationship("Ticket", back_populates="attachments")
+
+    __table_args__ = (
+        CheckConstraint("media_type IN ('image', 'video')", name="ck_media_type"),
+        CheckConstraint(
+            "status IN ('queued', 'approved', 'rejected', 'failed', 'deleted')",
+            name="ck_media_status",
         ),
     )
 

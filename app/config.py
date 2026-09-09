@@ -32,6 +32,16 @@ class Settings(BaseSettings):
     meta_send_timeout_seconds: float = 10.0
     meta_send_max_attempts: int = 5
 
+    media_processing_enabled: bool = False
+    media_bucket: str = ""
+    media_region: str = "ap-southeast-5"
+    media_s3_endpoint_url: str = ""
+    media_signed_url_seconds: int = 300
+    media_max_attempts: int = 3
+    clamav_host: str = "clamav"
+    clamav_port: int = 3310
+    clamav_timeout_seconds: float = 20.0
+
     llm_enabled: bool = False
     zai_api_key: str = ""
     llm_model: str = "glm-5.3-flash"
@@ -113,6 +123,25 @@ class Settings(BaseSettings):
             errors.append("META_SEND_MAX_ATTEMPTS must be between 1 and 10")
         if not 1 <= self.meta_send_timeout_seconds <= 30:
             errors.append("META_SEND_TIMEOUT_SECONDS must be between 1 and 30")
+
+        if not self.media_processing_enabled:
+            errors.append("MEDIA_PROCESSING_ENABLED must be true")
+        if self.media_processing_enabled and len(self.meta_access_token) < 24:
+            errors.append("META_ACCESS_TOKEN must be set when media processing is enabled")
+        if self.media_processing_enabled and not self.meta_phone_number_id.isdigit():
+            errors.append("META_PHONE_NUMBER_ID must be numeric when media processing is enabled")
+        if not self.media_bucket:
+            errors.append("MEDIA_BUCKET must be set")
+        if self.media_region != "ap-southeast-5":
+            errors.append("MEDIA_REGION must be the approved ap-southeast-5")
+        if self.media_s3_endpoint_url:
+            errors.append("MEDIA_S3_ENDPOINT_URL cannot override AWS in production")
+        if self.media_signed_url_seconds != 300:
+            errors.append("MEDIA_SIGNED_URL_SECONDS must be the approved 300 seconds")
+        if not 1 <= self.media_max_attempts <= 5:
+            errors.append("MEDIA_MAX_ATTEMPTS must be between 1 and 5")
+        if not 1 <= self.clamav_timeout_seconds <= 30:
+            errors.append("CLAMAV_TIMEOUT_SECONDS must be between 1 and 30")
 
         if not self.llm_enabled:
             errors.append("LLM_ENABLED must be true")

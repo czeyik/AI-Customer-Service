@@ -8,9 +8,10 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
-from app.models import AdminUser, AuditLog, SupportNotification, Ticket
+from app.models import AdminUser, AuditLog, MediaAttachment, SupportNotification, Ticket
 from app.security import make_session_token, read_session_token, verify_password, verify_totp
 from app.services.ticket_operations import add_ticket_note, assign_ticket, update_ticket_status
+from app.services.media import PrivateObjectStore
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parents[1] / "templates"))
@@ -131,6 +132,34 @@ def ticket_detail(
             "csrf": session["csrf"],
         },
     )
+
+
+@router.get("/media/{attachment_id}", response_model=None)
+def review_media(
+    attachment_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin),
+) -> RedirectResponse:
+    attachment = db.get(MediaAttachment, attachment_id)
+    if (
+        not attachment
+        or attachment.status != "approved"
+        or not attachment.ticket_id
+        or not attachment.object_key
+    ):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attachment not found")
+    url = PrivateObjectStore().signed_url(attachment.object_key)
+    db.add(
+        AuditLog(
+            actor=admin.username,
+            event_type="media_review_link_issued",
+            ip_address=request.client.host if request.client else None,
+            details={"attachment_id": attachment.id, "ticket_id": attachment.ticket_id},
+        )
+    )
+    db.commit()
+    return RedirectResponse(url, status_code=303)
 
 
 def _ticket_or_404(db: Session, public_id: str) -> Ticket:

@@ -6,7 +6,7 @@ from email_validator import EmailNotValidError, validate_email
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.models import AuditLog, Conversation, Message
+from app.models import AuditLog, Conversation, MediaAttachment, Message
 from app.schemas import ChatRequest, ChatResponse
 from app.services.answer_generation import ApprovedKnowledgeResponder
 from app.services.guardrails import SafetyAssessment, assess_message, is_account_action_request
@@ -171,6 +171,7 @@ class ChatbotService:
         lead: str | None = None,
     ) -> ChatResponse:
         data = {
+            "started_at": datetime.utcnow().isoformat(),
             "description": description,
             "issue_type": issue_type,
             "urgency": urgency,
@@ -333,7 +334,21 @@ class ChatbotService:
             data["urgency"],
             data.get("safety_flags", []),
         )
-        ticket.attachment_count = data.get("attachment_count", 0)
+        ticket.conversation_id = conversation.id
+        approved_media = (
+            db.query(MediaAttachment)
+            .filter(
+                MediaAttachment.conversation_id == conversation.id,
+                MediaAttachment.ticket_id.is_(None),
+                MediaAttachment.status == "approved",
+                MediaAttachment.created_at
+                >= datetime.fromisoformat(data.get("started_at", "1970-01-01T00:00:00")),
+            )
+            .all()
+        )
+        for attachment in approved_media:
+            attachment.ticket_id = ticket.id
+        ticket.attachment_count = data.get("attachment_count", 0) + len(approved_media)
         ticket.extra = {
             **(ticket.extra or {}),
             "supporting_evidence": data.get("evidence", []),

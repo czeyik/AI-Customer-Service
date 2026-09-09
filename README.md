@@ -32,14 +32,15 @@ The complete, authoritative baseline is
   each Wave 3 state transition with a durable outbound queue row.
 - `/admin` provides the named-administrator ticket inbox, assignment, status, and internal-note
   workflow after password + individual 2FA login.
+- Signed WhatsApp image/video events enter a quarantine queue; the media worker authenticates to
+  Meta, enforces streaming limits and file signatures, scans with ClamAV, and stores only clean
+  objects. Active administrators receive audited five-minute review links from the ticket page.
 
 ## Remaining Work Against The Approved Requirements
 
 The current code predates the consolidated requirements. Before launch it still needs:
 
 - DUDU-specific trilingual release evaluation of the hosted model and outage fallback.
-- Real image/video upload, scanning, storage, and ticket retrieval rather than attachment metadata
-  alone.
 - Automated deletion or anonymization after 90 days for chats and 36 months for tickets and
   ticket attachments.
 
@@ -136,6 +137,20 @@ The webhook never calls Meta inline. It stores the unique inbound message ID, Wa
 and reply together; the worker sends queued replies with bounded retries and moves permanent or
 exhausted failures to a dead-letter state. Raw HTTP access logging is disabled because Meta's
 verification request includes the private verify token in its query string.
+
+## Secure media
+
+Set `MEDIA_PROCESSING_ENABLED=true`, `MEDIA_BUCKET`, and the ClamAV connection values only after
+the private bucket and scanner are ready. Production requires the AWS Malaysia region and rejects
+an S3 endpoint override. Run the worker separately:
+
+```bash
+python -m app.workers.media
+```
+
+The application uses the Lightsail instance attachment for AWS credentials; do not create bucket
+access keys for production. The bucket remains private and Lightsail encrypts objects with
+AWS-managed keys. Media is never sent to the hosted LLM.
 
 ## Administration and ticket operations
 

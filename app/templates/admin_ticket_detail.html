@@ -36,6 +36,12 @@
           <p class="description">{{ ticket.ride_details }}</p>
         {% endif %}
       </section>
+      <section>
+        <h2>Attachments</h2>
+        {% for attachment in ticket.attachments if attachment.status == "approved" %}
+          <p><a href="/admin/media/{{ attachment.id }}">Review {{ attachment.media_type }}</a> · {{ attachment.detected_mime_type }} · {{ attachment.size_bytes }} bytes</p>
+        {% else %}<p class="hint">No approved attachments.</p>{% endfor %}
+      </section>
       <section class="operations">
         <h2>Operations</h2>
         <form method="post" action="/admin/tickets/{{ ticket.public_id }}/assign">

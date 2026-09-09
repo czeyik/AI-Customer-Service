@@ -52,7 +52,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 5 | PG-05 | Grounded hosted LLM and outage fallback | PASS |
 | 6 | PG-06 | Named admins and ticket operations | PASS |
 | 7 | PG-07 | CCO knowledge governance and launch corpus | PASS |
-| 8 | PG-08 | Secure image/video pipeline | NOT_STARTED |
+| 8 | PG-08 | Secure image/video pipeline | PASS |
 | 9 | PG-09 | Application security | NOT_STARTED |
 | 10 | PG-10 | Privacy, retention, and deletion | NOT_STARTED |
 | 11 | PG-11 | Production platform and operations | NOT_STARTED |
@@ -73,7 +73,7 @@ or commit them; provision secrets directly in the chosen secret manager.
 | OI-04 | Meta Business/WABA/app/phone readiness, API version, opt-in approval, test recipients, and secure credential provisioning | RESOLVED | 4, 12 |
 | OI-05 | Z.AI account, exact enabled model ID, data terms, region, quotas, timeout, availability needs, spend limit, and outage fallback approval | RESOLVED | 5, 12 |
 | OI-06 | CCO-approved knowledge and customer copy in all three languages, including bot disclosure, emergency, consent, partnership, and WhatsApp profile text | RESOLVED | 3, 7, 12 |
-| OI-07 | Allowed media types/sizes, private object store, malware scanner, reviewer access policy, signed-link lifetime, and media-analysis policy | UNRESOLVED | 8, 10, 11 |
+| OI-07 | Allowed media types/sizes, private object store, malware scanner, reviewer access policy, signed-link lifetime, and media-analysis policy | RESOLVED | 8, 10, 11 |
 | OI-08 | Privacy notice, controller/contact, deletion versus anonymization, legal holds, backup retention, incident owner, security owner, secret manager, scan policy, and risk approver | UNRESOLVED | 3, 9, 10, 11, 12 |
 | OI-09 | Logging/metrics/error tools, alerts, on-call roster, SLOs, maintenance window, RPO/RTO, and incident/operational escalation path | UNRESOLVED | 11, 12 |
 
@@ -604,6 +604,58 @@ launch corpus. Real customer traffic remains disabled.
 Next-wave notes: Wave 8 has not started and remains blocked on OI-07 plus the applicable OI-08
 privacy/security decisions for media types, limits, storage, malware scanning, reviewer access,
 signed-link lifetime, analysis, deletion, and risk approval.
+
+### Wave 8 — 2026-09-09
+Status: PASS
+Owner decisions: Cze Yik approved JPEG/PNG images up to 5 MB; MP4/3GP videos up to 16 MB; a
+private Lightsail object-storage bucket in AWS Malaysia (`ap-southeast-5`) attached to the
+same-region instance; ClamAV scanning; review by active named administrators through audited
+five-minute signed links; no automated media analysis or LLM media access; immediate disposal of
+rejected/failed bytes; deletion with the ticket under the approved 36-month post-closure rule;
+and Cze Yik as privacy, security, incident, and risk owner. OI-07 is `RESOLVED`. The owner does not
+need a separate AWS account or project: Wave 11 will create the bucket as a resource in the
+existing account. OI-08 remains globally open for later legal-hold, backup, and launch-security
+decisions.
+Files/migrations and commit/PR/release: Added signed WhatsApp image/video intake, a durable media
+queue, authenticated Graph API `v26.0` metadata/download requests, bounded streaming, SHA-256
+verification, structural content detection, quarantine, ClamAV `INSTREAM` scanning, private
+S3-compatible storage, generated object keys, ticket/conversation linkage, bounded retry/failure
+states, deletion, active-admin review with audited five-minute links, and trilingual
+acknowledgements/refusals. Added migration `69f51c2de537`, the media worker, production
+configuration validation, focused and live-boundary tests, and `docs/wave-8-secure-media.md`.
+Boto3 1.43.90 and its transitive dependencies are hash locked. Changes remain uncommitted on
+`dev`; no commit, push, PR, merge, deployment, AWS resource, billable action, customer traffic, or
+pilot-user contact occurred.
+Verification commands/results: The clean digest-pinned Python 3.11 image built as
+`dudu-support:wave8-check`; `python -m pip check` reported no broken requirements and all 114
+normal tests passed with the separately invoked integration module skipped in 28.25 seconds.
+Focused tests cover authenticated Meta requests, webhook/media-ID duplication, JPEG/PNG and
+MP4/3GP policy, streaming limits, SHA-256 and MIME mismatch, corruption, sensitive indicators,
+malware, scanner/storage failure and bounded retry, ticket linkage, reviewer authorization,
+five-minute links, and deletion invalidation. Against temporary real MinIO and ClamAV 1.4.6
+services, the integration check passed: anonymous retrieval returned 403, signed retrieval
+returned the exact clean PNG, integrity metadata round-tripped, ClamAV accepted the clean image,
+and rejected the EICAR test file. A fresh PostgreSQL 16 database migrated from zero to
+`69f51c2de537 (head)` and `alembic check` reported `No new upgrade operations detected.` The
+temporary object, services, database, containers, and networks were removed.
+External evidence (no secrets or customer data): Meta's official WhatsApp Business Platform API
+collection confirmed the authenticated two-request media retrieval flow, five-minute provider
+URL, supported JPEG/PNG and MP4/3GP formats, and 5 MB/16 MB limits. AWS documentation confirmed
+Lightsail buckets are private by default, account-level Block Public Access applies, Lightsail
+uses AWS-managed server-side encryption and HTTPS, and a same-region instance attachment avoids
+stored bucket credentials. ClamAV documentation confirmed the framed `INSTREAM` protocol. Boto3
+1.43.90 was the current AWS SDK release on PyPI. Exact source URLs and review date are recorded in
+`docs/wave-8-secure-media.md`.
+Gate update and residual risks: PG-08 is `PASS`. Only successfully sniffed, integrity-verified,
+ClamAV-clean media receives an object key or reviewer link; rejected and exhausted media never
+becomes accessible. Production fail-closed configuration requires media processing, the Malaysia
+region, bucket, registered Meta phone, access token, ClamAV, and the exact five-minute lifetime.
+The actual Lightsail bucket/scanner deployment remains Wave 11, and representative real WhatsApp
+image/video validation remains part of Wave 12 release validation. Real customer traffic remains
+disabled.
+Next-wave notes: Wave 9 is unblocked for code work but requires the unresolved OI-08 application
+security, secret-manager, scan-gate, and risk-acceptance decisions before it starts. Do not
+provision the Wave 8 AWS bucket until Wave 11.
 
 ## Fresh-Chat Prompt
 

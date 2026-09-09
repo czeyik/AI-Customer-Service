@@ -9,10 +9,18 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
-from app.models import AuditLog, WhatsAppInboundMessage, WhatsAppOutboundMessage
-from app.schemas import ChatRequest, MetaWebhookResult
+from app.models import (
+    AuditLog,
+    Conversation,
+    MediaAttachment,
+    Message,
+    WhatsAppInboundMessage,
+    WhatsAppOutboundMessage,
+)
+from app.schemas import AttachmentPayload, ChatRequest, MetaWebhookResult
 from app.security import verify_meta_signature
 from app.services.chatbot import chatbot_service
+from app.services.guardrails import assess_message
 from app.services.pii import redact_sensitive
 
 router = APIRouter(prefix="/webhooks/meta", tags=["meta-webhooks"])
@@ -55,22 +63,26 @@ async def receive_webhook(request: Request, db: Session = Depends(get_db)) -> Me
             if inbound is None:
                 duplicates += 1
                 continue
-            response = chatbot_service.handle(
-                db,
-                ChatRequest(
-                    channel="whatsapp",
-                    external_user_id=item["sender"],
-                    text=item["text"],
-                    user_role="unknown",
-                ),
-                request.client.host if request.client else None,
-                commit=False,
-            )
+            if item["type"] in {"image", "video"}:
+                body = _queue_media(db, inbound, item)
+            else:
+                response = chatbot_service.handle(
+                    db,
+                    ChatRequest(
+                        channel="whatsapp",
+                        external_user_id=item["sender"],
+                        text=item["text"],
+                        user_role="unknown",
+                    ),
+                    request.client.host if request.client else None,
+                    commit=False,
+                )
+                body = response.answer
             db.add(
                 WhatsAppOutboundMessage(
                     inbound_message_id=inbound.id,
                     recipient=item["sender"],
-                    body=_whatsapp_text(response.answer),
+                    body=_whatsapp_text(body),
                 )
             )
             processed += 1
@@ -114,19 +126,29 @@ def extract_messages(payload: dict[str, Any]) -> list[dict[str, str]]:
             if expected_phone_number_id and phone_number_id != expected_phone_number_id:
                 continue
             for message in value.get("messages", []):
-                if not isinstance(message, dict) or message.get("type") != "text":
+                if not isinstance(message, dict) or message.get("type") not in {
+                    "text",
+                    "image",
+                    "video",
+                }:
                     continue
-                text = message.get("text", {}).get("body")
+                message_type = message["type"]
+                content = message.get(message_type, {})
+                text = content.get("body") if message_type == "text" else content.get("caption", "")
                 sender = message.get("from")
                 message_id = message.get("id")
-                if text and sender and message_id and phone_number_id:
+                media_id = content.get("id") if message_type != "text" else ""
+                if sender and message_id and phone_number_id and (text or media_id):
                     messages.append(
                         {
                             "id": str(message_id),
                             "sender": str(sender),
                             "phone_number_id": phone_number_id,
-                            "text": str(text),
-                            "type": "text",
+                            "text": str(text or ""),
+                            "type": str(message_type),
+                            "media_id": str(media_id or ""),
+                            "mime_type": str(content.get("mime_type", "")),
+                            "sha256": str(content.get("sha256", "")),
                             "timestamp": str(message.get("timestamp", "")),
                             "context_message_id": str(
                                 message.get("context", {}).get("id", "")
@@ -152,11 +174,78 @@ def _reserve_inbound(db: Session, item: dict[str, str]) -> WhatsAppInboundMessag
             "timestamp": item["timestamp"],
             "context_message_id": item["context_message_id"],
             "text": redact_sensitive(item["text"]).text,
+            "media_id": item.get("media_id", ""),
         },
     )
     db.add(inbound)
     db.flush()
     return inbound
+
+
+def _queue_media(
+    db: Session, inbound: WhatsAppInboundMessage, item: dict[str, str]
+) -> str:
+    conversation = (
+        db.query(Conversation)
+        .filter_by(channel="whatsapp", external_user_id=item["sender"])
+        .order_by(Conversation.created_at.desc())
+        .first()
+    )
+    if not conversation:
+        conversation = Conversation(channel="whatsapp", external_user_id=item["sender"])
+        db.add(conversation)
+        db.flush()
+    caption = redact_sensitive(item["text"]).text
+    assessment = assess_message(
+        caption,
+        [
+            AttachmentPayload(
+                filename=f"whatsapp-{item['type']}",
+                mime_type=item["mime_type"],
+                description=caption,
+            )
+        ],
+    )
+    rejected = "sensitive_attachment_rejected" in assessment.flags
+    attachment = MediaAttachment(
+        provider_media_id=item["media_id"],
+        inbound_message_id=inbound.id,
+        conversation_id=conversation.id,
+        media_type=item["type"],
+        declared_mime_type=item["mime_type"],
+        provider_sha256=item["sha256"] or None,
+        status="rejected" if rejected else "queued",
+        failure_code="sensitive_content" if rejected else None,
+    )
+    db.add(attachment)
+    db.flush()
+    db.add(
+        Message(
+            conversation_id=conversation.id,
+            direction="inbound",
+            content=caption or f"[{item['type']}]",
+            language=conversation.preferred_language,
+            safety_flags=["sensitive_attachment_rejected"] if rejected else [],
+            payload={"channel": "whatsapp", "attachment_id": attachment.id},
+        )
+    )
+    if rejected:
+        return {
+            "en": "I can’t accept sensitive documents or payment information. "
+            "Please send only relevant ride pictures or videos.",
+            "ms": "Saya tidak boleh menerima dokumen sensitif atau maklumat pembayaran. "
+            "Sila hantar gambar atau video perjalanan yang berkaitan sahaja.",
+            "zh": "我无法接收敏感证件或付款资料。"
+            "请仅发送与行程有关的图片或视频。",
+        }[conversation.preferred_language]
+    return {
+        "en": "Thanks — your attachment is quarantined for security checks. "
+        "It will be added to your ticket only if it passes.",
+        "ms": "Terima kasih — lampiran anda dikuarantin untuk pemeriksaan keselamatan. "
+        "Ia hanya akan ditambah pada tiket jika lulus.",
+        "zh": "谢谢——您的附件已隔离并接受安全检查。"
+        "只有通过检查后才会加入工单。",
+    }[conversation.preferred_language]
 
 
 def _apply_status_updates(db: Session, payload: dict[str, Any]) -> int:
