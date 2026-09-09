@@ -36,3 +36,32 @@ Do not use the system with real customers until these items are complete.
 - Confirm the CCO can publish and update knowledge without second-person approval and that every
   change remains authenticated, versioned, attributable, and auditable.
 - Review the current Meta WhatsApp messaging and media policies before production launch.
+
+## Repeatable Evidence Map
+
+Status is scoped to the application gate. Deployment, lifecycle, and release checks remain open
+for their assigned waves even when the application control is present.
+
+| Checklist control | Status | Evidence |
+| --- | --- | --- |
+| Secret storage and strong application/provider/Meta secrets | APP_PASS; DEPLOY_OPEN_W11 | Production validation in `tests/test_config.py`; Gitleaks/Trivy in `.github/workflows/security.yml` |
+| Named administrators, unique credentials, 2FA, disable/recovery, audit | PASS_W6 | `tests/test_admin_ticket_operations.py` |
+| Meta application secret and webhook signatures | APP_PASS; DEPLOY_OPEN_W11 | `tests/test_config.py`, `tests/test_whatsapp_transport.py` |
+| HTTPS, secure cookies, sessions, CSRF, and internet-accessible admin controls | APP_PASS; TLS_OPEN_W11 | `tests/test_application_security.py`, `tests/test_admin_ticket_operations.py`, `tests/test_knowledge_governance.py` |
+| GLM configuration and deterministic outage fallback | PASS_W5 | `tests/test_config.py`, `tests/test_llm.py`, `tests/test_chatbot_service.py` |
+| LLM data minimization | APP_PASS | `tests/test_chatbot_service.py`, `tests/test_llm.py` |
+| 90-day chat lifecycle | OPEN_W10 | Wave 10 retention job and tests |
+| 36-month ticket/media lifecycle and backups | OPEN_W10_W11 | Wave 10 lifecycle tests and Wave 11 backup evidence |
+| Payment-card, credential, API-secret, and identity-number redaction | APP_PASS | `tests/test_application_security.py`, `tests/test_language_pii_guardrails.py` |
+| Account-changing action refusal | APP_PASS | `tests/test_ticket_intake.py` trilingual prohibited-action cases |
+| Media type/size/scan/private storage/sensitive-upload controls | PASS_W8 | `tests/test_media_pipeline.py`, `tests/test_media_integrations.py` |
+| Prompt-injection resistance at chat endpoint | APP_PASS | `tests/test_ticket_intake.py::test_chat_api_refuses_prompt_injection` |
+| Trilingual rider/driver/partner/safety/fraud/payment/account/complaint/human/FAQ behaviour | APP_PASS; RC_OPEN_W12 | `tests/test_ticket_intake.py`, `tests/test_chatbot_service.py`, Wave 12 evaluation |
+| Mandatory consent/contact/description ticket fields | PASS_W3 | `tests/test_ticket_intake.py` plus database constraints |
+| Priority and first-response acknowledgement | PASS_W3 | `tests/test_ticket_intake.py::test_acknowledgement_has_priority_target_and_hours` |
+| Human hours wording | PASS_W3 | `tests/test_ticket_intake.py::test_outside_hours_wording` and trilingual flow tests |
+| CCO authenticated/versioned/audited knowledge changes | PASS_W7 | `tests/test_knowledge_governance.py` |
+| Current Meta messaging/media policy review | OPEN_W12 | Release-candidate policy review |
+
+The Wave 9 threat model, approved scan gates, residual boundary, and tool versions are in
+`docs/wave-9-application-security.md`.

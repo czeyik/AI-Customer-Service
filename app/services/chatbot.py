@@ -40,8 +40,21 @@ class ChatbotService:
         commit: bool = True,
     ) -> ChatResponse:
         settings = get_settings()
-        limiter_key = f"{request.channel}:{request.external_user_id}"
-        if not rate_limiter.allow(limiter_key, settings.rate_limit_messages_per_minute):
+        limiter_keys = []
+        if ip_address and request.channel != "whatsapp":
+            limiter_keys.append(f"chat-ip:{ip_address}")
+        limiter_keys.append(f"chat-user:{request.channel}:{request.external_user_id}")
+        if not all(
+            rate_limiter.allow(
+                db,
+                key,
+                settings.rate_limit_messages_per_minute,
+                max_keys=settings.rate_limit_max_keys,
+            )
+            for key in limiter_keys
+        ):
+            if commit:
+                db.commit()
             return ChatResponse(
                 answer="Too many messages in a short time. Please wait a moment and try again.",
                 language=request.preferred_language or "en",
@@ -72,7 +85,6 @@ class ChatbotService:
                     safety_flags=assessment.flags + redaction.findings,
                     payload={
                         "channel": request.channel,
-                        "ip_address": ip_address,
                         "attachments": [item.model_dump() for item in request.attachments],
                     },
                 )

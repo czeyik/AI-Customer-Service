@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     environment: Literal["development", "test", "production", "prod"] = "development"
     database_url: str = "sqlite:///./dudu_support.db"
     secret_key: str = "change-me-in-production"
+    secret_manager: Literal["local", "aws-secrets-manager"] = "local"
 
     admin_totp_secrets: dict[str, str] = Field(default_factory=dict)
     notification_send_enabled: bool = False
@@ -50,6 +51,9 @@ class Settings(BaseSettings):
     llm_max_output_tokens: int = 300
 
     rate_limit_messages_per_minute: int = 20
+    rate_limit_admin_attempts: int = 5
+    rate_limit_admin_window_seconds: int = 900
+    rate_limit_max_keys: int = 10_000
     retrieval_min_confidence: float = 0.12
     chat_log_retention_days: int = 90
     trusted_hosts: str = "*"
@@ -96,6 +100,8 @@ class Settings(BaseSettings):
 
         if not self.admin_totp_secrets:
             errors.append("ADMIN_TOTP_SECRETS must contain per-user secret references")
+        if self.secret_manager != "aws-secrets-manager":
+            errors.append("SECRET_MANAGER must be aws-secrets-manager")
         if self.notification_send_enabled:
             if not all(
                 (self.smtp_host, self.smtp_username, self.smtp_password, self.smtp_from_address)
@@ -160,6 +166,14 @@ class Settings(BaseSettings):
             errors.append("TRUSTED_HOSTS must contain explicit production hosts")
         if "*" in self.cors_origin_list:
             errors.append("CORS_ORIGINS cannot contain '*' in production")
+        if not 1 <= self.rate_limit_messages_per_minute <= 120:
+            errors.append("RATE_LIMIT_MESSAGES_PER_MINUTE must be between 1 and 120")
+        if not 1 <= self.rate_limit_admin_attempts <= 20:
+            errors.append("RATE_LIMIT_ADMIN_ATTEMPTS must be between 1 and 20")
+        if not 60 <= self.rate_limit_admin_window_seconds <= 3600:
+            errors.append("RATE_LIMIT_ADMIN_WINDOW_SECONDS must be between 60 and 3600")
+        if not 100 <= self.rate_limit_max_keys <= 100_000:
+            errors.append("RATE_LIMIT_MAX_KEYS must be between 100 and 100000")
         if errors:
             raise ValueError("Invalid production configuration: " + "; ".join(errors))
         return self

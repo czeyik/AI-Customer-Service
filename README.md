@@ -35,6 +35,11 @@ The complete, authoritative baseline is
 - Signed WhatsApp image/video events enter a quarantine queue; the media worker authenticates to
   Meta, enforces streaming limits and file signatures, scans with ClamAV, and stores only clean
   objects. Active administrators receive audited five-minute review links from the ticket page.
+- PostgreSQL-backed hashed rate limits are shared across application processes and bounded by an
+  expiring active-key cap; administrator sign-in has a stricter attempt window.
+- Production enables HTTPS redirect, HSTS, secure session cookies, restrictive browser headers,
+  explicit hosts/CORS, disabled API documentation, non-root containers, and fail-closed AWS
+  Secrets Manager configuration.
 
 ## Remaining Work Against The Approved Requirements
 
@@ -114,6 +119,11 @@ alembic upgrade head
 
 The application does not create tables at startup. After changing SQLAlchemy models, add a
 migration and run `alembic check` against an up-to-date database before opening a pull request.
+
+The security workflow runs secret, dependency, static, source/configuration, container, and ZAP
+dynamic scans with the approved release gates. The threat model, exact policy, versions, and
+evidence map are in
+[`docs/wave-9-application-security.md`](docs/wave-9-application-security.md).
 
 ## WhatsApp Transport
 

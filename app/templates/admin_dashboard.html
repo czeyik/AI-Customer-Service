@@ -9,7 +9,10 @@
   <body>
     <header class="topbar">
       <h1>Support Inbox</h1>
-      <a href="/admin/logout">Log out</a>
+      <form method="post" action="/admin/logout">
+        <input type="hidden" name="csrf_token" value="{{ csrf }}">
+        <button type="submit">Log out</button>
+      </form>
     </header>
     <main class="container">
       {% if notifications %}

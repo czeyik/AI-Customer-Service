@@ -10,7 +10,15 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.config import Settings, get_settings
-from app.models import AdminUser, AuditLog, Base, SupportNotification, Ticket, TicketNote
+from app.models import (
+    AdminUser,
+    AuditLog,
+    Base,
+    RateLimitBucket,
+    SupportNotification,
+    Ticket,
+    TicketNote,
+)
 from app.security import make_session_token, read_session_token, verify_password, verify_totp
 from app.services.admin_accounts import provision_admin, recover_admin, set_admin_active
 from app.services.ticket_operations import (
@@ -20,12 +28,13 @@ from app.services.ticket_operations import (
     reopen_closed_ticket_for_customer,
     update_ticket_status,
 )
+from app.routers import admin as admin_router_module
 from app.routers.admin import assign, login
 from app.services.notifications import process_next_notification
 
 
-CZE_SECRET = "JBSWY3DPEHPK3PXP"
-JANE_SECRET = "GEZDGNBVGY3TQOJQ"
+CZE_TOTP_FIXTURE = "JBSWY3DPEHPK3PXP"
+JANE_TOTP_FIXTURE = "GEZDGNBVGY3TQOJQ"
 
 
 @pytest.fixture()
@@ -103,9 +112,9 @@ def test_two_named_admins_have_individual_2fa_and_audited_management(db_session:
     assert cze.is_recovery_approver and jane.is_cco
     assert verify_password("owner-password-123", cze.password_hash)
     assert verify_password("support-password-123", jane.password_hash)
-    assert verify_totp(cze.totp_secret_ref, pyotp.TOTP(CZE_SECRET).now())
-    assert verify_totp(jane.totp_secret_ref, pyotp.TOTP(JANE_SECRET).now())
-    assert not verify_totp(cze.totp_secret_ref, pyotp.TOTP(JANE_SECRET).now())
+    assert verify_totp(cze.totp_secret_ref, pyotp.TOTP(CZE_TOTP_FIXTURE).now())
+    assert verify_totp(jane.totp_secret_ref, pyotp.TOTP(JANE_TOTP_FIXTURE).now())
+    assert not verify_totp(cze.totp_secret_ref, pyotp.TOTP(JANE_TOTP_FIXTURE).now())
     with pytest.raises(ValueError, match="authenticated active"):
         provision_admin(
             db_session,
@@ -156,11 +165,13 @@ def test_named_admin_login_and_ticket_mutation_require_csrf(db_session: Session)
         request,
         username="czeyik",
         password="owner-password-123",
-        totp_code=pyotp.TOTP(CZE_SECRET).now(),
+        totp_code=pyotp.TOTP(CZE_TOTP_FIXTURE).now(),
         db=db_session,
     )
     assert response.status_code == 303
-    cookie = SimpleCookie(response.headers["set-cookie"])["dudu_admin_session"].value
+    parsed_cookie = SimpleCookie(response.headers["set-cookie"])["dudu_admin_session"]
+    assert parsed_cookie["httponly"] and parsed_cookie["samesite"] == "lax"
+    cookie = parsed_cookie.value
     session = read_session_token(cookie)
     assert session["admin_id"] == cze.id
 
@@ -180,6 +191,58 @@ def test_named_admin_login_and_ticket_mutation_require_csrf(db_session: Session)
     )
     assert assigned.status_code == 303 and value.assigned_admin_id == jane.id
     assert db_session.query(AuditLog).filter_by(event_type="admin_login_succeeded").one()
+
+
+def test_production_admin_cookie_is_secure(
+    db_session: Session, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    provision_two_admins(db_session)
+    settings = Settings(_env_file=None)
+    settings.environment = "production"
+    monkeypatch.setattr(admin_router_module, "get_settings", lambda: settings)
+    request = Request(
+        {
+            "type": "http",
+            "method": "POST",
+            "path": "/admin/login",
+            "headers": [],
+            "client": ("127.0.0.1", 1234),
+        }
+    )
+
+    response = login(
+        request,
+        "czeyik",
+        "owner-password-123",
+        pyotp.TOTP(CZE_TOTP_FIXTURE).now(),
+        db_session,
+    )
+
+    assert SimpleCookie(response.headers["set-cookie"])["dudu_admin_session"]["secure"]
+
+
+def test_admin_login_is_rate_limited_without_storing_raw_identity(db_session: Session) -> None:
+    provision_two_admins(db_session)
+    request = Request(
+        {
+            "type": "http",
+            "method": "POST",
+            "path": "/admin/login",
+            "headers": [],
+            "client": ("203.0.113.7", 1234),
+        }
+    )
+
+    for _ in range(5):
+        assert login(request, "czeyik", "wrong-password", "000000", db_session).status_code == 401
+    response = login(request, "czeyik", "wrong-password", "000000", db_session)
+
+    assert response.status_code == 429
+    assert db_session.query(AuditLog).filter_by(event_type="admin_login_rate_limited").one()
+    assert all(
+        "czeyik" not in bucket.key_hash
+        for bucket in db_session.query(RateLimitBucket).all()
+    )
 
 
 def test_ticket_lifecycle_assignment_notes_and_notifications_are_attributable(

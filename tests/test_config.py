@@ -8,6 +8,7 @@ PRODUCTION_SETTINGS = {
     "environment": "production",
     "database_url": "postgresql+psycopg://app:password@db/dudu_support",
     "secret_key": "production-session-secret-at-least-32",
+    "secret_manager": "aws-secrets-manager",
     "admin_totp_secrets": {"admin/czeyik/totp": "JBSWY3DPEHPK3PXP"},
     "meta_verify_token": "production-meta-verify-token-long",
     "meta_app_secret": "production-meta-app-secret-long",
@@ -61,6 +62,7 @@ def test_production_send_requires_meta_transport_credentials() -> None:
     [
         ("database_url", "sqlite:///production.db"),
         ("secret_key", "change-me-in-production"),
+        ("secret_manager", "local"),
         ("admin_totp_secrets", {}),
         ("meta_verify_token", "dev-verify-token"),
         ("meta_app_secret", ""),

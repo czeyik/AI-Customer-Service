@@ -300,3 +300,16 @@ class AuditLog(Base, TimestampMixin):
     event_type = Column(String(120), nullable=False, index=True)
     ip_address = Column(String(80), nullable=True)
     details = Column(JSON, default=dict, nullable=False)
+
+
+class RateLimitBucket(Base):
+    __tablename__ = "rate_limit_buckets"
+
+    key_hash = Column(String(64), primary_key=True)
+    request_count = Column(Integer, nullable=False)
+    window_started_at = Column(DateTime, nullable=False)
+    expires_at = Column(DateTime, nullable=False, index=True)
+
+    __table_args__ = (
+        CheckConstraint("request_count > 0", name="ck_rate_limit_request_count"),
+    )

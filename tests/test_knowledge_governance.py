@@ -19,7 +19,7 @@ from app.services.knowledge import (
     rollback_knowledge,
 )
 from app.services.retrieval import search_knowledge
-from app.services.website_knowledge import ContentParser
+from app.services.website_knowledge import ContentParser, SameHostRedirectHandler, _validate_url
 from scripts.ingest_seed import corpus_records, ingest_seed
 
 
@@ -137,6 +137,20 @@ def test_website_extraction_ignores_scripts_navigation_and_footer() -> None:
     )
     assert parser.title == "Dasar Tempahan" and parser.language == "ms"
     assert parser.parts == ["Dasar Tempahan", "Maklumat tempahan yang berguna."]
+
+
+def test_website_ingestion_rejects_off_host_urls_and_redirects() -> None:
+    with pytest.raises(ValueError):
+        _validate_url("https://127.0.0.1/private")
+    with pytest.raises(ValueError):
+        SameHostRedirectHandler().redirect_request(
+            type("Request", (), {"full_url": "https://duducar.co/start"})(),
+            None,
+            302,
+            "Found",
+            {},
+            "http://169.254.169.254/latest/meta-data",
+        )
 
 
 def test_knowledge_api_requires_named_cco_session_and_csrf(db_session: Session) -> None:

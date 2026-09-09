@@ -53,7 +53,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 6 | PG-06 | Named admins and ticket operations | PASS |
 | 7 | PG-07 | CCO knowledge governance and launch corpus | PASS |
 | 8 | PG-08 | Secure image/video pipeline | PASS |
-| 9 | PG-09 | Application security | NOT_STARTED |
+| 9 | PG-09 | Application security | PASS |
 | 10 | PG-10 | Privacy, retention, and deletion | NOT_STARTED |
 | 11 | PG-11 | Production platform and operations | NOT_STARTED |
 | 12 | PG-12 | Release validation and pilot activation | NOT_STARTED |
@@ -656,6 +656,51 @@ disabled.
 Next-wave notes: Wave 9 is unblocked for code work but requires the unresolved OI-08 application
 security, secret-manager, scan-gate, and risk-acceptance decisions before it starts. Do not
 provision the Wave 8 AWS bucket until Wave 11.
+
+### Wave 9 — 2026-09-09
+Status: PASS
+Owner decisions: Cze Yik approved AWS Secrets Manager for production secrets and PostgreSQL for
+the shared bounded abuse-control store, with no Redis service. Cze Yik approved Gitleaks,
+pip-audit, Bandit, Trivy source/container, and OWASP ZAP scans. Verified secrets, dependency or
+container high/critical findings, Bandit high-severity/high-confidence findings, and ZAP high-risk
+findings block release; medium findings require review. A high/critical exception requires Cze
+Yik's written, time-limited acceptance naming an owner and remediation date. Cze Yik is the
+security and risk-acceptance owner. These decisions resolve the Wave 9 portion of OI-08; OI-08
+remains globally unresolved for Wave 10 legal-hold, deletion/anonymization, and backup-retention
+decisions.
+Files/migrations and commit/PR/release: Added a bounded shared PostgreSQL rate limiter with hashed
+identities and migration `49b1f7a0c2de`; IP-first and caller/admin limits; bounded webhook bodies;
+redirect-safe website ingestion; expanded credential and identity redaction; production HTTPS,
+HSTS, CSP, browser, cache, cookie, CSRF, CORS, and API-documentation controls; and production AWS
+Secrets Manager validation. Added a digest-pinned non-root Alpine application image, hash-locked
+patched dependencies, a pinned security workflow, focused application-security tests,
+`docs/wave-9-application-security.md`, and repeatable checklist evidence. Removed the obsolete
+pgvector CI service. Changes remain uncommitted on `dev`; no commit, push, PR, merge, release,
+deployment, secret provisioning, risk waiver, billable action, customer traffic, or pilot-user
+contact occurred.
+Verification commands/results: The clean `dudu-support:wave9-final` image built successfully;
+`python -m pip check` reported no broken requirements and all 126 tests passed with one integration
+test skipped in 41.76 seconds. A fresh PostgreSQL 16 database migrated from zero to
+`49b1f7a0c2de (head)`, `alembic check` reported `No new upgrade operations detected`, and a
+cross-session limiter check proved shared counters with hashed stored identities. Gitleaks scanned
+all 19 commits with no leak; pip-audit reported no known vulnerability; Bandit reported zero
+high-severity/high-confidence findings; Trivy 0.74.0 reported zero source/image high or critical
+vulnerability, secret, or misconfiguration findings; and ZAP 2.17.0 reported zero high-risk alert.
+Five Bandit medium findings and five lower-risk ZAP development-surface warnings were reviewed and
+documented without a waiver. Workflow YAML, Compose configuration, compilation, and
+`git diff --check` passed.
+External evidence (no secrets or customer data): Official Gitleaks 8.28.0, pip-audit 2.10.1,
+Bandit 1.9.4, Trivy Action 0.36.0/Trivy 0.74.0, and ZAP baseline documentation were reviewed on 9
+September 2026. Exact source URLs and the approved gate semantics are recorded in
+`docs/wave-9-application-security.md`.
+Gate update and residual risks: PG-09 is `PASS`; every application-security checklist control now
+maps to repeatable evidence and no unaccepted launch-blocking application finding remains.
+Platform TLS termination, AWS policies/runtime injection, host/network controls, authenticated
+dark-production dynamic testing, and monitoring remain Wave 11/12 work. Retention, legal holds,
+and backup lifecycle remain Wave 10/11 work. Real customer traffic remains disabled.
+Next-wave notes: Wave 10 has not started and is blocked on the remaining OI-08 owner decisions for
+deletion versus anonymization, narrow legal holds, backup retention and deletion propagation.
+Obtain and record those decisions before starting Wave 10.
 
 ## Fresh-Chat Prompt
 

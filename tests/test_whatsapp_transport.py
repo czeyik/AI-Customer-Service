@@ -23,7 +23,7 @@ from app.models import (
     WhatsAppInboundMessage,
     WhatsAppOutboundMessage,
 )
-from app.routers.webhooks_meta import receive_webhook, router as webhook_router
+from app.routers.webhooks_meta import MAX_WEBHOOK_BYTES, _bounded_body, receive_webhook, router as webhook_router
 from app.security import verify_meta_signature
 from app.services import whatsapp as whatsapp_module
 from app.services.whatsapp import MetaSendError, process_next_outbound
@@ -98,6 +98,21 @@ def call_webhook(db: Session, data: dict, signature: str | None = None):
         receive,
     )
     return asyncio.run(receive_webhook(request, db))
+
+
+def test_webhook_rejects_oversized_body_before_reading_it() -> None:
+    request = Request(
+        {
+            "type": "http",
+            "method": "POST",
+            "path": "/webhooks/meta",
+            "headers": [(b"content-length", str(MAX_WEBHOOK_BYTES + 1).encode())],
+        }
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        asyncio.run(_bounded_body(request))
+    assert exc.value.status_code == 413
 
 
 def test_invalid_signature_is_rejected_before_writes(db_session: Session) -> None:

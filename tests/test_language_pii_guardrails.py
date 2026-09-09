@@ -14,9 +14,13 @@ def test_language_detection_handles_launch_languages() -> None:
 
 
 def test_redacts_sensitive_values() -> None:
-    result = redact_sensitive("My card is 4111 1111 1111 1111 and password: secret123")
+    result = redact_sensitive(
+        "My card is 4111 1111 1111 1111, password is secret123, "
+        "and passport number is A12345678"
+    )
     assert "[REDACTED_PAYMENT_CARD]" in result.text
     assert "[REDACTED_SECRET]" in result.text
+    assert "[REDACTED_ID_NUMBER]" in result.text
     assert "payment_card" in result.findings
 
 

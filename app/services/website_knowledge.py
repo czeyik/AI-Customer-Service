@@ -1,6 +1,6 @@
 from html.parser import HTMLParser
-from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.parse import urljoin, urlparse
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 from xml.etree import ElementTree
 
 
@@ -73,15 +73,24 @@ class ContentParser(HTMLParser):
             self._buffer.append(data)
 
 
-def _read_url(url: str) -> bytes:
+def _validate_url(url: str, message: str = "website knowledge URLs") -> None:
     parsed = urlparse(url)
-    if parsed.scheme != "https" or parsed.hostname != ALLOWED_HOST:
-        raise ValueError("website knowledge URLs must use https://duducar.co")
+    if parsed.scheme != "https" or parsed.hostname != ALLOWED_HOST or parsed.username:
+        raise ValueError(f"{message} must stay on https://duducar.co")
+
+
+class SameHostRedirectHandler(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        newurl = urljoin(req.full_url, newurl)
+        _validate_url(newurl, "website knowledge redirects")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def _read_url(url: str) -> bytes:
+    _validate_url(url)
     request = Request(url, headers={"User-Agent": "DUDU-Knowledge-Draft/1.0"})
-    with urlopen(request, timeout=10) as response:
-        final_url = urlparse(response.geturl())
-        if final_url.scheme != "https" or final_url.hostname != ALLOWED_HOST:
-            raise ValueError("website knowledge redirects must stay on https://duducar.co")
+    with build_opener(SameHostRedirectHandler()).open(request, timeout=10) as response:
+        _validate_url(response.geturl(), "website knowledge redirects")
         data = response.read(MAX_PAGE_BYTES + 1)
     if len(data) > MAX_PAGE_BYTES:
         raise ValueError("website page exceeds the 2 MB extraction limit")
@@ -89,7 +98,10 @@ def _read_url(url: str) -> bytes:
 
 
 def sitemap_urls(sitemap_url: str = "https://duducar.co/sitemap.xml") -> list[str]:
-    root = ElementTree.fromstring(_read_url(sitemap_url))
+    data = _read_url(sitemap_url)
+    if b"<!DOCTYPE" in data.upper() or b"<!ENTITY" in data.upper():
+        raise ValueError("website sitemap cannot contain DTD or entity declarations")
+    root = ElementTree.fromstring(data)
     urls = []
     for element in root.iter("{http://www.sitemaps.org/schemas/sitemap/0.9}loc"):
         url = (element.text or "").strip()
