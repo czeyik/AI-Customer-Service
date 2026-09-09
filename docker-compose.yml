@@ -12,10 +12,12 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-    command: sh -c "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    command: >-
+      sh -c "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+      --reload --no-access-log"
 
   db:
-    image: pgvector/pgvector:pg16
+    image: postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94
     environment:
       POSTGRES_DB: dudu_support
       POSTGRES_USER: dudu

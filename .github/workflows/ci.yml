@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: pgvector/pgvector:pg16
+        image: postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94
         env:
           POSTGRES_DB: dudu_support_test
           POSTGRES_USER: dudu
@@ -31,8 +31,8 @@ jobs:
       PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
 
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version-file: .python-version
           cache: pip
@@ -48,3 +48,9 @@ jobs:
         run: python -m pytest -q
       - name: Build application image
         run: docker build --tag dudu-support:${{ github.sha }} .
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+      - name: Prove ARM64 release image and tests
+        run: |
+          docker buildx build --platform linux/arm64 --target test --output type=cacheonly .
+          docker buildx build --platform linux/arm64 --file infra/production/Dockerfile.clamav \
+            --target test --output type=cacheonly .

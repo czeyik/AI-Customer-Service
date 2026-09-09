@@ -8,11 +8,16 @@ PRODUCTION_SETTINGS = {
     "environment": "production",
     "database_url": "postgresql+psycopg://app:password@db/dudu_support",
     "secret_key": "production-session-secret-at-least-32",
-    "admin_initial_password": "production-admin-password",
-    "admin_totp_secret": "JBSWY3DPEHPK3PXP",
-    "admin_api_key": "production-admin-api-key-long",
+    "secret_manager": "aws-secrets-manager",
+    "admin_totp_secrets": {"admin/czeyik/totp": "JBSWY3DPEHPK3PXP"},
     "meta_verify_token": "production-meta-verify-token-long",
     "meta_app_secret": "production-meta-app-secret-long",
+    "meta_access_token": "production-meta-access-token-long",
+    "meta_phone_number_id": "123456789",
+    "media_processing_enabled": True,
+    "media_bucket": "dudu-private-media",
+    "llm_enabled": True,
+    "zai_api_key": "production-zai-api-key",
     "trusted_hosts": "support.example.com",
 }
 
@@ -28,18 +33,58 @@ def test_unknown_environment_is_rejected() -> None:
         Settings(_env_file=None, environment="prodution")
 
 
+def test_production_send_requires_meta_transport_credentials() -> None:
+    with pytest.raises(ValidationError, match="META_ACCESS_TOKEN"):
+        Settings(
+            _env_file=None,
+            **(
+                PRODUCTION_SETTINGS
+                | {"meta_send_enabled": True, "meta_access_token": "", "meta_phone_number_id": ""}
+            ),
+        )
+
+    settings = Settings(
+        _env_file=None,
+        **(
+            PRODUCTION_SETTINGS
+            | {
+                "meta_send_enabled": True,
+                "meta_access_token": "production-meta-access-token-long",
+                "meta_phone_number_id": "123456789",
+            }
+        ),
+    )
+    assert settings.meta_graph_api_version == "v26.0"
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [
         ("database_url", "sqlite:///production.db"),
         ("secret_key", "change-me-in-production"),
-        ("admin_initial_password", "change-me-now"),
-        ("admin_totp_secret", ""),
-        ("admin_api_key", "dev-admin-api-key"),
+        ("secret_manager", "local"),
+        ("admin_totp_secrets", {}),
         ("meta_verify_token", "dev-verify-token"),
         ("meta_app_secret", ""),
+        ("media_processing_enabled", False),
+        ("media_bucket", ""),
+        ("media_region", "ap-southeast-1"),
+        ("media_signed_url_seconds", 3600),
+        ("llm_enabled", False),
+        ("zai_api_key", ""),
+        ("llm_model", "glm-5.3"),
+        ("llm_timeout_seconds", 9),
+        ("llm_max_input_chars", 8001),
+        ("llm_max_output_tokens", 301),
         ("trusted_hosts", "*"),
         ("cors_origins", "*"),
+        ("chat_log_retention_days", 91),
+        ("ticket_retention_months", 35),
+        ("backup_retention_days", 36),
+        ("backup_interval_minutes", 61),
+        ("backup_prefix", "postgresql"),
+        ("privacy_owner_username", "shared-admin"),
+        ("retention_batch_size", 0),
     ],
 )
 def test_production_configuration_rejects_unsafe_values(field: str, value: str) -> None:
