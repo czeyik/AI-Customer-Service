@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from datetime import datetime
 import json
 
 import pytest
@@ -13,7 +14,6 @@ from app.services.answer_generation import (
     ProviderResponse,
 )
 from app.services.chatbot import ChatbotService
-from app.services.retrieval import embed_text
 
 
 @pytest.fixture()
@@ -31,10 +31,15 @@ def db_session(tmp_path) -> Generator[Session, None, None]:
 @pytest.fixture()
 def seeded_db(db_session: Session) -> Session:
     document = KnowledgeDocument(
+        document_key="fares-payments",
+        version=1,
         title="Fares and payments",
         source_type="test",
+        source_uri="https://duducar.co/test-fares",
         language="en",
-        is_approved=True,
+        status="active",
+        effective_at=datetime(2020, 1, 1),
+        content_hash="test-fares-v1",
     )
     db_session.add(document)
     db_session.flush()
@@ -47,7 +52,6 @@ def seeded_db(db_session: Session) -> Session:
             ),
             language="en",
             tags=["fare", "payment", "refund"],
-            embedding=embed_text("fare payment refund"),
         )
     )
     db_session.commit()

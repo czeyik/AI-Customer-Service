@@ -12,6 +12,9 @@ from sqlalchemy import (
     JSON,
     String,
     Text,
+    UniqueConstraint,
+    func,
+    text,
 )
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -189,13 +192,42 @@ class KnowledgeDocument(Base, TimestampMixin):
     __tablename__ = "knowledge_documents"
 
     id = Column(String(36), primary_key=True, default=new_uuid)
+    document_key = Column(String(120), nullable=False, index=True)
+    version = Column(Integer, nullable=False)
     title = Column(String(255), nullable=False)
     source_type = Column(String(40), nullable=False)
     source_uri = Column(String(500), nullable=True)
     language = Column(String(12), default="en", nullable=False)
-    is_approved = Column(Boolean, default=True, nullable=False)
+    status = Column(String(20), default="draft", nullable=False, index=True)
+    effective_at = Column(DateTime, nullable=True)
+    approved_by_admin_id = Column(
+        String(36), ForeignKey("admin_users.id"), nullable=True, index=True
+    )
+    supersedes_document_id = Column(
+        String(36), ForeignKey("knowledge_documents.id"), nullable=True
+    )
+    content_hash = Column(String(64), nullable=False)
 
     chunks = relationship("KnowledgeChunk", back_populates="document", cascade="all, delete-orphan")
+    approved_by = relationship("AdminUser")
+
+    __table_args__ = (
+        UniqueConstraint(
+            "document_key", "language", "version", name="uq_knowledge_document_version"
+        ),
+        CheckConstraint(
+            "status IN ('draft', 'active', 'superseded', 'removed')",
+            name="ck_knowledge_documents_status",
+        ),
+        Index(
+            "uq_knowledge_document_active",
+            "document_key",
+            "language",
+            unique=True,
+            postgresql_where=text("status = 'active'"),
+            sqlite_where=text("status = 'active'"),
+        ),
+    )
 
 
 class KnowledgeChunk(Base, TimestampMixin):
@@ -206,9 +238,17 @@ class KnowledgeChunk(Base, TimestampMixin):
     content = Column(Text, nullable=False)
     language = Column(String(12), default="en", nullable=False, index=True)
     tags = Column(JSON, default=list, nullable=False)
-    embedding = Column(JSON, default=list, nullable=False)
 
     document = relationship("KnowledgeDocument", back_populates="chunks")
+
+    __table_args__ = (
+        Index(
+            "ix_knowledge_chunks_content_trgm",
+            func.lower(content).label("content_lower"),
+            postgresql_using="gin",
+            postgresql_ops={"content_lower": "gin_trgm_ops"},
+        ),
+    )
 
 
 class AuditLog(Base, TimestampMixin):

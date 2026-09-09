@@ -26,7 +26,8 @@ The complete, authoritative baseline is
 - Complaints and safety issues enter a consent-first ticket flow.
 - Prompt-injection attempts and account-changing requests are refused.
 - Sensitive uploads and risky secrets are rejected or redacted.
-- `POST /api/knowledge/documents` ingests approved FAQ/policy chunks.
+- Named CCO sessions can draft, publish, remove, and roll back versioned knowledge through
+  `/api/knowledge/documents`; inactive versions never reach customer answers.
 - `/webhooks/meta` strictly verifies WhatsApp webhooks, deduplicates Meta message IDs, and commits
   each Wave 3 state transition with a durable outbound queue row.
 - `/admin` provides the named-administrator ticket inbox, assignment, status, and internal-note
@@ -39,7 +40,6 @@ The current code predates the consolidated requirements. Before launch it still 
 - DUDU-specific trilingual release evaluation of the hosted model and outage fallback.
 - Real image/video upload, scanning, storage, and ticket retrieval rather than attachment metadata
   alone.
-- CCO-attributed, versioned knowledge governance.
 - Automated deletion or anonymization after 90 days for chats and 36 months for tickets and
   ticket attachments.
 
@@ -62,10 +62,10 @@ will promote a tested image digest and migration set through the release workflo
    docker compose up --build
    ```
 
-4. In another terminal, seed starter support knowledge:
+4. After provisioning Jane's named CCO account, publish the approved launch corpus:
 
    ```bash
-   docker compose exec api python scripts/ingest_seed.py
+   docker compose exec api python scripts/ingest_seed.py --cco-username jane
    ```
 
 5. Open the API:
@@ -75,6 +75,24 @@ will promote a tested image digest and migration set through the release workflo
    - Admin inbox: http://localhost:8000/admin
 
 Administrator accounts are provisioned explicitly; there is no shared or fallback 2FA code.
+
+Website pages can be extracted into inactive versions for CCO review. This command never
+publishes them:
+
+```bash
+docker compose exec api python scripts/stage_website.py --cco-username jane
+```
+
+The importer accepts only HTTPS pages on `duducar.co`, reads at most 100 sitemap URLs and 2 MB per
+page, and removes scripts, navigation, forms, and footers. Jane must review and activate each
+language version through her authenticated session.
+
+Knowledge management uses Jane's normal named-admin session, not a shared API key. A CCO client
+can obtain its CSRF token from `GET /api/knowledge/session`, list the bounded version history at
+`GET /api/knowledge/documents`, and use the documented publish, activate, remove, and rollback
+endpoints. Every mutation records Jane's account, source URI, version, and replacement details.
+Customer retrieval queries only effective `active` versions and uses the indexed PostgreSQL
+trigram candidate search before bounded in-process ranking.
 
 ## Reproducible Checks And Migrations
 

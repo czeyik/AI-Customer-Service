@@ -184,6 +184,6 @@ and launch.
 ## Current MVP Gap Notice
 
 The requirements above describe the approved target, not the current implementation state. The
-current MVP already provides basic chat, retrieval, tickets, guardrails, Meta webhooks, hosted GLM
-generation, and an administrator inbox, but it still requires real media storage, CCO knowledge
-versioning, and automated retention enforcement.
+current MVP already provides basic chat, governed trilingual retrieval, tickets, guardrails, Meta
+webhooks, hosted GLM generation, and an administrator inbox, but it still requires real media
+storage and automated retention enforcement.

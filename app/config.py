@@ -14,7 +14,6 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-in-production"
 
     admin_totp_secrets: dict[str, str] = Field(default_factory=dict)
-    admin_api_key: str = "dev-admin-api-key"
     notification_send_enabled: bool = False
     notification_max_attempts: int = 5
     smtp_host: str = ""
@@ -69,7 +68,6 @@ class Settings(BaseSettings):
 
         unsafe_values = {
             "secret_key": {"", "change-me-in-production", "change-this-to-a-long-random-string"},
-            "admin_api_key": {"", "dev-admin-api-key", "change-this-admin-api-key"},
             "meta_verify_token": {"", "dev-verify-token", "change-this-meta-verify-token"},
             "meta_app_secret": {""},
         }
@@ -79,7 +77,6 @@ class Settings(BaseSettings):
 
         minimum_lengths = {
             "secret_key": 32,
-            "admin_api_key": 24,
             "meta_verify_token": 24,
             "meta_app_secret": 24,
         }

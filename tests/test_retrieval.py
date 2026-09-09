@@ -1,4 +1,4 @@
-from app.services.retrieval import embed_text, score_text, tokenize
+from app.services.retrieval import score_text, tokenize
 
 
 def test_tokenize_removes_common_stopwords() -> None:
@@ -13,7 +13,5 @@ def test_score_text_rewards_relevant_overlap() -> None:
     assert score > 0
 
 
-def test_embedding_is_fixed_size() -> None:
-    vector = embed_text("driver onboarding document approval")
-    assert len(vector) == 64
-
+def test_tokenize_builds_searchable_chinese_bigrams() -> None:
+    assert {"车费", "付款"} <= tokenize("车费和付款")

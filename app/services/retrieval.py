@@ -1,7 +1,7 @@
-import math
 import re
 from dataclasses import dataclass
 
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.models import KnowledgeChunk, KnowledgeDocument
@@ -26,6 +26,10 @@ STOPWORDS = {
     "dan",
     "yang",
     "untuk",
+    "ini",
+    "itu",
+    "的",
+    "了",
 }
 
 
@@ -35,6 +39,9 @@ class RetrievedChunk:
     source_title: str
     language: str
     score: float
+    source_uri: str | None = None
+    document_key: str = ""
+    version: int = 0
 
 
 @dataclass(frozen=True)
@@ -44,16 +51,13 @@ class RetrievalResult:
 
 
 def tokenize(text: str) -> set[str]:
-    tokens = {token.lower() for token in re.findall(r"[\w\u4e00-\u9fff]+", text)}
-    return {token for token in tokens if token not in STOPWORDS and len(token) > 1}
-
-
-def embed_text(text: str, dimensions: int = 64) -> list[float]:
-    vector = [0.0] * dimensions
-    for token in tokenize(text):
-        vector[hash(token) % dimensions] += 1.0
-    magnitude = math.sqrt(sum(value * value for value in vector)) or 1.0
-    return [round(value / magnitude, 6) for value in vector]
+    tokens: set[str] = set()
+    for token in re.findall(r"[a-zA-Z0-9]+|[\u4e00-\u9fff]+", text.lower()):
+        if "\u4e00" <= token[0] <= "\u9fff":
+            tokens.update(token[index : index + 2] for index in range(len(token) - 1))
+        elif token not in STOPWORDS and len(token) > 1:
+            tokens.add(token)
+    return tokens
 
 
 def score_text(query: str, content: str, tags: list[str] | None = None) -> float:
@@ -68,23 +72,35 @@ def score_text(query: str, content: str, tags: list[str] | None = None) -> float
 
 
 def search_knowledge(db: Session, query: str, language: str, limit: int = 4) -> RetrievalResult:
+    query_tokens = tokenize(query)
+    if not query_tokens or limit < 1:
+        return RetrievalResult(chunks=[], confidence=0.0)
+    terms = sorted(query_tokens, key=len, reverse=True)[:12]
     rows = (
         db.query(KnowledgeChunk, KnowledgeDocument)
         .join(KnowledgeDocument, KnowledgeChunk.document_id == KnowledgeDocument.id)
-        .filter(KnowledgeDocument.is_approved.is_(True))
+        .filter(
+            KnowledgeDocument.status == "active",
+            KnowledgeDocument.language == language,
+            KnowledgeChunk.language == language,
+            KnowledgeDocument.effective_at.is_not(None),
+            KnowledgeDocument.effective_at <= func.now(),
+            or_(*(func.lower(KnowledgeChunk.content).like(f"%{term}%") for term in terms)),
+        )
+        .limit(max(limit * 8, 20))
         .all()
     )
     candidates: list[RetrievedChunk] = []
     for chunk, document in rows:
-        if chunk.language not in {language, "en"}:
-            continue
-        language_bonus = 0.05 if chunk.language == language else 0.0
-        score = score_text(query, chunk.content, chunk.tags) + language_bonus
+        score = score_text(query, chunk.content, chunk.tags) + 0.05
         if score > 0:
             candidates.append(
                 RetrievedChunk(
                     content=chunk.content,
                     source_title=document.title,
+                    source_uri=document.source_uri,
+                    document_key=document.document_key,
+                    version=document.version,
                     language=chunk.language,
                     score=score,
                 )
@@ -93,4 +109,3 @@ def search_knowledge(db: Session, query: str, language: str, limit: int = 4) -> 
     selected = candidates[:limit]
     confidence = selected[0].score if selected else 0.0
     return RetrievalResult(chunks=selected, confidence=round(confidence, 3))
-

@@ -51,7 +51,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 4 | PG-04 | Reliable WhatsApp send/receive path | PASS |
 | 5 | PG-05 | Grounded hosted LLM and outage fallback | PASS |
 | 6 | PG-06 | Named admins and ticket operations | PASS |
-| 7 | PG-07 | CCO knowledge governance and launch corpus | NOT_STARTED |
+| 7 | PG-07 | CCO knowledge governance and launch corpus | PASS |
 | 8 | PG-08 | Secure image/video pipeline | NOT_STARTED |
 | 9 | PG-09 | Application security | NOT_STARTED |
 | 10 | PG-10 | Privacy, retention, and deletion | NOT_STARTED |
@@ -72,7 +72,7 @@ or commit them; provision secrets directly in the chosen secret manager.
 | OI-03 | Human support workflow, assignees, ticket statuses/notifications, escalation contacts, admin roster, CCO identity, and recovery approver | RESOLVED | 1, 3, 6, 7 |
 | OI-04 | Meta Business/WABA/app/phone readiness, API version, opt-in approval, test recipients, and secure credential provisioning | RESOLVED | 4, 12 |
 | OI-05 | Z.AI account, exact enabled model ID, data terms, region, quotas, timeout, availability needs, spend limit, and outage fallback approval | RESOLVED | 5, 12 |
-| OI-06 | CCO-approved knowledge and customer copy in all three languages, including bot disclosure, emergency, consent, partnership, and WhatsApp profile text | UNRESOLVED | 3, 7, 12 |
+| OI-06 | CCO-approved knowledge and customer copy in all three languages, including bot disclosure, emergency, consent, partnership, and WhatsApp profile text | RESOLVED | 3, 7, 12 |
 | OI-07 | Allowed media types/sizes, private object store, malware scanner, reviewer access policy, signed-link lifetime, and media-analysis policy | UNRESOLVED | 8, 10, 11 |
 | OI-08 | Privacy notice, controller/contact, deletion versus anonymization, legal holds, backup retention, incident owner, security owner, secret manager, scan policy, and risk approver | UNRESOLVED | 3, 9, 10, 11, 12 |
 | OI-09 | Logging/metrics/error tools, alerts, on-call roster, SLOs, maintenance window, RPO/RTO, and incident/operational escalation path | UNRESOLVED | 11, 12 |
@@ -561,6 +561,49 @@ remain false by default, and no live delivery was attempted.
 Next-wave notes: Wave 7 is unblocked but has not started. Use `AdminUser.is_cco` and the authenticated
 named-admin session for CCO knowledge actions; remove the shared knowledge API key rather than
 adding a second authorization path. Do not store TOTP material in the database or knowledge audit.
+
+### Wave 7 — 2026-09-09
+Status: PASS
+Owner decisions: Cze Yik asked for the eight existing seed topics as a trilingual corpus and
+confirmed that Jane approved all English, Bahasa Malaysia, and Simplified Chinese content, the
+recorded sources, and the 9 September 2026 effective date with no exceptions. Cze Yik approved the
+website workflow in which DUDU sitemap pages are extracted as inactive drafts and each page or
+translation remains excluded until Jane activates it through her named CCO account. OI-06 is
+`RESOLVED` for Wave 7.
+Files/migrations and commit/PR/release: Added the approved 24-record corpus in
+`docs/wave-7-knowledge-corpus.md`, versioned knowledge metadata and migration `8b61c2f2a8d7`, CCO-only
+draft/publish/remove/rollback services and authenticated API actions, source/version traceability,
+bounded indexed PostgreSQL trigram candidate retrieval, an idempotent corpus publisher, and a
+bounded `duducar.co` sitemap/page draft importer. The API and both import paths use the same
+ingestion function. Removed the shared knowledge API key, English-only JSONL seed, hash embeddings,
+pgvector extension setup, and pgvector development image. The completed Wave 7 change set was
+committed locally on `dev` at the owner's request; no push, PR, merge, release, production
+deployment, administrator provisioning, live traffic, or customer contact occurred.
+Verification commands/results: The clean digest-pinned Python 3.11 image built as
+`dudu-support:wave7-check`; `python -m pip check` reported no broken requirements, all 97 tests
+passed in 27.24s, and compile checks passed. Focused tests prove CCO-only mutations with CSRF,
+attributable source/version audits, update, removal, rollback, exclusion of draft/superseded/removed
+content, uncertainty for absent content, traceability, and representative retrieval plus complete
+eight-topic coverage in all three languages. A fresh PostgreSQL 16 database migrated from zero to
+`8b61c2f2a8d7 (head)`; `alembic check` reported no drift, `pg_trgm` and both the trigram and
+single-active-version indexes were present, and the vector extension was absent. A legacy shared-key
+knowledge row migrated as an inactive draft and its embedding column was removed. On another fresh
+database, the publisher created exactly 24 active records; one live booking-policy page became one
+draft record and retrieval of draft-only text returned zero results. `docker compose config
+--quiet` and `git diff --check` passed.
+External evidence (no secrets or customer data): The official DUDU Car sitemap and booking-policy
+page were reviewed on 9 September 2026. The sitemap returned 28 unique same-host HTTPS URLs. The
+bounded extractor successfully identified the booking-policy title, English language, and three
+content chunks while excluding page chrome. Source URLs: `https://duducar.co/sitemap.xml` and
+`https://duducar.co/booking-policy`.
+Gate update and residual risks: PG-07 is `PASS`. Jane can publish, update, remove, and roll back
+without second-person approval; every action is named, versioned, sourced, effective-dated, and
+audited. Only the 24 approved current records are searchable. The other website pages and any
+machine translations remain inactive until Jane reviews them, which does not weaken the approved
+launch corpus. Real customer traffic remains disabled.
+Next-wave notes: Wave 8 has not started and remains blocked on OI-07 plus the applicable OI-08
+privacy/security decisions for media types, limits, storage, malware scanning, reviewer access,
+signed-link lifetime, analysis, deletion, and risk approval.
 
 ## Fresh-Chat Prompt
 
