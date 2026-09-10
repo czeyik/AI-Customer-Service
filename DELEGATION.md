@@ -914,6 +914,17 @@ links through the authenticated admin UI. The two-admin media and ticket-lifecyc
 `PASS`. Representative live video validation, the final owner go/no-go decision, limited cohort
 activation and observation remain pending.
 
+Sixth resume update — 2026-09-10: Cze Yik completed the remaining representative live-media
+check with an MP4 under the 16 MB limit. Meta declared `video/mp4`, content detection confirmed
+`video/mp4`, ClamAV approved it without a failure code, it linked to the newly completed ticket,
+and Jane opened it through the corrected authenticated review path. The single queued response
+was accepted on its first attempt and reached final `read` state; its stored text included the
+quarantine notice, ride-detail guidance and explicit `Done` action. The ticket was then closed.
+`META_SEND_ENABLED` was returned to false immediately after evidence collection. Real WhatsApp
+text, JPEG and representative MP4 validation now pass; PNG and 3GPP content-sniffing, scanning and
+storage remain covered by the release suite. No unresolved P0/P1 finding remains. Final owner
+go/no-go, controlled cohort activation and observation are the remaining Wave 12 work.
+
 ## Fresh-Chat Prompt
 
 > Read `DELEGATION.md`, `AGENTS.md`, `docs/requirements-summary.md`, and
