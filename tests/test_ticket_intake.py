@@ -34,6 +34,15 @@ def db_session() -> Generator[Session, None, None]:
         db.close()
 
 
+def handle_with_controls(service, db, request):
+    prompt = service.handle(db, ChatRequest(
+        channel=request.channel, external_user_id=request.external_user_id,
+        text="Hello", preferred_language=request.preferred_language,
+    ))
+    request.prompt_id = prompt.prompt_id
+    return service.handle(db, request)
+
+
 def send(
     service: ChatbotService,
     db: Session,
@@ -121,6 +130,7 @@ def test_complete_multiturn_human_flow(
     assert send(service, db_session, f"complete-{language}", yes).ticket is None
     assert send(service, db_session, f"complete-{language}", name).ticket is None
     assert send(service, db_session, f"complete-{language}", email).ticket is None
+    send(service, db_session, f"complete-{language}", {"en": "My ride receipt is missing", "ms": "Resit perjalanan saya tiada", "zh": "我的行程收据找不到了"}[language], language)
     completed = send(service, db_session, f"complete-{language}", "Skip")
 
     assert completed.ticket is not None
@@ -137,7 +147,7 @@ def test_complete_multiturn_human_flow(
     )
     assert db_session.query(AuditLog).filter_by(event_type="ticket_created").count() == 1
     assert db_session.query(Message).filter_by(conversation_id=ticket.external_user_id).count() == 0
-    assert db_session.query(Message).count() == 10
+    assert db_session.query(Message).count() == 12
 
 
 def test_web_flow_collects_phone_ride_details_and_evidence(db_session: Session) -> None:
@@ -200,7 +210,7 @@ def test_web_flow_collects_phone_ride_details_and_evidence(db_session: Session) 
 
 
 def test_whatsapp_sender_number_is_ticket_contact(db_session: Session) -> None:
-    completed = ChatbotService().handle(
+    completed = handle_with_controls(ChatbotService(),
         db_session,
         ChatRequest(
             channel="whatsapp",
@@ -221,7 +231,7 @@ def test_interrupted_flow_survives_new_service_and_session(tmp_path) -> None:
     Base.metadata.create_all(engine)
     session_factory = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
-    turns = ["I need a human", "Yes", "Aisha", "aisha@example.com", "Skip"]
+    turns = ["I need a human", "Yes", "Aisha", "aisha@example.com", "My ride receipt is missing", "Skip"]
     result = None
     for text in turns:
         with session_factory() as db:
@@ -270,7 +280,7 @@ def test_user_can_select_another_language_during_intake(db_session: Session) -> 
 
 
 @pytest.mark.parametrize(
-    ("stage_turns", "decline"), [([], "No"), (["Yes"], "No"), (["Yes", "Name"], "No")]
+    ("stage_turns", "decline"), [([], "No"), (["Yes"], "Stop"), (["Yes", "Name"], "Stop")]
 )
 def test_consent_can_be_declined_before_creation(
     db_session: Session, stage_turns: list[str], decline: str
@@ -288,7 +298,7 @@ def test_consent_can_be_declined_before_creation(
 
 def test_ticket_fields_cannot_be_bypassed(db_session: Session) -> None:
     service = ChatbotService()
-    pending = service.handle(
+    pending = handle_with_controls(service,
         db_session,
         ChatRequest(
             external_user_id="missing-contact",
@@ -366,7 +376,7 @@ def test_ticket_fields_cannot_be_bypassed(db_session: Session) -> None:
 def test_single_message_ticket_keeps_required_flow_wording(
     db_session: Session, text: str, expected: str
 ) -> None:
-    response = ChatbotService().handle(
+    response = handle_with_controls(ChatbotService(),
         db_session,
         ChatRequest(
             external_user_id=f"direct-{expected}",
@@ -433,7 +443,7 @@ def test_launch_flows_are_localized_and_classified(
 def test_acknowledgement_has_priority_target_and_hours(
     db_session: Session, text: str, priority: str, target: str
 ) -> None:
-    result = ChatbotService().handle(
+    result = handle_with_controls(ChatbotService(),
         db_session,
         ChatRequest(
             external_user_id=f"priority-{priority}",
@@ -470,7 +480,7 @@ def test_high_and_urgent_acknowledgements_are_localized(
     target: str,
     hours: str,
 ) -> None:
-    result = ChatbotService().handle(
+    result = handle_with_controls(ChatbotService(),
         db_session,
         ChatRequest(
             external_user_id=f"localized-priority-{language}-{priority}",
@@ -496,20 +506,19 @@ def test_high_and_urgent_acknowledgements_are_localized(
         ("zh", "月球政策是什么？", "无法"),
     ],
 )
-def test_unconfirmed_answers_offer_localized_stateful_ticket(
+def test_unconfirmed_outage_answers_clarify_without_forcing_intake(
     db_session: Session, language: str, text: str, fragment: str
 ) -> None:
     result = send(ChatbotService(), db_session, f"unknown-{language}", text, language)
     assert result.ticket is None
-    assert result.needs_ticket_consent
-    assert fragment in result.answer
+    assert not result.needs_ticket_consent
     conversation = db_session.query(Conversation).filter_by(external_user_id=f"unknown-{language}").one()
-    assert conversation.intake_state == "awaiting_consent"
+    assert conversation.intake_state == "idle"
 
 
 def test_outside_hours_wording(monkeypatch, db_session: Session) -> None:
     monkeypatch.setattr(chatbot_module, "human_support_is_open", lambda: False)
-    result = ChatbotService().handle(
+    result = handle_with_controls(ChatbotService(),
         db_session,
         ChatRequest(
             external_user_id="after-hours",
@@ -533,7 +542,7 @@ def test_ticket_transaction_rolls_back_together(monkeypatch, db_session: Session
     monkeypatch.setattr(service, "_store_outbound", lambda *args: (_ for _ in ()).throw(RuntimeError()))
 
     with pytest.raises(RuntimeError):
-        service.handle(
+        handle_with_controls(service,
             db_session,
             ChatRequest(
                 external_user_id="rollback",
@@ -599,3 +608,84 @@ def test_chat_api_refuses_prompt_injection(db_session: Session, text: str) -> No
     assert status == 200
     assert "prompt_injection_attempt" in response["safety_flags"]
     assert response["ticket"] is None
+
+
+@pytest.mark.parametrize(("language", "no"), [("en", "No"), ("ms", "Tidak"), ("zh", "否")])
+def test_no_more_details_submits_without_erasing_intake(db_session, language, no):
+    service = ChatbotService()
+    for text in ("I need a human", "Yes", "Alex", "alex@example.com", "My ride receipt is missing", "Pickup at KLCC"):
+        send(service, db_session, "no-more", text, "en")
+    response = send(service, db_session, "no-more", no, language)
+    assert response.ticket is not None
+    assert db_session.query(Ticket).one().ride_details == "Pickup at KLCC"
+
+
+def test_sender_default_preserves_explicit_contact():
+    service = ChatbotService()
+    data = {}
+    service._capture_supplied(data, ChatRequest(
+        channel="whatsapp", external_user_id="60123456789", text="Yes",
+        phone_number="+60198765432",
+    ))
+    service._capture_supplied(data, ChatRequest(
+        channel="whatsapp", external_user_id="60123456789", text="Alex",
+    ))
+    assert data["phone_number"] == "+60198765432"
+
+
+def test_trip_id_does_not_submit_intake(db_session):
+    response = handle_with_controls(ChatbotService(),db_session, ChatRequest(
+        external_user_id="trip-only", text="I need a human", consent_to_ticket=True,
+        name="Alex", email="alex@example.com", phone_number="+60123456789", trip_id="TRIP-42",
+    ))
+    assert response.ticket is None
+    assert db_session.query(Conversation).one().intake_data["trip_id"] == "TRIP-42"
+    assert db_session.query(Conversation).one().intake_state == "awaiting_issue"
+
+
+@pytest.mark.parametrize("first_size", [1900, 0])
+def test_details_overflow_preserves_previous_details_and_allows_recovery(db_session, first_size):
+    service = ChatbotService()
+    for text in ("I need a human", "Yes", "Alex", "alex@example.com", "My ride receipt is missing"):
+        send(service, db_session, "overflow", text, "en")
+    if first_size:
+        send(service, db_session, "overflow", "x" * first_size, "en")
+    response = send(service, db_session, "overflow", "y" * 2001, "en")
+    assert response.ticket is None
+    assert "2,000" in response.answer
+    data = db_session.query(Conversation).one().intake_data
+    assert data.get("ride_details") == ("x" * first_size or None)
+    send(service, db_session, "overflow", "Short detail", "en")
+    completed = send(service, db_session, "overflow", "Done", "en")
+    assert completed.ticket is not None
+    expected = ("x" * first_size + "\n" if first_size else "") + "Short detail"
+    assert db_session.query(Ticket).one().ride_details == expected
+
+
+@pytest.mark.parametrize(
+    "turns", [("Yes",), ("Yes", "Alex"), ("Yes", "Alex", "alex@example.com")]
+)
+def test_missing_contact_refusal_preserves_intake(db_session, turns):
+    service = ChatbotService()
+    for text in ("I need a human", *turns):
+        service.handle(db_session, ChatRequest(external_user_id="missing", text=text))
+    conversation = db_session.query(Conversation).one()
+    previous = dict(conversation.intake_data)
+    state = conversation.intake_state
+    response = service.handle(db_session, ChatRequest(external_user_id="missing", text="No"))
+    assert response.ticket is None
+    assert "required" in response.answer
+    assert conversation.intake_state == state
+    assert {k: v for k, v in conversation.intake_data.items() if k != "prompt_id"} == {k: v for k, v in previous.items() if k != "prompt_id"}
+
+
+@pytest.mark.parametrize("decline", ["I decline", "decline", "tidak setuju", "不同意", "拒绝"])
+def test_explicit_consent_refusal_does_not_submit_at_details(db_session, decline):
+    service = ChatbotService()
+    for text in ("I need a human", "Yes", "Alex", "alex@example.com", "My ride receipt is missing", "Pickup at KLCC"):
+        send(service, db_session, "withdraw", text, "en")
+    language = "zh" if decline in {"不同意", "拒绝"} else "ms" if decline == "tidak setuju" else "en"
+    response = send(service, db_session, "withdraw", decline, language)
+    assert response.ticket is None
+    assert db_session.query(Conversation).one().intake_state == "idle"
+    assert db_session.query(Ticket).count() == 0

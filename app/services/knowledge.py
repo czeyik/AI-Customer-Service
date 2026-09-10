@@ -62,11 +62,13 @@ def _active_document(db: Session, document_key: str, language: str) -> Knowledge
 
 
 def activate_knowledge(
-    db: Session, *, actor: AdminUser, document: KnowledgeDocument
+    db: Session, *, actor: AdminUser, document: KnowledgeDocument, effective_at: datetime | None = None
 ) -> KnowledgeDocument:
     _require_cco(actor)
     if document.status not in {"draft", "superseded", "removed"}:
         raise ValueError("only an inactive knowledge version can be activated")
+    if effective_at is not None:
+        document.effective_at = effective_at
     if not document.effective_at:
         raise ValueError("an effective date is required before activation")
     previous = _active_document(db, document.document_key, document.language)
@@ -81,6 +83,7 @@ def activate_knowledge(
         actor,
         "knowledge_published",
         document,
+        effective_at=document.effective_at.isoformat(),
         replaced_document_id=previous.id if previous else "",
         replaced_version=previous.version if previous else 0,
     )
@@ -128,7 +131,6 @@ def ingest_knowledge(
                 "language": language,
                 "chunks": chunks,
                 "tags": tags,
-                "effective_at": effective_at.isoformat() if effective_at else None,
             },
             ensure_ascii=False,
             sort_keys=True,

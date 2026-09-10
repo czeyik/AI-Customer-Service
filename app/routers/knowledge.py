@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from fastapi import APIRouter, Body, Depends, Header, HTTPException, Request, status
+from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -96,13 +97,14 @@ def ingest_document(
 def activate_document(
     document_id: str,
     request: Request,
+    effective_at: datetime | None = Body(default=None, embed=True),
     x_csrf_token: str = Header(...),
     db: Session = Depends(get_db),
     admin: AdminUser = Depends(get_current_admin),
 ) -> KnowledgeDocumentResponse:
     require_csrf(request, x_csrf_token)
     return _mutate(
-        activate_knowledge, db, actor=admin, document=_document_or_404(db, document_id)
+        activate_knowledge, db, actor=admin, document=_document_or_404(db, document_id), effective_at=effective_at
     )
 
 

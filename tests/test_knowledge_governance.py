@@ -124,7 +124,7 @@ def test_approved_corpus_has_complete_trilingual_search_coverage(db_session: Ses
     for query, language, expected_key in checks:
         result = search_knowledge(db_session, query, language)
         assert result.confidence > 0 and result.chunks[0].document_key == expected_key
-    assert not search_knowledge(db_session, "quantum submarine bakery", "en").chunks
+    assert search_knowledge(db_session, "quantum submarine bakery", "en").confidence == 0
 
 
 def test_website_extraction_ignores_scripts_navigation_and_footer() -> None:

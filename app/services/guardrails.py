@@ -150,14 +150,35 @@ def assess_message(text: str, attachments: list[AttachmentPayload] | None = None
     if _contains_any(lowered, PROMPT_INJECTION_PHRASES):
         flags.append("prompt_injection_attempt")
 
-    is_safety = _contains_any(lowered, SAFETY_TERMS)
-    is_money = _contains_any(lowered, MONEY_TERMS)
-    is_fraud = _contains_any(lowered, FRAUD_TERMS)
-    is_account = _contains_any(lowered, ACCOUNT_TERMS)
-    is_complaint = _contains_any(lowered, COMPLAINT_TERMS)
-    is_human_request = _contains_any(lowered, HUMAN_REQUEST_TERMS)
-    is_partnership = _contains_any(lowered, PARTNERSHIP_TERMS)
-
+    # Only direct, affirmative incident/request forms are deterministic. Ordinary
+    # language, mixed intent and keyword collisions are interpreted in the one GLM call.
+    informational = bool(re.search(
+        r"(?i)^(?:how|what|why|when|where|can i|do you|does|is there|are you|if |suppose|imagine|bagaimana|apakah|mengapa|jika|如何|为什么|什么|如果)|\b(?:not|never|no longer|don't|do not|didn't|tidak|bukan)\b|[\"“”]|(?:没有|不是|不需要)",
+        text.strip(),
+    ))
+    is_safety = not informational and bool(re.search(
+        r"(?i)\b(?:i am|i'm|we are|i was|we were|someone is) (?:in (?:immediate )?danger|injured|being (?:assaulted|threatened|harassed)|hurt)|\b(?:i|we) (?:had|was injured in|were injured in) (?:a |an )?(?:crash|accident)|saya (?:cedera|dalam bahaya)|我(?:撞车受伤|受伤|有危险|被骚扰)|有人受伤", text
+    ))
+    is_money = not informational and (
+        bool(re.search(r"(?i)\bi (?:was|have been) (?:charged|overcharged)|\bmy payment (?:failed|was)|\bi have (?:a )?(?:payment|fare|refund|wallet) (?:problem|issue)|saya ada masalah (?:bayaran|tambang)|我有(?:付款|车费)问题", text))
+        or (is_account_action_request(text) and _contains_any(lowered, MONEY_TERMS))
+    )
+    is_fraud = not informational and bool(re.search(
+        r"(?i)^(?:i (?:was scammed|need help with fraud|experienced fraud)|saya (?:mahu lapor penipuan|ditipu)|我遇到诈骗)[.!。]*$", text.strip()
+    ))
+    is_account = not informational and (
+        bool(re.search(r"(?i)\bi (?:cannot|can't) log ?in|\bmy account (?:is|was) (?:blocked|suspended)|saya tidak boleh log masuk|我的账户被封", text))
+        or (is_account_action_request(text) and _contains_any(lowered, ACCOUNT_TERMS))
+    )
+    is_complaint = not informational and bool(re.search(
+        r"(?i)(?:^i (?:want to complain|have a complaint)|the driver was rude|saya mahu buat aduan tentang|^我要投诉(?:司机|服务|行程|付款)|司机态度很差.*我要投诉)", text.strip()
+    ))
+    is_human_request = not informational and bool(re.fullmatch(
+        r"(?i)(?:i (?:need|want|would like)(?: to (?:speak|talk) to)? (?:a )?(?:human(?: agent)?|representative|real person)|saya mahu pegawai manusia|我要人工客服|转人工)[.!。]*", re.split(r"[.!。！？?]", text.strip(), maxsplit=1)[0].strip()
+    ))
+    is_partnership = not informational and bool(re.fullmatch(
+        r"(?i)(?:i have a (?:business )?partnership proposal|saya mahu bincang kerjasama|我想咨询商务合作)[.!。]*", text.strip()
+    ))
     issue_type = "general_faq"
     urgency = "normal"
 
@@ -181,6 +202,8 @@ def assess_message(text: str, attachments: list[AttachmentPayload] | None = None
         issue_type = "partnership"
     elif is_human_request:
         issue_type = "human_escalation"
+    elif is_account_action_request(text):
+        issue_type = "prohibited_action_request"
 
     if is_complaint:
         flags.append("complaint")
@@ -200,14 +223,14 @@ def assess_message(text: str, attachments: list[AttachmentPayload] | None = None
         is_human_request=is_human_request,
         is_partnership=is_partnership,
         should_create_ticket=(
-            is_safety or is_fraud or is_complaint or is_human_request or is_partnership
+            is_safety or is_fraud or is_complaint or is_human_request or is_partnership or is_account_action_request(text)
         ),
     )
 
 
 def is_account_action_request(text: str) -> bool:
     lowered = text.lower()
-    if _contains_any(lowered, ("how do i", "how can i", "how to", "can i", "where can i")):
+    if re.search(r"(?i)^(?:how|why|what|can i|where|bagaimana|apakah|如何|为什么)|\b(?:not|don't|do not|tidak)\b|[\"“”]|(?:不要|不想)", lowered):
         return False
     action_terms = (
         "refund me",
@@ -230,22 +253,21 @@ def is_account_action_request(text: str) -> bool:
         "access my account",
         "sign the contract",
         "agree to the contract",
-        "bayar balik",
         "batalkan perjalanan",
+        "batalkan perjalanan saya",
         "tempah perjalanan untuk saya",
         "ubah akaun",
         "akses akaun saya",
         "luluskan permohonan saya",
-        "退款",
         "帮我退款",
         "取消行程",
+        "请取消行程",
         "帮我预订",
         "更改账户",
         "查看我的账户",
         "批准我的申请",
-        "封禁",
     )
-    return _contains_any(lowered, action_terms)
+    return re.sub(r"^please\s+", "", lowered.strip().rstrip(".!。?")) in action_terms
 
 
 def _contains_any(text: str, terms: tuple[str, ...]) -> bool:

@@ -44,7 +44,9 @@ not waived.
 - Use ECR digests, GitHub OIDC, EC2 roles, Secrets Manager, private encrypted S3, CloudWatch, AWS
   Backup, Systems Manager, Caddy TLS, and PostgreSQL queues. No production access keys or public SSH.
 - Customer data, logs, media, dumps, and snapshots remain in Malaysia except explicit Meta and
-  hosted-model processing. Never send customer messages, identifiers, tickets, or media to the model.
+  hosted-model processing. The approved revised scope permits a minimized current question and
+  bounded sanitized context in Singapore. Raw identifiers, ticket bodies, media, account data and
+  full conversation history remain excluded; activate only after privacy/provider review.
 - Retain chats 90 days, closed tickets/media 36 months, and backups at most 35 days, subject only to
   an approved legal hold.
 

@@ -12,7 +12,7 @@ Approved by Cze Yik on 9 September 2026.
 | Application/CloudWatch logs | Security owner | No content, contacts, or object URLs; CloudWatch expires after 30 days |
 | Rate-limit buckets | Security owner | Hashed identities only; delete expired windows |
 | Encrypted backups | Infrastructure/privacy owner | Expire within 35 days; reapply retention before restored traffic |
-| Z.AI | CCO/provider owner | Approved knowledge only; no customer data |
+| Z.AI | CCO/provider owner | Approved knowledge, minimized question and bounded sanitized context; no raw identifiers, ticket bodies, account data, media or full history |
 
 Meta-held data is outside the application deletion boundary. Temporary media files close after
 scanning and are not durable storage. There is no external conversation/search index.

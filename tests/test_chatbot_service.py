@@ -1,3 +1,4 @@
+from test_ticket_intake import handle_with_controls
 from collections.abc import Generator
 from datetime import datetime
 import json
@@ -87,6 +88,7 @@ def test_customer_identifiers_never_reach_hosted_provider(seeded_db: Session, ca
             return ProviderResponse(
                 json.dumps(
                     {
+                        "disposition": "answer",
                         "answer": (
                             "Fare estimates can change because of distance, traffic, tolls, "
                             "waiting time, route changes, or promotions."
@@ -99,7 +101,7 @@ def test_customer_identifiers_never_reach_hosted_provider(seeded_db: Session, ca
     provider = CapturingProvider()
     service = ChatbotService()
     service.answer_generator = ApprovedKnowledgeResponder(
-        Settings(_env_file=None, llm_enabled=True, zai_api_key="test-api-key-value"),
+        Settings(_env_file=None, llm_enabled=True, llm_customer_context_enabled=True, zai_api_key="test-api-key-value"),
         provider,
     )
 
@@ -115,6 +117,7 @@ def test_customer_identifiers_never_reach_hosted_provider(seeded_db: Session, ca
 
     sent = json.dumps(provider.messages)
     assert response.confidence > 0
+    assert "Why did my fare change?" in sent
     assert "Jane" not in sent
     assert "jane@example.com" not in sent
     assert "+60123456789" not in sent
@@ -127,7 +130,7 @@ def test_customer_identifiers_never_reach_hosted_provider(seeded_db: Session, ca
 
 def test_complaint_with_consent_creates_ticket(seeded_db: Session) -> None:
     service = ChatbotService()
-    response = service.handle(
+    response = handle_with_controls(service,
         seeded_db,
         ChatRequest(
             channel="web",

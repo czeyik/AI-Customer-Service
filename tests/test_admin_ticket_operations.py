@@ -270,7 +270,7 @@ def test_ticket_lifecycle_assignment_notes_and_notifications_are_attributable(
     with pytest.raises(ValueError, match="invalid ticket transition"):
         update_ticket_status(db_session, ticket=normal, new_status="open", actor=jane)
     reopened = reopen_closed_ticket_for_customer(
-        db_session, channel=normal.channel, external_user_id=normal.external_user_id
+        db_session, channel=normal.channel, external_user_id=normal.external_user_id, public_id=normal.public_id
     )
     db_session.commit()
     assert reopened is normal and normal.status == "open" and normal.closed_at is None

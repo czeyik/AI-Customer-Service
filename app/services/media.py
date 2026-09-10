@@ -313,18 +313,10 @@ def process_next_media(
         attachment.status = "approved"
         attachment.failure_code = None
         attachment.approved_at = now
-        ticket = (
-            db.query(Ticket)
-            .filter(
-                Ticket.conversation_id == attachment.conversation_id,
-                Ticket.created_at >= attachment.created_at,
-            )
-            .order_by(Ticket.created_at.desc())
-            .first()
-        )
+        # Evidence ownership was recorded at intake/submission, independently of scan timing.
+        ticket = db.get(Ticket, attachment.ticket_id) if attachment.ticket_id else None
         if ticket:
-            attachment.ticket = ticket
-            ticket.attachment_count = sum(
+            ticket.attachment_count = len((ticket.extra or {}).get("supporting_evidence", [])) + sum(
                 item.status == "approved" for item in ticket.attachments
             )
         event = "media_approved"

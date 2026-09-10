@@ -31,6 +31,12 @@
       <section>
         <h2>Description</h2>
         <p class="description">{{ ticket.description }}</p>
+        {% if ticket.extra.get('customer_updates') %}
+          <h3>Customer updates</h3>
+          {% for update in ticket.extra['customer_updates'] %}
+            <p class="description">{{ update }}</p>
+          {% endfor %}
+        {% endif %}
         {% if ticket.ride_details %}
           <h2>Ride details</h2>
           <p class="description">{{ ticket.ride_details }}</p>

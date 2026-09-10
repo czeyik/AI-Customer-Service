@@ -39,13 +39,14 @@ class FakeProvider:
 
 
 def settings() -> Settings:
-    return Settings(_env_file=None, llm_enabled=True, zai_api_key="test-api-key-value")
+    return Settings(_env_file=None, llm_enabled=True, llm_customer_context_enabled=True, zai_api_key="test-api-key-value")
 
 
 def test_grounded_hosted_answer_uses_only_approved_chunks(caplog) -> None:
     provider = FakeProvider(
         json.dumps(
             {
+                "disposition": "answer",
                 "answer": "Fare estimates can change because of distance and traffic.",
                 "citations": [1],
             }
@@ -54,21 +55,21 @@ def test_grounded_hosted_answer_uses_only_approved_chunks(caplog) -> None:
     responder = ApprovedKnowledgeResponder(settings(), provider)
 
     with caplog.at_level(logging.INFO):
-        answer = responder.generate("en", CHUNKS)
+        answer = responder.generate("en", CHUNKS, "Why did my fare change?", {})
 
-    assert answer == "Fare estimates can change because of distance and traffic."
+    assert answer.answer == "Fare estimates can change because of distance and traffic."
     sent = json.dumps(provider.messages)
     assert "Fare estimates" in sent
-    assert "customer" not in sent.lower()
-    record = next(record for record in caplog.records if record.message == "llm_generation")
+    assert "Why did my fare change?" in sent
+    record = next(record for record in caplog.records if record.message.startswith("llm_generation "))
     assert (record.outcome, record.prompt_tokens, record.completion_tokens) == ("success", 20, 10)
-    assert answer not in record.getMessage()
+    assert answer.answer not in record.getMessage()
 
 
 def test_provider_outage_uses_deterministic_approved_answer() -> None:
-    answer = ApprovedKnowledgeResponder(settings(), FakeProvider()).generate("en", CHUNKS)
+    answer = ApprovedKnowledgeResponder(settings(), FakeProvider()).generate("en", CHUNKS, "Why did my fare change?", {})
 
-    assert "Fare estimates can change because of distance and traffic." in answer
+    assert answer is None
 
 
 def test_ungrounded_number_or_citation_uses_deterministic_answer() -> None:
@@ -80,9 +81,9 @@ def test_ungrounded_number_or_citation_uses_deterministic_answer() -> None:
         [],
     ):
         answer = ApprovedKnowledgeResponder(
-            settings(), FakeProvider(json.dumps(response))
-        ).generate("en", CHUNKS)
-        assert answer.startswith("Here’s what I found")
+            settings(), FakeProvider(json.dumps({"disposition": "answer", **response} if isinstance(response, dict) else response))
+        ).generate("en", CHUNKS, "Why did my fare change?", {})
+        assert answer is None
 
 
 def test_zai_provider_sends_bounded_tool_free_contract(monkeypatch) -> None:
@@ -136,11 +137,19 @@ def test_total_prompt_limit_falls_back_without_calling_provider() -> None:
     limited = Settings(
         _env_file=None,
         llm_enabled=True,
+        llm_customer_context_enabled=True,
         zai_api_key="test-api-key-value",
         llm_max_input_chars=100,
     )
 
-    answer = ApprovedKnowledgeResponder(limited, provider).generate("en", CHUNKS)
+    answer = ApprovedKnowledgeResponder(limited, provider).generate("en", CHUNKS, "Why did my fare change?", {})
 
-    assert answer.startswith("Here’s what I found")
+    assert answer is None
     assert provider.messages is None
+
+
+def test_overlap_does_not_allow_new_eligibility_prices_or_universal_promises():
+    chunks = [RetrievedChunk(content="Support reviews refund requests within 24 hours. Waiting time may be 5 minutes.", source_title="Support", language="en", score=1)]
+    responder = ApprovedKnowledgeResponder(settings(), FakeProvider())
+    for answer in ("All refund requests are approved within 24 hours.", "The fare is RM 5.", "Riders are automatically eligible for refund requests within 24 hours."):
+        assert responder._grounded_answer(json.dumps({"answer": answer, "citations": [1]}), chunks) is None

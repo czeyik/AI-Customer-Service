@@ -7,6 +7,7 @@ from app.services.media import process_next_media, reconcile_orphaned_media
 from app.services.notifications import process_notifications
 from app.services.retention import run_retention
 from app.services.whatsapp import process_outbox
+from app.services.inbound import process_inbox
 from app.workers.backup import run_backup
 
 
@@ -25,7 +26,7 @@ def main() -> None:
     next_backup = time.monotonic() + settings.backup_interval_minutes * 60
     next_retention = time.monotonic() + 24 * 60 * 60
     while True:
-        processed = False
+        processed = process_inbox(SessionLocal)
         for operation in (process_outbox, process_next_media, process_notifications):
             with SessionLocal() as db:
                 processed = operation(db) or processed

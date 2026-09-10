@@ -40,3 +40,42 @@ def redact_sensitive(text: str) -> RedactionResult:
         if count:
             findings.append(finding)
     return RedactionResult(text=redacted, findings=findings)
+
+
+# Provider minimization is separate from permitted local intake storage.
+EMAIL_PATTERN = re.compile(r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}")
+PHONE_PATTERN = re.compile(r"(?<!\w)\+?\d[\d ()-]{6,}\d(?!\w)")
+FIELD_PATTERN = re.compile(
+    r"(?i)(?:\b(?:my name is|name is|name:|nama saya|nama:)|我叫|姓名[：:])\s*"
+    r"([^,;\n.!?，。；@]+)|\b(?:i am|i'm)\s+((?-i:[A-Z][a-z'-]+)(?:\s+(?-i:[A-Z][a-z'-]+))*)"
+)
+IDENTIFIER_PATTERN = re.compile(
+    r"(?i)\b(?:account|trip|booking|ride|ticket|akaun|perjalanan)(?:[ _-]?id| number| no\.?|编号)?"
+    r"\s*[:=#]?\s*([A-Z]*[-_]?[0-9][A-Z0-9_-]*)\b|DUDU-[A-Z0-9-]+"
+)
+
+
+def provider_question(text: str, local_values: dict[str, str] | None = None) -> str | None:
+    """Minimize known fields; uncertain identity/location prose stays local for clarification."""
+    sanitized = text
+    for role, value in sorted((local_values or {}).items(), key=lambda item: len(str(item[1])), reverse=True):
+        if value:
+            sanitized = re.sub(re.escape(str(value)), f"[FIELD_{role.upper()}]", sanitized, flags=re.I)
+    sanitized = FIELD_PATTERN.sub("[FIELD_NAME]", sanitized)
+    sanitized = EMAIL_PATTERN.sub("[FIELD_EMAIL]", sanitized)
+    sanitized = PHONE_PATTERN.sub("[FIELD_PHONE_NUMBER]", sanitized)
+    sanitized = IDENTIFIER_PATTERN.sub("[FIELD_IDENTIFIER]", sanitized)
+    sanitized = re.sub(r"(?i)\b(?:otp|pin|passcode|password)\s+\d{4,8}\b", "[REDACTED_SECRET]", sanitized)
+    sanitized = re.sub(r"(?i)\b(?:account|trip|booking|ride)(?:[ _-]?id| number)?\s*[:=]\s*[\w-]+", "[FIELD_IDENTIFIER]", sanitized)
+    sanitized = re.sub(r"\b(?=[A-Za-z0-9_-]*[A-Za-z])(?=[A-Za-z0-9_-]*\d)[A-Za-z0-9_-]{4,}\b", "[FIELD_IDENTIFIER]", sanitized)
+    sanitized = redact_sensitive(sanitized).text
+    known_words = {"I", "My", "The", "How", "What", "Why", "When", "Where", "Can", "Could", "Does", "Do", "Are", "Is", "Hi", "Hello", "Please", "Thanks", "Thank", "If", "It", "Yes", "No", "Fare", "Car", "Malaysia", "English", "Malay", "Chinese", "Bahasa", "Saya", "Bagaimana", "Apakah", "Boleh", "Di", "Adakah", "Sila", "Ini", "Tidak", "Terima", "Jika", "Mengapa", "Siapa", "Siapakah", "Nama", "Resit", "Semak", "Anda", "Hantar", "Langkau", "Done", "Submit", "Stop"}
+    sanitized = re.sub(r"\b[A-Z][a-z]{1,}\b", lambda match: match.group() if match.group() in known_words else "[FIELD_POSSIBLE_NAME]", sanitized)
+    # ponytail: regex cannot anonymize arbitrary prose. Unrecognized identifying narratives
+    # require a local rephrase; upgrade with an evaluated local entity detector if needed.
+    if re.search(
+        r"(?i)\b(?:address|passport|nric|ic number|bank account|my driver is|driver named|lives? at|located at|pickup at|pick me up at|destination is|alamat|pemandu bernama)\b|住址|身份证|护照|司机叫|上车地点|目的地是",
+        sanitized,
+    ):
+        return None
+    return sanitized if len(sanitized) <= 1600 else None

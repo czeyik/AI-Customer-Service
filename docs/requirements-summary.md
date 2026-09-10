@@ -32,7 +32,9 @@ This is the authoritative product baseline.
 - Only the named CCO may publish, replace, remove, or roll back knowledge. Every change is
   authenticated, versioned, attributable, and audited.
 - Production uses hosted `glm-5.3-flash` through the provider-neutral adapter. It receives approved
-  knowledge, not customer messages, identifiers, tickets, or attachments, and has no action tools.
+  knowledge, the minimized current question, and bounded sanitized conversation context after the
+  privacy activation gate is approved. Raw identifiers, ticket bodies, attachments and full history
+  remain excluded. It has no action tools; local code validates consent and all mutations.
 - Unsafe, ungrounded, invalid, or unavailable model output uses the deterministic approved-knowledge
   fallback.
 

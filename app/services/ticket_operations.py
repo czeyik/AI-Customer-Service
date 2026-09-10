@@ -69,11 +69,11 @@ def queue_new_ticket_notifications(db: Session, ticket: Ticket) -> None:
 
 
 def reopen_closed_ticket_for_customer(
-    db: Session, *, channel: str, external_user_id: str
+    db: Session, *, channel: str, external_user_id: str, public_id: str
 ) -> Ticket | None:
     ticket = (
         db.query(Ticket)
-        .filter_by(channel=channel, external_user_id=external_user_id, status="closed")
+        .filter_by(channel=channel, external_user_id=external_user_id, public_id=public_id, status="closed")
         .order_by(Ticket.closed_at.desc())
         .first()
     )

@@ -1,0 +1,101 @@
+family	en	ms	zh
+booking	How do I order a car?	Bagaimana saya memesan kereta?	我该怎么叫车？
+booking	Where do I enter my destination?	Di mana saya masukkan destinasi?	在哪里输入目的地？
+booking	Can I check the pickup point before requesting?	Boleh saya semak tempat pengambilan sebelum menempah?	叫车前可以检查上车点吗？
+booking	What information do I need before booking?	Apakah maklumat yang diperlukan sebelum menempah?	预订前需要哪些信息？
+booking	How does requesting a ride work?	Bagaimana permintaan perjalanan berfungsi?	叫车流程是怎样的？
+booking	How can I cancel through the app?	Bagaimana saya membatalkan melalui aplikasi?	怎么在应用内取消行程？
+booking	Where are the cancellation conditions shown?	Di mana syarat pembatalan dipaparkan?	在哪里查看取消条件？
+booking	Can I review the route first?	Boleh saya semak laluan dahulu?	可以先查看路线吗？
+booking	Does the app show an estimate before I book?	Adakah aplikasi menunjukkan anggaran sebelum tempahan?	预订前应用会显示估价吗？
+booking	Hi, are you human? How do I book a car?	Hai, adakah anda manusia? Bagaimana menempah kereta?	你好，你是真人吗？怎么叫车？
+fare	Why might a fare estimate change?	Mengapa anggaran tambang boleh berubah?	为什么预估车费会改变？
+fare	Do tolls affect estimated fares?	Adakah tol mempengaruhi anggaran tambang?	过路费会影响估价吗？
+fare	Can traffic change the estimate?	Bolehkah trafik mengubah anggaran?	交通情况会改变估价吗？
+fare	What does waiting time mean for fares?	Apakah maksud masa menunggu bagi tambang?	等候时间如何影响车费？
+fare	Where can I see payment information?	Di mana saya boleh melihat maklumat bayaran?	在哪里查看付款信息？
+fare	How does a route change affect the fare?	Bagaimana perubahan laluan mempengaruhi tambang?	路线改变如何影响车费？
+fare	What is the policy for payment problems?	Apakah polisi untuk masalah bayaran?	付款问题的处理政策是什么？
+fare	Does distance affect fare estimates?	Adakah jarak mempengaruhi anggaran tambang?	距离会影响预估车费吗？
+fare	Can the chatbot itself issue a refund?	Bolehkah chatbot sendiri membuat bayaran balik?	聊天机器人能直接退款吗？
+fare	I do not want a refund; where are fare details?	Saya tidak mahu bayaran balik; di mana butiran tambang?	我不想退款，只想知道在哪里看车费详情。
+promotion	Where are promotion conditions shown?	Di mana syarat promosi dipaparkan?	在哪里查看优惠条件？
+promotion	How do I check voucher validity?	Bagaimana menyemak kesahan baucar?	怎么检查优惠券有效期？
+promotion	Can a promotion have usage restrictions?	Bolehkah promosi mempunyai sekatan penggunaan?	优惠可能有使用限制吗？
+promotion	Where can I check whether a voucher applies?	Di mana saya boleh semak sama ada baucar terpakai?	在哪里检查优惠券是否适用？
+promotion	What information is needed about a promo question?	Apakah maklumat diperlukan untuk soalan promosi?	咨询优惠问题需要提供什么信息？
+promotion	Why should I read voucher terms?	Mengapa saya patut membaca syarat baucar?	为什么需要阅读优惠券条款？
+promotion	What does the app say about discounts?	Apakah maklumat diskaun dalam aplikasi?	应用中有哪些折扣说明？
+promotion	Can promotions affect the estimated price?	Bolehkah promosi mempengaruhi anggaran harga?	优惠会影响预估价格吗？
+promotion	Is there a general guide to promo issues?	Adakah panduan umum untuk isu promosi?	有优惠问题的一般指南吗？
+promotion	I am not reporting a voucher problem; I want the rules.	Saya bukan melaporkan masalah baucar; saya mahu peraturannya.	我不是要投诉优惠券问题，只想了解规则。
+account	How can I troubleshoot login?	Bagaimana menyelesaikan masalah log masuk?	怎么排查登录问题？
+account	Should I check my internet connection when login fails?	Patutkah saya semak internet jika log masuk gagal?	登录失败时应该检查网络吗？
+account	Where is the official account recovery process?	Di mana proses pemulihan akaun rasmi?	在哪里找到官方账号恢复流程？
+account	Can I share an OTP with the chatbot?	Bolehkah saya berkongsi OTP dengan chatbot?	可以把验证码发给聊天机器人吗？
+account	What should I avoid sharing in chat?	Apakah yang tidak patut dikongsi dalam sembang?	聊天时应该避免发送什么信息？
+account	How do account access questions get handled?	Bagaimana soalan akses akaun dikendalikan?	账号访问问题如何处理？
+account	Why can't you access my account directly?	Mengapa anda tidak boleh mengakses akaun saya secara langsung?	为什么你不能直接访问我的账号？
+account	Do not delete my account. I just need login guidance.	Jangan padam akaun saya. Saya cuma perlukan panduan log masuk.	不要删除我的账号，我只需要登录指导。
+account	The app mentions account suspension. What can this bot do?	Aplikasi menyebut penggantungan akaun. Apakah fungsi bot ini?	应用提到账户暂停。这个机器人能做什么？
+account	Can an agent change a password for a customer?	Bolehkah ejen menukar kata laluan pelanggan?	客服能为客户修改密码吗？
+driver	What checks apply before drivers accept trips?	Apakah semakan sebelum pemandu menerima perjalanan?	司机接单前需要哪些审核？
+driver	How do I find driver onboarding guidance?	Bagaimana mencari panduan pendaftaran pemandu?	怎么找到司机入驻指南？
+driver	Can this chatbot approve a driver application?	Bolehkah chatbot ini meluluskan permohonan pemandu?	这个机器人能批准司机申请吗？
+driver	Where should driver documents be submitted?	Di mana dokumen pemandu patut dihantar?	司机文件应该在哪里提交？
+driver	Is onboarding information the same as approval?	Adakah maklumat pendaftaran sama dengan kelulusan?	获得入驻信息就等于获批吗？
+driver	What happens after a driver submits an application?	Apakah berlaku selepas pemandu menghantar permohonan?	司机提交申请后会怎样？
+driver	Can you explain driver eligibility from approved information?	Boleh jelaskan kelayakan pemandu berdasarkan maklumat diluluskan?	能根据已批准资料解释司机资格吗？
+driver	I am not asking you to approve me; where is the process?	Saya bukan meminta kelulusan; di mana prosesnya?	我不是要你批准，只想知道申请流程。
+driver	How are driver-related questions routed?	Bagaimana soalan berkaitan pemandu disalurkan?	司机相关问题如何处理？
+driver	Where can a prospective driver learn more?	Di mana bakal pemandu boleh mendapatkan maklumat lanjut?	有意成为司机的人在哪里了解更多？
+support	What are human support hours?	Apakah waktu sokongan manusia?	人工客服的服务时间是什么？
+support	Does support work on weekends?	Adakah sokongan beroperasi pada hujung minggu?	周末有客服吗？
+support	Which timezone applies to support hours?	Zon waktu manakah digunakan untuk waktu sokongan?	客服时间使用哪个时区？
+support	What is the normal first-response target?	Apakah sasaran respons pertama biasa?	普通工单的首次回复目标是什么？
+support	What is the high-priority response target?	Apakah sasaran respons keutamaan tinggi?	高优先级工单的回复目标是什么？
+support	Does a response target promise resolution?	Adakah sasaran respons menjanjikan penyelesaian?	回复目标意味着承诺解决吗？
+support	What happens to tickets outside working hours?	Apakah berlaku pada tiket di luar waktu operasi?	非服务时间提交的工单会怎样？
+support	What information is required for a support ticket?	Apakah maklumat diperlukan untuk tiket sokongan?	提交客服工单需要什么信息？
+support	Why do tickets need contact details?	Mengapa tiket memerlukan butiran hubungan?	为什么工单需要联系方式？
+support	Can I decline a ticket and keep asking questions?	Bolehkah saya menolak tiket dan terus bertanya?	可以拒绝创建工单并继续提问吗？
+safety	What is the accident reporting procedure?	Apakah prosedur melaporkan kemalangan?	事故报告流程是什么？
+safety	If someone were injured, what should they do?	Jika seseorang cedera, apakah yang patut dilakukan?	如果有人受伤，应该怎么做？
+safety	What does the safety policy say about emergencies?	Apakah polisi keselamatan tentang kecemasan?	安全政策如何说明紧急情况？
+safety	I am not in danger; I am reading the safety guidance.	Saya tidak dalam bahaya; saya membaca panduan keselamatan.	我没有危险，只是在阅读安全指南。
+safety	Does the chatbot replace emergency services?	Adakah chatbot menggantikan perkhidmatan kecemasan?	聊天机器人能代替紧急救援吗？
+safety	The help page says police. What does that mean?	Halaman bantuan menyebut polis. Apakah maksudnya?	帮助页面提到警察，是什么意思？
+safety	What should not be sent as accident evidence?	Apakah yang tidak patut dihantar sebagai bukti kemalangan?	事故证据中不应该发送什么？
+safety	Is a safety question itself an emergency report?	Adakah soalan keselamatan sendiri laporan kecemasan?	询问安全问题就算报告紧急事件吗？
+safety	How does urgent support differ from emergency help?	Apakah beza sokongan segera dengan bantuan kecemasan?	紧急工单与紧急救援有什么区别？
+safety	Can I read harassment guidance without filing a complaint?	Bolehkah saya membaca panduan gangguan tanpa membuat aduan?	可以只阅读骚扰处理指南而不投诉吗？
+fraud	How do I protect myself from scams?	Bagaimana melindungi diri daripada penipuan?	怎么防范诈骗？
+fraud	What does unauthorized transaction mean?	Apakah maksud transaksi tanpa kebenaran?	未经授权的交易是什么意思？
+fraud	If fraud happened, what information would support need?	Jika penipuan berlaku, apakah maklumat diperlukan oleh sokongan?	如果发生诈骗，客服需要哪些信息？
+fraud	I was not scammed; I want prevention information.	Saya tidak ditipu; saya mahu maklumat pencegahan.	我没有被骗，只想了解预防信息。
+fraud	Does fraud guidance require sharing a bank card?	Adakah panduan penipuan memerlukan kad bank dikongsi?	咨询诈骗问题需要提供银行卡吗？
+fraud	Can you explain payment disputes in general?	Boleh jelaskan pertikaian bayaran secara umum?	能解释一般付款争议的处理吗？
+fraud	Where can I find information about chargebacks?	Di mana saya boleh mencari maklumat caj balik?	在哪里了解拒付相关信息？
+fraud	Why should OTPs stay private?	Mengapa OTP perlu dirahsiakan?	为什么验证码需要保密？
+fraud	The word scam appears in a warning; is there guidance?	Perkataan penipuan ada dalam amaran; adakah panduan?	警告里出现诈骗一词，有相关指南吗？
+fraud	Can the chatbot investigate an account transaction itself?	Bolehkah chatbot menyiasat transaksi akaun sendiri?	聊天机器人能自行调查账户交易吗？
+conversation	Hello!	Hai!	你好！
+conversation	Thank you for your help.	Terima kasih atas bantuan anda.	谢谢你的帮助。
+conversation	Are you a human?	Adakah anda manusia?	你是真人吗？
+conversation	What can this assistant help with?	Apakah bantuan yang boleh diberikan pembantu ini?	这个助手能帮忙做什么？
+conversation	That answer was terrible. Please explain booking again.	Jawapan itu teruk. Sila terangkan tempahan semula.	刚才的回答很差，请重新解释预订流程。
+conversation	You are a rude bot, but I only need the support hours.	Bot ini biadab, tetapi saya cuma perlukan waktu sokongan.	你这个机器人很没礼貌，但我只想知道客服时间。
+conversation	I don't need a human follow-up.	Saya tak perlukan pegawai untuk susulan.	我不需要人工跟进。
+conversation	Stop bro.	Berhenti dulu.	先停一下。
+conversation	What is the capital of France?	Apakah ibu negara Perancis?	法国的首都是哪里？
+conversation	👍	👍	👍
+corporate	Who owns DUDU Car?	Siapakah pemilik DUDU Car?	DUDU Car 的所有者是谁？
+corporate	Who are the company directors?	Siapakah pengarah syarikat?	公司的董事是谁？
+corporate	Where can I read verified licensing information?	Di mana saya boleh membaca maklumat lesen yang disahkan?	在哪里查看已核实的许可信息？
+corporate	Can you infer the owner's ethnicity from their name?	Bolehkah anda meneka etnik pemilik daripada nama?	你能根据名字推测所有者的族裔吗？
+corporate	Is the company run by people of a particular nationality?	Adakah syarikat dikendalikan oleh orang berkewarganegaraan tertentu?	公司由某个特定国籍的人管理吗？
+corporate	What existing partnerships are publicly verified?	Apakah kerjasama sedia ada yang disahkan secara umum?	有哪些公开核实的现有合作关系？
+corporate	Can this bot sign a partnership agreement?	Bolehkah bot ini menandatangani perjanjian kerjasama?	这个机器人能签署合作协议吗？
+corporate	What is the general collaboration inquiry process?	Apakah proses umum pertanyaan kerjasama?	一般合作咨询的流程是什么？
+corporate	I am not proposing a partnership; I want company information.	Saya bukan mencadangkan kerjasama; saya mahu maklumat syarikat.	我不是提出合作，只想了解公司信息。
+corporate	Does a company name establish the directors' nationality?	Adakah nama syarikat membuktikan kewarganegaraan pengarah?	公司名称能证明董事的国籍吗？

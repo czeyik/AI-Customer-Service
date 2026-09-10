@@ -1,0 +1,122 @@
+# SMART implementation and release evidence
+
+The revised conversation implementation is local and **not activated in production**.
+`LLM_CUSTOMER_CONTEXT_ENABLED` defaults to `false`. The existing model setting alone does not
+permit transmitting customer questions under the revised processing scope.
+
+## Conversation and intake
+
+The responder makes one structured interpretation request per eligible turn. Immediate safety,
+standalone identity and standalone language commands retain local handling. Local code validates
+contact fields, consent, submission, case ownership and priorities. A ticket offer leaves intake
+idle; acceptance opens the separate consent question. Pause/cancel/resume proposals require matching
+local customer intent. Explicit local handoff requests and Yes/No/Done/Skip/Submit controls
+take precedence over model action proposals. Model proposals cannot override ordinary contact fields.
+Side questions preserve the draft. Explicit
+case updates require confirmation against the owned case before changing or reopening it.
+
+API clients should return the latest response's `prompt_id` when submitting `create_ticket` or
+`consent_to_ticket`. Missing or stale control tokens cannot authorize those actions. Ordinary text
+replies continue to work. WhatsApp additionally checks quoted reply IDs and event timestamps.
+
+Names, email and contact numbers can be supplied in any order. Corrections update local fields;
+ambiguous email choices require clarification. Human requests collect the actual issue. Trip IDs
+do not imply submission. Accumulated ride details cannot exceed 2,000 characters; an oversized
+addition is rejected with a recovery prompt while earlier details remain. Local review precedes
+submission when fields have been corrected. Draft expiry defaults to 60 minutes and is configurable
+with `INTAKE_EXPIRY_MINUTES` (5–1,440 minutes).
+
+## Provider boundary
+
+Provider input contains approved excerpts, a minimized question of at most 1,600 characters,
+a topic of at most 100 characters, a previous sanitized question of at most 400 characters,
+a previous sanitized answer of at most 600 characters, up to four source keys, intake stage,
+pending-offer status and field-presence/role indicators. Prior answers are never policy.
+Raw local contact fields, account identifiers, ticket bodies, attachments and full history are
+excluded. Local extraction runs before provider minimization. Uncertain identifying narratives
+and oversized questions use local clarification; regex minimization is not a guarantee of anonymity
+for arbitrary prose.
+
+The total prompt remains capped at 8,000 characters. Ranked excerpts are removed whole when needed
+to fit, and citations are validated only against excerpts actually sent. The output cap remains
+300 tokens and timeout eight seconds. Logs expose outcomes, latency and reported token counts,
+including reasoning-token details when supplied, without prompts or response bodies.
+Citation and numerical checks are rejection guards, not proof of semantic entailment. Semantic
+correctness and faithful translation require the separate reviewed evaluation denominator.
+
+## Knowledge governance
+
+Retrieval ranks the complete effective approved corpus up to 500 chunks, including titles and
+multiword tags, and can retrieve across source languages. More than 500 eligible chunks requires
+clarification until SQL ranking is introduced; it does not silently rank an arbitrary prefix.
+Website and seed sources have equal authority within their stated scope. Unresolved conflicts
+require clarification, not an inferred override.
+
+`WEBSITE_KNOWLEDGE_URLS` is an explicit JSON list of exact CCO-selected HTTPS URLs. It defaults to
+empty. Staging no longer crawls the sitemap automatically. Redirects stay within the configured
+allowlist; nested lists, inline text, table conditions and links are retained. Oversized source
+blocks require review rather than silent splitting or truncation.
+
+The CCO activation endpoint accepts `{"effective_at": "2026-09-10T00:00:00Z"}`. Activation remains
+authenticated and audited. Content hashes exclude the approval schedule, so activating an unchanged
+snapshot does not make the next crawl produce a duplicate draft. Changed content remains inactive
+until approved. No website pages were published or assigned an invented approver.
+
+## Durability and evidence ownership
+
+Migration `d9010a1b2c3d` adds conversation uniqueness, inbound claims and evidence groups. It stops
+before changing the schema if duplicate conversation owners exist; reconcile those records without
+losing histories or case ownership before retrying. Existing processed inbound rows remain `done`.
+Existing unassigned media is not guessed into a case by timestamp.
+
+Webhooks persist events and beta counters before acknowledging. The existing worker processes up to
+four senders concurrently, serializes each sender, and records a provider-attempt marker before
+network work. A retry after a worker crash uses fallback rather than issuing another model request.
+Provider calls run outside database transactions. State version checks discard stale proposals.
+The ticket, audit and outbound reply commit together before delivery. Outbound retries preserve
+recipient order.
+
+Each upload has an explicit evidence group. Ticket submission binds queued and approved uploads in
+that group. Scanning changes availability, never ownership. Confirmed existing-case updates can bind
+new evidence to that case. Rejected uploads and other groups remain excluded. Customer case updates
+are visible in the staff ticket view.
+
+## Executable evidence
+
+- `python -m pytest -q`: application and regression checks. Set `TEST_POSTGRES_URL` to a fresh
+  disposable PostgreSQL database for concurrency checks; install `pg_trgm` and run migrations first.
+- `python scripts/release_eval.py --suite smart --mode outage --input-price 0.15 --output-price 0.50`:
+  100 distinct non-escalation scenarios in English, Malay and Chinese, 18 paired legitimate handoff
+  sessions and 30 intake sessions covering ten intake variants.
+- The same command with `--mode live` uses synthetic inputs only. Each language has an observed-spend
+  guard; latency and usage are recorded. Semantic review fields remain unscored until reviewed.
+- Add `--intake-only` to the SMART evaluation command for the 18 handoff and 30 intake diagnostics.
+  This does not exercise the non-escalation matrix.
+- `python scripts/smart_burst.py`: eight synthetic senders through the PostgreSQL inbox with four
+  workers and two-second simulated provider latency. `smart-burst.json` records reply-queue latency,
+  which does not include Meta delivery time.
+
+The matrix is in `data/evaluation/smart-non-escalation.tsv`; its 20 held-out scenarios are reported
+separately from translations. These development scenarios have been rerun during fixes; a fresh
+independent holdout must accompany the CCO release review. Captured synthetic answers, family failures, denominators and usage
+are in `docs/evaluation/`. CCO semantic review and staging WhatsApp end-to-end validation are still
+required before release eligibility. Successful API calls are not counted as correct answers.
+
+## Pricing and activation
+
+The [official Z.AI pricing table](https://docs.z.ai/guides/overview/pricing), checked on
+10 September 2026, lists GLM-5.3-Flash at USD 0.15 per million input tokens and USD 0.50 per million
+output tokens (cached input USD 0.03). Evaluation projections use uncached input pricing and
+reported aggregate completion usage. Missing reasoning breakdowns are recorded as missing, not
+assumed to be zero. These are measured-sample projections, not a hard maximum for the 10,000-call
+beta. The existing USD 15 model allowance and beta message caps remain unchanged.
+
+Before activation: approve and publish the revised privacy copy/effective date, confirm provider
+DPA coverage, select and review website snapshots, complete the CCO semantic evaluation, and pass
+staging WhatsApp, concurrency, outage and production readiness controls using the same immutable
+image. Then enable the context flag through the existing controlled release process.
+
+For rollback, first disable `LLM_CUSTOMER_CONTEXT_ENABLED`, preserve the durable inbox and drain
+or pause its worker deliberately, then use the existing `/opt/dudu/rollback-images` process.
+Do not downgrade the data migration. An older image does not understand the new queued inbox:
+check for queued/processing events and ensure they are handled before returning to that worker.
