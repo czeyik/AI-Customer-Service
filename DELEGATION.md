@@ -925,6 +925,17 @@ text, JPEG and representative MP4 validation now pass; PNG and 3GPP content-snif
 storage remain covered by the release suite. No unresolved P0/P1 finding remains. Final owner
 go/no-go, controlled cohort activation and observation are the remaining Wave 12 work.
 
+Seventh resume update — 2026-09-10: Cze Yik authorized cancelling the 12 queued notifications
+created by the two validation tickets. They were marked `cancelled`, not deleted, with 12 retained
+audit events; zero pending notification remains. He approved the first 60 minutes after activation
+as the observation window and changed the requested 15 September scope from the qualified
+invitation-only pilot to a public launch. Public launch is `NO-GO` under the current evidence: the
+single-host capacity proof, USD 20 AWS ceiling and AWS-0104/AWS-0136 exceptions were accepted only
+for up to 100 invited participants, and the application currently enforces a per-minute abuse
+limit but not the recorded per-participant daily, global daily and pilot-total caps. A revised
+public traffic/availability/budget contract, security remediation or new public-scope risk
+decision, enforceable limits and renewed validation are required before public activation.
+
 ## Fresh-Chat Prompt
 
 > Read `DELEGATION.md`, `AGENTS.md`, `docs/requirements-summary.md`, and

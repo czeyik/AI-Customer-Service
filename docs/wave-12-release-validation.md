@@ -128,18 +128,33 @@ Official AWS sources reviewed 10 September 2026:
 Do not mark this section approved from an inferred instruction. Cze Yik records the decision after
 reviewing the completed evidence above.
 
-- Decision and timestamp: PENDING
+- Decision and timestamp: PUBLIC LAUNCH NO-GO PENDING REVISED CONTRACT; Cze Yik requested a
+  public launch from 15 September 2026 on 10 September 2026
 - Approved release SHA and digest pair: candidate evidence recorded above; OWNER APPROVAL PENDING
 - Open P0/P1 findings: none identified; final owner review pending
 - Waivers, owner, expiry, and remediation date: Cze Yik accepted AWS-0104 for required TCP 443/465
   egress and AWS-0136 for AWS-managed SNS encryption through 30 September 2026; expires 1 October
   2026; remediate before broader launch
-- Current AWS and total external-service spend: PENDING
-- Approved invitee list location and count (no personal data here): PENDING
+- Current AWS and total external-service spend: AWS actual USD 0.005; hosted evaluation estimated
+  USD 0.003893; other current actuals unavailable or zero
+- Approved invitee list location and count (no personal data here): not applicable to the newly
+  requested public scope; the qualified contract remains capped at 100 invited participants
 - Authorization to enable Meta outbound and support notifications: PENDING
 - Pre-release staging, hosted-model and two-tester WhatsApp/media validation: AUTHORIZED 10
   September 2026
-- Observation window: proposed first 60 minutes after activation, then daily review; PENDING OWNER
+- Observation window: first 60 minutes after activation, then daily review; APPROVED BY OWNER
+
+Twelve notifications created by the two owner-controlled validation tickets were marked
+`cancelled` before activation, with one retained `support_notification_cancelled` audit event per
+row. Zero pending notification remains. They were not sent or deleted.
+
+The requested public scope is not approved by this release record. The current single-host
+capacity evidence, USD 20 AWS ceiling and time-limited AWS-0104/AWS-0136 exceptions qualify only
+the documented 100-person pilot. The application also enforces a per-minute abuse limit but does
+not yet implement the contract's 20-per-participant/day, 1,000/day and 15,000-total launch caps.
+A public go/no-go requires an approved public traffic ceiling, availability architecture and
+budget, security remediation or a new explicit public-scope risk decision, and enforceable volume
+controls followed by representative load and rollback validation.
 
 ## Activation and observation
 
