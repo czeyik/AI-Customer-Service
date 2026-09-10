@@ -843,6 +843,48 @@ billable Z.AI evaluation calls, contact with the two owner-controlled testers, a
 text/media validation. This is validation authorization only; final production cohort activation
 still requires the completed evidence and documented go/no-go decision. Wave 12 is resumed.
 
+Resume progress — 2026-09-10: RC `77ce6c9a23f125b3e3ef5f52cf0672d6dbb9646b` was pushed in PR 2;
+GitHub CI and security passed. Its zero-finding ARM64 application and ClamAV digest pair deployed
+to isolated temporary staging at migration head `c81d4e2a7f10`. Staging passed public readiness,
+1,000/1,000 four-way capacity requests at 0.060-second p95, database 503/recovery, ClamAV
+fail-closed/recovery and EICAR rejection, encrypted S3 round-trip, and outbound-disabled checks.
+The authorized Z.AI run passed all 36 scenarios at 4.245-second p95 for estimated USD 0.001863,
+but only 14/15 provider calls succeeded; the failed call safely fell back. The strict live-model
+gate is therefore failed and no rerun is authorized. Production infrastructure was updated without
+replacement to required TCP 443/465 egress, `alias/aws/s3`, and `alias/aws/sns`; readiness remained
+200. Named production admins, corpus publication, real WhatsApp/media/admin review, PR review,
+final go/no-go, production RC deployment, cohort activation, observation, and staging cleanup are
+still pending. Production outbound remains disabled.
+
+Second resume update — 2026-09-10: Both named production administrator records now exist with one
+CCO and one recovery approver. The current secret matches Cze Yik's TOTP reference but does not yet
+contain Jane's reference; her mapping must be merged before admin review. Jane nevertheless
+attributed publication of all 24 approved corpus records through the trusted operator command.
+Cze Yik authorized exactly one further 15-call hosted-model run. It passed 15/15 provider calls and
+36/36 scenarios at 3.679-second p95, using 6,989 input and 1,964 output tokens for estimated USD
+0.002030. No more hosted-model call is authorized or needed. The remaining Wave 12 work is Jane's
+TOTP mapping, reviewed/merged PR and dark production RC deployment, real two-tester WhatsApp
+text/media/admin lifecycle validation, final owner go/no-go, limited cohort activation and
+observation. Production outbound remains disabled.
+
+Current blocker — 2026-09-10: Production is healthy and dark with two active named admins and 24
+active approved records, and the hosted-model gate now passes. The runtime secret contains only
+Cze Yik's matching TOTP entry; Jane's generated reference is absent. Jane must merge her mapping
+into the same compact JSON object, refresh the runtime file, and prove login before the authorized
+two-tester WhatsApp/media/admin review can proceed. PR 2 also still awaits owner review/merge and
+no production RC deployment or final pilot go/no-go has been authorized.
+
+Third resume update — 2026-09-10: Jane's mapping was merged and both active administrator TOTP
+references now match the two-entry runtime secret. Cze Yik approved PR 2; it merged to `dev` as
+`0a6b3b3177a797c13e9bcc69582843388d55fc31`. The exact staging-tested release pair was deployed
+dark to production by SSM command `d30e721d-e496-41a7-bb7b-2228695b7102`. API and ClamAV are
+healthy on the new digests, PostgreSQL remained healthy, public readiness is 200, all five alarms
+are `OK`, the current backup is completed, the AWS budget reports USD 0 actual against USD 20,
+and the prior pair is recorded for rollback. Both send switches remain false. DUDU Car Malaysia's
+configured WhatsApp number is quality GREEN and the public callback passes verification. Real
+tester text/media and admin lifecycle review now await Cze Yik and Jane sending the prescribed
+messages; final pilot go/no-go remains unapproved.
+
 ## Fresh-Chat Prompt
 
 > Read `DELEGATION.md`, `AGENTS.md`, `docs/requirements-summary.md`, and
