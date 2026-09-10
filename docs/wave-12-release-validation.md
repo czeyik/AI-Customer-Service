@@ -58,8 +58,8 @@ further model call is authorized or required.
 | Hosted `glm-5.3-flash` evaluation, actual latency/tokens/cost | PASS: authorized rerun 15/15 provider calls and 36/36 scenarios |
 | Secret, dependency, static, source/image and dynamic scans | PASS RC WITH TIME-LIMITED OWNER EXCEPTIONS |
 | Temporary staging deployment and failure checks | PASS: exact digest pair; readiness, capacity, DB, ClamAV and S3 checks |
-| Real WhatsApp text, JPEG/PNG, MP4/3GP, duplicate and delivery checks | AUTHORIZED; PENDING EXECUTION |
-| Two named admins review media and complete the ticket lifecycle | PENDING OWNER/JANE TEST |
+| Real WhatsApp text, JPEG/PNG, MP4/3GP, duplicate and delivery checks | PARTIAL: live text/JPEG and delivery/read passed; corrective media review and live video retest pending |
+| Two named admins review media and complete the ticket lifecycle | PARTIAL: assignment, note and open → in-progress → closed passed; corrected media review pending |
 | Production TLS/readiness, alarms, backup, rollback pair and spend | PASS: RC dark-deployed; readiness, five alarms, backup, rollback and budget healthy |
 | Production named admins and active approved corpus | PASS: 2 active admins with matching TOTP references; 24 approved records |
 | Current Meta messaging/media policy review | PASS (10 September 2026) |
@@ -124,7 +124,7 @@ reviewing the completed evidence above.
 
 - Decision and timestamp: PENDING
 - Approved release SHA and digest pair: candidate evidence recorded above; OWNER APPROVAL PENDING
-- Open P0/P1 findings: real WhatsApp/media and two-admin lifecycle checks pending
+- Open P0/P1 findings: corrected media review and remaining representative live-media checks pending
 - Waivers, owner, expiry, and remediation date: Cze Yik accepted AWS-0104 for required TCP 443/465
   egress and AWS-0136 for AWS-managed SNS encryption through 30 September 2026; expires 1 October
   2026; remediate before broader launch

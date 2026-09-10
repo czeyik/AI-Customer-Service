@@ -885,6 +885,23 @@ configured WhatsApp number is quality GREEN and the public callback passes verif
 tester text/media and admin lifecycle review now await Cze Yik and Jane sending the prescribed
 messages; final pilot go/no-go remains unapproved.
 
+Fourth resume update — 2026-09-10: The permanent Meta callback replaced the retired temporary
+tunnel and passed verification. Cze Yik then completed a real WhatsApp intake: seven unique
+inbound messages produced seven provider-accepted replies whose final status was `read`, two clean
+JPEG submissions were approved, exactly one ticket and one creation audit were recorded, and the
+conversation returned to `idle`. Both named administrators authenticated successfully. Cze Yik
+assigned the ticket to Jane and moved it to `in_progress`; Jane added an internal note and closed
+it. The temporary outbound test window was returned to `META_SEND_ENABLED=false` immediately
+afterward. Admin media review exposed a release defect: Botocore signed the Malaysia bucket URL
+against the global S3 hostname, which returned `IllegalLocationConstraintException`. Corrective
+commit `8cae9d7` explicitly selects the configured regional S3 endpoint and keeps attachment intake
+open with localized trip ID, date/time, pickup, destination, supporting-media, additional-details
+and `Done` guidance. The focused suite passed 76 tests, the full suite passed 151 with two opt-in
+integrations skipped, a direct SDK check produced `s3.ap-southeast-5.amazonaws.com`, and the local
+corrective image had zero high/critical Trivy findings. Publishing the corrective branch requires
+fresh explicit GitHub export authorization; corrected production media review, representative
+live video, final go/no-go and pilot activation remain pending.
+
 ## Fresh-Chat Prompt
 
 > Read `DELEGATION.md`, `AGENTS.md`, `docs/requirements-summary.md`, and
