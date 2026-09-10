@@ -18,6 +18,12 @@ digest is `sha256:f0ffa992f925fd37687efab9ac004878ec7a29bff46d21146c7c4fa40c91f0
 Both ECR child-image scans completed with zero findings. Temporary staging runs this exact pair at
 migration `c81d4e2a7f10`. Mutable tags are not release evidence.
 
+Corrective PR 3 merged to `dev` as `c4d41a904161486874c4a928ed985f7ae1170fa0` after its CI and
+security workflows passed. Its ARM64 application index is
+`sha256:d50cbb6195b7486517410eaf1b859d3b6fef056f7ccc51561341b61b9d21319e`; production retains the
+qualified ClamAV digest above. The corrective image explicitly signs media-review URLs against the
+Malaysia S3 endpoint and adds localized additional-details/`Done` guidance after attachments.
+
 ## DUDU evaluation
 
 Run `python scripts/release_eval.py --mode outage` in the clean release image. This exercises 36
@@ -59,7 +65,7 @@ further model call is authorized or required.
 | Secret, dependency, static, source/image and dynamic scans | PASS RC WITH TIME-LIMITED OWNER EXCEPTIONS |
 | Temporary staging deployment and failure checks | PASS: exact digest pair; readiness, capacity, DB, ClamAV and S3 checks |
 | Real WhatsApp text, JPEG/PNG, MP4/3GP, duplicate and delivery checks | PARTIAL: live text/JPEG and delivery/read passed; corrective media review and live video retest pending |
-| Two named admins review media and complete the ticket lifecycle | PARTIAL: assignment, note and open → in-progress → closed passed; corrected media review pending |
+| Two named admins review media and complete the ticket lifecycle | PASS: both reviewed approved media; assignment, note and open → in-progress → closed passed |
 | Production TLS/readiness, alarms, backup, rollback pair and spend | PASS: RC dark-deployed; readiness, five alarms, backup, rollback and budget healthy |
 | Production named admins and active approved corpus | PASS: 2 active admins with matching TOTP references; 24 approved records |
 | Current Meta messaging/media policy review | PASS (10 September 2026) |

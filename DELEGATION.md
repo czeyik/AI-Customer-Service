@@ -902,6 +902,18 @@ corrective image had zero high/critical Trivy findings. Publishing the correctiv
 fresh explicit GitHub export authorization; corrected production media review, representative
 live video, final go/no-go and pilot activation remain pending.
 
+Fifth resume update — 2026-09-10: Cze Yik authorized publishing and deploying the correction.
+PR 3 merged to `dev` as `c4d41a904161486874c4a928ed985f7ae1170fa0` after GitHub CI and
+security passed, including the ARM64 release proof. Production now runs application index
+`sha256:d50cbb6195b7486517410eaf1b859d3b6fef056f7ccc51561341b61b9d21319e` with the unchanged
+qualified ClamAV index; the prior application index is recorded for rollback. All five containers
+run, public readiness returns 200, and both outbound switches remain false. A signed range request
+for the approved JPEG returned HTTP 206 with `image/jpeg` from
+`s3.ap-southeast-5.amazonaws.com`, and Cze Yik and Jane subsequently issued successful review
+links through the authenticated admin UI. The two-admin media and ticket-lifecycle gate is now
+`PASS`. Representative live video validation, the final owner go/no-go decision, limited cohort
+activation and observation remain pending.
+
 ## Fresh-Chat Prompt
 
 > Read `DELEGATION.md`, `AGENTS.md`, `docs/requirements-summary.md`, and
