@@ -49,6 +49,7 @@ def test_production_send_requires_meta_transport_credentials() -> None:
             PRODUCTION_SETTINGS
             | {
                 "meta_send_enabled": True,
+                "public_beta_enabled": True,
                 "meta_access_token": "production-meta-access-token-long",
                 "meta_phone_number_id": "123456789",
             }
@@ -76,6 +77,11 @@ def test_production_send_requires_meta_transport_credentials() -> None:
         ("llm_timeout_seconds", 9),
         ("llm_max_input_chars", 8001),
         ("llm_max_output_tokens", 301),
+        ("public_beta_start_date", "2026-09-11"),
+        ("public_beta_end_date", "2026-09-15"),
+        ("public_beta_messages_per_user_day", 201),
+        ("public_beta_messages_per_day", 2001),
+        ("public_beta_messages_total", 10001),
         ("trusted_hosts", "*"),
         ("cors_origins", "*"),
         ("chat_log_retention_days", 91),

@@ -4,8 +4,9 @@ import hmac
 import io
 import json
 from collections.abc import Generator
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from urllib.error import HTTPError
+from zoneinfo import ZoneInfo
 
 import pytest
 from fastapi import FastAPI, HTTPException
@@ -19,11 +20,18 @@ from app.models import (
     AuditLog,
     Base,
     Message,
+    RateLimitBucket,
     Ticket,
     WhatsAppInboundMessage,
     WhatsAppOutboundMessage,
 )
-from app.routers.webhooks_meta import MAX_WEBHOOK_BYTES, _bounded_body, receive_webhook, router as webhook_router
+from app.routers.webhooks_meta import (
+    MAX_WEBHOOK_BYTES,
+    _bounded_body,
+    _consume_public_beta_limits,
+    receive_webhook,
+    router as webhook_router,
+)
 from app.security import verify_meta_signature
 from app.services import whatsapp as whatsapp_module
 from app.services.whatsapp import MetaSendError, process_next_outbound
@@ -182,6 +190,55 @@ def test_message_id_is_processed_and_queued_exactly_once(db_session: Session) ->
     audit = db_session.query(AuditLog).filter_by(event_type="meta_webhook_received").first()
     assert "I need a human" not in json.dumps(audit.details)
     assert "60108865432" not in json.dumps(audit.details)
+
+
+def test_public_beta_limits_are_calendar_aligned_and_atomic(
+    db_session: Session, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("PUBLIC_BETA_ENABLED", "true")
+    monkeypatch.setenv("PUBLIC_BETA_MESSAGES_PER_USER_DAY", "2")
+    monkeypatch.setenv("PUBLIC_BETA_MESSAGES_PER_DAY", "3")
+    monkeypatch.setenv("PUBLIC_BETA_MESSAGES_TOTAL", "4")
+    get_settings.cache_clear()
+    first_day = datetime(2026, 9, 10, 8, tzinfo=ZoneInfo("Asia/Kuala_Lumpur"))
+
+    assert _consume_public_beta_limits(db_session, "user-a", first_day) == [1, 1, 1, 1]
+    assert _consume_public_beta_limits(db_session, "user-a", first_day) == [2, 2, 2, 2]
+    assert _consume_public_beta_limits(db_session, "user-a", first_day) is None
+    assert _consume_public_beta_limits(db_session, "user-b", first_day) == [1, 1, 3, 3]
+    assert _consume_public_beta_limits(db_session, "user-b", first_day) is None
+
+    second_day = first_day + timedelta(days=1)
+    assert _consume_public_beta_limits(db_session, "user-b", second_day) == [1, 1, 1, 4]
+    assert _consume_public_beta_limits(db_session, "user-c", second_day) is None
+    db_session.commit()
+
+    assert all(
+        "user-a" not in bucket.key_hash and "user-b" not in bucket.key_hash
+        for bucket in db_session.query(RateLimitBucket).all()
+    )
+    get_settings.cache_clear()
+
+
+def test_public_beta_sends_only_one_capacity_notice_per_user_day(
+    db_session: Session, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    today = datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Kuala_Lumpur")).date()
+    monkeypatch.setenv("PUBLIC_BETA_ENABLED", "true")
+    monkeypatch.setenv("PUBLIC_BETA_START_DATE", today.isoformat())
+    monkeypatch.setenv("PUBLIC_BETA_END_DATE", today.isoformat())
+    monkeypatch.setenv("PUBLIC_BETA_MESSAGES_PER_USER_DAY", "1")
+    get_settings.cache_clear()
+
+    call_webhook(db_session, payload("wamid.beta-1", "Hello"))
+    call_webhook(db_session, payload("wamid.beta-2", "Again"))
+    call_webhook(db_session, payload("wamid.beta-3", "Again"))
+
+    outbound = db_session.query(WhatsAppOutboundMessage).all()
+    assert len(outbound) == 2
+    assert sum("public beta message limit" in item.body.lower() for item in outbound) == 1
+    assert db_session.query(WhatsAppInboundMessage).count() == 3
+    get_settings.cache_clear()
 
 
 def test_webhook_rolls_back_inbox_when_chat_processing_fails(

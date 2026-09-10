@@ -1,3 +1,4 @@
+from datetime import date
 from functools import lru_cache
 from typing import Literal
 
@@ -51,6 +52,12 @@ class Settings(BaseSettings):
     llm_max_output_tokens: int = 300
 
     rate_limit_messages_per_minute: int = 20
+    public_beta_enabled: bool = False
+    public_beta_start_date: date = date(2026, 9, 10)
+    public_beta_end_date: date = date(2026, 9, 14)
+    public_beta_messages_per_user_day: int = 200
+    public_beta_messages_per_day: int = 2_000
+    public_beta_messages_total: int = 10_000
     rate_limit_admin_attempts: int = 5
     rate_limit_admin_window_seconds: int = 900
     rate_limit_max_keys: int = 10_000
@@ -174,6 +181,18 @@ class Settings(BaseSettings):
             errors.append("CORS_ORIGINS cannot contain '*' in production")
         if not 1 <= self.rate_limit_messages_per_minute <= 120:
             errors.append("RATE_LIMIT_MESSAGES_PER_MINUTE must be between 1 and 120")
+        if self.public_beta_start_date != date(2026, 9, 10):
+            errors.append("PUBLIC_BETA_START_DATE must be 2026-09-10")
+        if self.public_beta_end_date != date(2026, 9, 14):
+            errors.append("PUBLIC_BETA_END_DATE must be 2026-09-14")
+        if self.public_beta_messages_per_user_day != 200:
+            errors.append("PUBLIC_BETA_MESSAGES_PER_USER_DAY must be 200")
+        if self.public_beta_messages_per_day != 2_000:
+            errors.append("PUBLIC_BETA_MESSAGES_PER_DAY must be 2000")
+        if self.public_beta_messages_total != 10_000:
+            errors.append("PUBLIC_BETA_MESSAGES_TOTAL must be 10000")
+        if self.meta_send_enabled and not self.public_beta_enabled:
+            errors.append("PUBLIC_BETA_ENABLED must be true when META_SEND_ENABLED is true")
         if not 1 <= self.rate_limit_admin_attempts <= 20:
             errors.append("RATE_LIMIT_ADMIN_ATTEMPTS must be between 1 and 20")
         if not 60 <= self.rate_limit_admin_window_seconds <= 3600:

@@ -181,7 +181,10 @@ def test_production_platform_keeps_budget_access_and_traffic_guards() -> None:
     assert 'IpProtocol: "-1"' not in environment
     assert "SSEAlgorithm: aws:kms" in environment
     assert "KmsMasterKeyId: alias/aws/sns" in environment
-    assert "Amount: 20" in budget
+    assert "Amount: 30" in budget
+    assert "BudgetName: dudu-support-aws-monthly-beta" in budget
+    assert all(f"Threshold: {percentage}" in budget for percentage in (66.67, 83.33, 93.33))
+    assert "ThresholdType: PERCENTAGE" in budget
     assert "META_SEND_ENABLED=(false|0)" in deployment
     assert "releases/$app_release-$clamav_release" in deployment
     assert "install -m 0600 /opt/dudu/last-good-images /opt/dudu/rollback-images" in deployment

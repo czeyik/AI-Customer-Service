@@ -43,7 +43,8 @@ class ChatbotService:
         limiter_keys = []
         if ip_address and request.channel != "whatsapp":
             limiter_keys.append(f"chat-ip:{ip_address}")
-        limiter_keys.append(f"chat-user:{request.channel}:{request.external_user_id}")
+        if request.channel != "whatsapp":
+            limiter_keys.append(f"chat-user:{request.channel}:{request.external_user_id}")
         if not all(
             rate_limiter.allow(
                 db,

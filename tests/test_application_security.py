@@ -1,7 +1,10 @@
 import asyncio
+import os
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 
-from sqlalchemy import create_engine
+import pytest
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -42,6 +45,61 @@ def test_rate_limits_are_shared_hashed_expiring_and_bounded() -> None:
     second.commit()
     assert second.query(RateLimitBucket).count() == 1
     second.close()
+
+
+def test_combined_rate_limits_consume_all_or_none() -> None:
+    engine = create_engine(
+        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+    )
+    Base.metadata.create_all(engine)
+    db = sessionmaker(bind=engine, autocommit=False, autoflush=False)()
+    limiter = DatabaseRateLimiter()
+    now = datetime(2026, 9, 10, 0, 0)
+
+    assert limiter.allow_all(
+        db, [("user:a", 2, 86_400), ("global", 1, 86_400)], now=now
+    ) == [1, 1]
+    assert limiter.allow_all(
+        db, [("user:b", 2, 86_400), ("global", 1, 86_400)], now=now
+    ) is None
+    db.commit()
+
+    counts = sorted(bucket.request_count for bucket in db.query(RateLimitBucket).all())
+    assert counts == [1, 1]
+    db.close()
+
+
+@pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="PostgreSQL integration is opt-in")
+def test_combined_rate_limits_serialize_under_postgresql() -> None:
+    engine = create_engine(os.environ["TEST_POSTGRES_URL"])
+    with engine.begin() as connection:
+        connection.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+    Base.metadata.create_all(engine)
+    sessions = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    limiter = DatabaseRateLimiter()
+    now = datetime(2026, 9, 10, 0, 0)
+
+    def consume(index: int) -> bool:
+        db = sessions()
+        try:
+            allowed = limiter.allow_all(
+                db,
+                [(f"concurrent-user:{index}", 1, 60), ("concurrent-global", 3, 60)],
+                now=now,
+            )
+            db.commit()
+            return allowed is not None
+        finally:
+            db.close()
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(consume, range(8)))
+
+    assert sum(results) == 3
+    db = sessions()
+    assert max(bucket.request_count for bucket in db.query(RateLimitBucket).all()) == 3
+    db.close()
+    engine.dispose()
 
 
 def test_security_headers_are_set_on_application_responses() -> None:

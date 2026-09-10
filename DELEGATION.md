@@ -936,6 +936,31 @@ limit but not the recorded per-participant daily, global daily and pilot-total c
 public traffic/availability/budget contract, security remediation or new public-scope risk
 decision, enforceable limits and renewed validation are required before public activation.
 
+Eighth resume update — 2026-09-10: Cze Yik approved a capped public beta for 10–14 September 2026:
+200 unique inbound messages per user/day, 2,000/day globally, 10,000 total and the existing
+20/user/minute burst limit, with Malaysia-time day boundaries, 80%/90% warnings, 99% availability,
+a USD 30 AWS ceiling and the unchanged USD 70 total external-service ceiling. He accepted the
+single-host availability boundary and the existing AWS-0104/AWS-0136 exceptions for this public
+beta through 14 September only. He explicitly deferred the staged public launch and its proposed
+availability, security, capacity and budget contract. Activation remains `NO-GO`: shared atomic
+daily and lifetime caps do not yet exist and must be implemented, reviewed, deployed and validated
+under concurrency and boundary conditions before the final go/no-go and approved 60-minute
+observation window.
+
+Ninth resume update — 2026-09-10: The approved public-beta contract was implemented locally by
+reusing the shared PostgreSQL limiter. Authenticated, deduplicated WhatsApp text and media now pass
+through one atomic set of 20/user/minute, 200/user/day, 2,000/global-day and 10,000/beta counters;
+day boundaries use Malaysia time. Rejected traffic skips normal chatbot/media processing and
+queues at most one clear trilingual capacity notice per user/day. Aggregate 80%/90% thresholds
+write audit warnings without customer identifiers. Production validation pins the approved dates
+and values and prevents Meta sending unless the beta switch is enabled. The AWS budget template
+now uses the approved USD 30 ceiling and equivalent USD 20/25/28 notifications. The final full
+container suite passed 159 tests with two opt-in integrations skipped; a separate real PostgreSQL
+check proved that eight concurrent writers respect an atomic three-message cap with no partial
+claims; compilation and `git diff --check` passed. No commit, push, GitHub Actions run, AWS update,
+production deployment, send-switch change or live traffic occurred. Activation remains `NO-GO`
+pending review and boundary/load/rollback validation of the new image.
+
 ## Fresh-Chat Prompt
 
 > Read `DELEGATION.md`, `AGENTS.md`, `docs/requirements-summary.md`, and

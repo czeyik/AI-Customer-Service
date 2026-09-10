@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Global DUDU support USD 20 monthly AWS cost controls
+Description: Global DUDU support USD 30 monthly AWS cost controls
 
 Parameters:
   AlertEmail:
@@ -10,9 +10,9 @@ Resources:
     Type: AWS::Budgets::Budget
     Properties:
       Budget:
-        BudgetName: dudu-support-aws-monthly
+        BudgetName: dudu-support-aws-monthly-beta
         BudgetLimit:
-          Amount: 20
+          Amount: 30
           Unit: USD
         BudgetType: COST
         TimeUnit: MONTHLY
@@ -23,7 +23,7 @@ Resources:
         - Notification:
             ComparisonOperator: GREATER_THAN
             NotificationType: FORECASTED
-            Threshold: 50
+            Threshold: 66.67
             ThresholdType: PERCENTAGE
           Subscribers:
             - Address: !Ref AlertEmail
@@ -31,7 +31,7 @@ Resources:
         - Notification:
             ComparisonOperator: GREATER_THAN
             NotificationType: ACTUAL
-            Threshold: 75
+            Threshold: 83.33
             ThresholdType: PERCENTAGE
           Subscribers:
             - Address: !Ref AlertEmail
@@ -39,7 +39,7 @@ Resources:
         - Notification:
             ComparisonOperator: GREATER_THAN
             NotificationType: ACTUAL
-            Threshold: 90
+            Threshold: 93.33
             ThresholdType: PERCENTAGE
           Subscribers:
             - Address: !Ref AlertEmail

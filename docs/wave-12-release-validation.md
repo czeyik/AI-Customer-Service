@@ -3,10 +3,10 @@
 Status: **IN PROGRESS**
 Owner and go/no-go authority: Cze Yik
 Support lead and CCO: Jane
-Target pilot: 15–29 September 2026
+Target public beta: 10–14 September 2026
 
 Production remains dark. `META_SEND_ENABLED` and `NOTIFICATION_SEND_ENABLED` must stay false until
-the documented go/no-go approval authorizes the limited pilot.
+the documented go/no-go approval authorizes the capped public beta.
 
 ## Release candidate
 
@@ -68,6 +68,7 @@ further model call is authorized or required.
 | Two named admins review media and complete the ticket lifecycle | PASS: both reviewed approved media; assignment, note and open → in-progress → closed passed |
 | Production TLS/readiness, alarms, backup, rollback pair and spend | PASS: RC dark-deployed; readiness, five alarms, backup, rollback and budget healthy |
 | Production named admins and active approved corpus | PASS: 2 active admins with matching TOTP references; 24 approved records |
+| Public-beta daily/global/total controls | LOCAL PASS: atomic shared counters, calendar boundaries, one capacity notice and warnings; real PostgreSQL concurrency passed; image/deployment proof pending |
 | Current Meta messaging/media policy review | PASS (10 September 2026) |
 | P0/P1 and waiver review | PENDING GO/NO-GO |
 | Go/no-go decision | PENDING |
@@ -112,12 +113,12 @@ The current Trivy 0.74.0 source scan found two critical AWS-0104 findings becaus
 needs public HTTPS egress to dynamic Meta, Z.AI and AWS endpoints and SMTP/TLS egress to the
 approved mail service. The former all-protocol rule has been narrowed locally to TCP 443 and 465,
 but security groups cannot express hostname destinations. AWS recommends DNS/SNI filtering with
-AWS Network Firewall for dynamic endpoints; that is outside the approved single-host USD 20 pilot
+AWS Network Firewall for dynamic endpoints; that is outside the approved single-host public-beta
 architecture. Trivy also reports AWS-0136 high because encrypted SNS uses the free AWS-managed
-`alias/aws/sns` key rather than a customer-managed key. A customer-managed key costs USD 1/month
-before request charges and would exceed the verified USD 19.54 basis and USD 20 ceiling. These
-findings have owner-approved, resource-scoped exceptions valid only through 30 September 2026;
-the inline controls expire on 1 October and remediation is required before a broader launch.
+`alias/aws/sns` key rather than a customer-managed key. The owner retained both exceptions rather
+than introduce an unvalidated infrastructure change for the five-day beta. These findings have
+owner-approved, resource-scoped exceptions valid only through 14 September 2026; remediation or a
+new explicit decision is required before any later launch.
 Official AWS sources reviewed 10 September 2026:
 `https://docs.aws.amazon.com/pdfs/prescriptive-guidance/latest/secure-outbound-network-traffic/secure-outbound-network-traffic.pdf`,
 `https://docs.aws.amazon.com/sns/latest/dg/sns-enable-encryption-for-topic.html`, and
@@ -128,17 +129,18 @@ Official AWS sources reviewed 10 September 2026:
 Do not mark this section approved from an inferred instruction. Cze Yik records the decision after
 reviewing the completed evidence above.
 
-- Decision and timestamp: PUBLIC LAUNCH NO-GO PENDING REVISED CONTRACT; Cze Yik requested a
-  public launch from 15 September 2026 on 10 September 2026
+- Decision and timestamp: CAPPED PUBLIC-BETA CONTRACT APPROVED 10 September 2026; activation
+  remains `NO-GO` until its enforceable limits and renewed validation pass. The staged public
+  launch from 15 September and its availability/security/budget contract are deferred.
 - Approved release SHA and digest pair: candidate evidence recorded above; OWNER APPROVAL PENDING
 - Open P0/P1 findings: none identified; final owner review pending
 - Waivers, owner, expiry, and remediation date: Cze Yik accepted AWS-0104 for required TCP 443/465
-  egress and AWS-0136 for AWS-managed SNS encryption through 30 September 2026; expires 1 October
-  2026; remediate before broader launch
+  egress and AWS-0136 for AWS-managed SNS encryption for the capped public beta through
+  14 September 2026 only; remediate or obtain a new explicit decision before any later launch
 - Current AWS and total external-service spend: AWS actual USD 0.005; hosted evaluation estimated
   USD 0.003893; other current actuals unavailable or zero
-- Approved invitee list location and count (no personal data here): not applicable to the newly
-  requested public scope; the qualified contract remains capped at 100 invited participants
+- Approved invitee list location and count (no personal data here): not applicable; the approved
+  beta is public and controlled by enforceable traffic limits
 - Authorization to enable Meta outbound and support notifications: PENDING
 - Pre-release staging, hosted-model and two-tester WhatsApp/media validation: AUTHORIZED 10
   September 2026
@@ -148,21 +150,24 @@ Twelve notifications created by the two owner-controlled validation tickets were
 `cancelled` before activation, with one retained `support_notification_cancelled` audit event per
 row. Zero pending notification remains. They were not sent or deleted.
 
-The requested public scope is not approved by this release record. The current single-host
-capacity evidence, USD 20 AWS ceiling and time-limited AWS-0104/AWS-0136 exceptions qualify only
-the documented 100-person pilot. The application also enforces a per-minute abuse limit but does
-not yet implement the contract's 20-per-participant/day, 1,000/day and 15,000-total launch caps.
-A public go/no-go requires an approved public traffic ceiling, availability architecture and
-budget, security remediation or a new explicit public-scope risk decision, and enforceable volume
-controls followed by representative load and rollback validation.
+The owner has approved a five-day public-beta scope of 200 unique inbound messages per user/day,
+2,000/day globally and 10,000 total, with the existing 20/user/minute burst limit, 99% availability,
+USD 30 AWS and USD 70 total external-service ceilings. The single-host availability boundary and
+AWS-0104/AWS-0136 exceptions are accepted only through 14 September 2026. A local implementation
+now atomically applies the minute, user/day, global/day and beta-total limits after authentication
+and deduplication, uses Malaysia calendar boundaries, emits 80%/90% audit warnings and queues at
+most one trilingual capacity notice per affected user/day. Activation remains `NO-GO` until this
+change is reviewed, deployed and passes representative PostgreSQL concurrency, boundary, load and
+rollback validation. The staged public launch and its proposed multi-AZ availability, security and
+budget contract are deferred.
 
 ## Activation and observation
 
-Activation is a controlled configuration change, not a new build. Update the production runtime
-secret through the approved operator path, enable only Meta outbound and approved support
-notifications, restart the affected services, and immediately verify readiness. Do not broaden
-the invitee list or the contract limits: 100 participants, 15,000 inbound messages total,
-1,000/day, and 20/participant/day.
+After the approved limit implementation is reviewed, deployed and validated, activation is a
+controlled configuration change. Update the production runtime secret through the approved
+operator path, enable only Meta outbound and approved support notifications, restart the affected
+services, and immediately verify readiness. Do not exceed 10,000 unique inbound messages over the
+beta, 2,000/day globally, 200/user/day or the existing 20/user/minute burst limit.
 
 During the observation window, verify public readiness, all five production alarms, accepted and
 delivered/read WhatsApp messages, duplicates, dead letters, message p95, tickets, notification
@@ -172,6 +177,6 @@ synthetic evidence only.
 Disable outbound traffic immediately for the launch-contract security/data-loss triggers. Pause
 or roll back after 15 minutes above 5% failures or duplicates, p95 above 30 seconds, total answer
 failure, availability below 99%, forecast total spend above USD 65, actual total spend at USD 70,
-or AWS actual spend at USD 20. Preserve inbound events for replay. The prior immutable digest pair
+or AWS actual spend at USD 30. Preserve inbound events for replay. The prior immutable digest pair
 in `/opt/dudu/rollback-images` remains the application rollback target; never reverse a migration
 by destroying data.

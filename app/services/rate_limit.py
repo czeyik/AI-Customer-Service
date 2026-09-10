@@ -7,7 +7,38 @@ from sqlalchemy.orm import Session
 from app.models import RateLimitBucket
 
 
+class _LimitExceeded(Exception):
+    pass
+
+
 class DatabaseRateLimiter:
+    def allow_all(
+        self,
+        db: Session,
+        limits: list[tuple[str, int, int]],
+        *,
+        max_keys: int = 10_000,
+        now: datetime | None = None,
+    ) -> list[int] | None:
+        """Consume several limits together or consume none of them."""
+        if not limits or max_keys < 1 or any(
+            not key or limit < 1 or window_seconds < 1
+            for key, limit, window_seconds in limits
+        ):
+            raise ValueError("Invalid rate-limit parameters")
+        now = now or datetime.utcnow()
+        try:
+            with db.begin_nested():
+                counts = []
+                for key, limit, window_seconds in limits:
+                    key_hash = sha256(key.encode()).hexdigest()
+                    if not self._allow(db, key_hash, limit, window_seconds, max_keys, now):
+                        raise _LimitExceeded
+                    counts.append(db.get(RateLimitBucket, key_hash).request_count)
+            return counts
+        except _LimitExceeded:
+            return None
+
     def allow(
         self,
         db: Session,
@@ -61,6 +92,7 @@ class DatabaseRateLimiter:
                 bucket.request_count = 1
                 bucket.window_started_at = now
                 bucket.expires_at = now + timedelta(seconds=window_seconds)
+                db.flush()
                 return True
             if bucket.request_count >= limit:
                 return False

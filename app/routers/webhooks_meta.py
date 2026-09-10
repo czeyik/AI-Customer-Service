@@ -1,7 +1,8 @@
 import hmac
 import json
-from datetime import datetime
+from datetime import datetime, time, timedelta, timezone
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import PlainTextResponse
@@ -22,6 +23,7 @@ from app.security import verify_meta_signature
 from app.services.chatbot import chatbot_service
 from app.services.guardrails import assess_message
 from app.services.pii import redact_sensitive
+from app.services.rate_limit import rate_limiter
 
 router = APIRouter(prefix="/webhooks/meta", tags=["meta-webhooks"])
 MAX_WEBHOOK_BYTES = 1_000_000
@@ -56,7 +58,7 @@ async def receive_webhook(request: Request, db: Session = Depends(get_db)) -> Me
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid webhook object"
         )
 
-    processed = duplicates = 0
+    processed = duplicates = limited = 0
     try:
         status_updates = _apply_status_updates(db, payload)
         for item in extract_messages(payload):
@@ -64,6 +66,20 @@ async def receive_webhook(request: Request, db: Session = Depends(get_db)) -> Me
             if inbound is None:
                 duplicates += 1
                 continue
+            beta_counts = _consume_public_beta_limits(db, item["sender"])
+            if beta_counts is None:
+                limited += 1
+                if _allow_capacity_notice(db, item["sender"]):
+                    db.add(
+                        WhatsAppOutboundMessage(
+                            inbound_message_id=inbound.id,
+                            recipient=item["sender"],
+                            body=_capacity_message(),
+                        )
+                    )
+                processed += 1
+                continue
+            _record_volume_warnings(db, beta_counts)
             if item["type"] in {"image", "video"}:
                 body = _queue_media(db, inbound, item)
             else:
@@ -96,6 +112,7 @@ async def receive_webhook(request: Request, db: Session = Depends(get_db)) -> Me
                 details={
                     "message_count": processed,
                     "duplicate_count": duplicates,
+                    "limited_count": limited,
                     "status_update_count": status_updates,
                 },
             )
@@ -110,6 +127,110 @@ async def receive_webhook(request: Request, db: Session = Depends(get_db)) -> Me
         processed=processed,
         duplicates=duplicates,
         status_updates=status_updates,
+    )
+
+
+def _consume_public_beta_limits(
+    db: Session, sender: str, now: datetime | None = None
+) -> list[int] | None:
+    settings = get_settings()
+    if not settings.public_beta_enabled:
+        return []
+    local_now = (now or datetime.now(timezone.utc)).astimezone(
+        ZoneInfo("Asia/Kuala_Lumpur")
+    )
+    if not settings.public_beta_start_date <= local_now.date() <= settings.public_beta_end_date:
+        return None
+    next_midnight = datetime.combine(
+        local_now.date() + timedelta(days=1), time.min, local_now.tzinfo
+    )
+    beta_end = datetime.combine(
+        settings.public_beta_end_date + timedelta(days=1), time.min, local_now.tzinfo
+    )
+    day_seconds = max(1, int((next_midnight - local_now).total_seconds()))
+    beta_seconds = max(1, int((beta_end - local_now).total_seconds()))
+    day = local_now.date().isoformat()
+    return rate_limiter.allow_all(
+        db,
+        [
+            (
+                f"beta-minute:{sender}",
+                settings.rate_limit_messages_per_minute,
+                60,
+            ),
+            (
+                f"beta-user-day:{day}:{sender}",
+                settings.public_beta_messages_per_user_day,
+                day_seconds,
+            ),
+            (
+                f"beta-global-day:{day}",
+                settings.public_beta_messages_per_day,
+                day_seconds,
+            ),
+            (
+                "beta-total:2026-09-10:2026-09-14",
+                settings.public_beta_messages_total,
+                beta_seconds,
+            ),
+        ],
+        max_keys=settings.rate_limit_max_keys,
+        now=local_now.astimezone(timezone.utc).replace(tzinfo=None),
+    )
+
+
+def _allow_capacity_notice(db: Session, sender: str, now: datetime | None = None) -> bool:
+    local_now = (now or datetime.now(timezone.utc)).astimezone(
+        ZoneInfo("Asia/Kuala_Lumpur")
+    )
+    next_midnight = datetime.combine(
+        local_now.date() + timedelta(days=1), time.min, local_now.tzinfo
+    )
+    return rate_limiter.allow_all(
+        db,
+        [
+            (
+                f"beta-capacity-notice:{local_now.date().isoformat()}:{sender}",
+                1,
+                max(1, int((next_midnight - local_now).total_seconds())),
+            )
+        ],
+        max_keys=get_settings().rate_limit_max_keys,
+        now=local_now.astimezone(timezone.utc).replace(tzinfo=None),
+    ) is not None
+
+
+def _record_volume_warnings(db: Session, counts: list[int]) -> None:
+    if not counts:
+        return
+    settings = get_settings()
+    for scope, count, limit in (
+        ("daily", counts[2], settings.public_beta_messages_per_day),
+        ("total", counts[3], settings.public_beta_messages_total),
+    ):
+        for percentage in (80, 90):
+            if count == (limit * percentage + 99) // 100:
+                db.add(
+                    AuditLog(
+                        actor="system",
+                        event_type="public_beta_volume_warning",
+                        details={
+                            "scope": scope,
+                            "count": count,
+                            "limit": limit,
+                            "percentage": percentage,
+                        },
+                    )
+                )
+
+
+def _capacity_message() -> str:
+    return (
+        "The public beta message limit has been reached. Please try again after midnight "
+        "Malaysia time. If the beta has ended, please wait for the next service update.\n\n"
+        "Had mesej beta awam telah dicapai. Sila cuba lagi selepas tengah malam waktu Malaysia. "
+        "Jika beta telah tamat, sila tunggu kemas kini perkhidmatan seterusnya.\n\n"
+        "公测消息限额已满。请在马来西亚时间午夜后重试；如果公测已经结束，请等待下一次服务通知。"
     )
 
 

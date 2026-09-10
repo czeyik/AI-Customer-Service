@@ -96,9 +96,9 @@ Resources:
         - {IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0}
         - {IpProtocol: udp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0}
       SecurityGroupEgress:
-        # trivy:ignore:AWS-0104:exp:2026-10-01
+        # trivy:ignore:AWS-0104:exp:2026-09-15
         - {IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0}
-        # trivy:ignore:AWS-0104:exp:2026-10-01
+        # trivy:ignore:AWS-0104:exp:2026-09-15
         - {IpProtocol: tcp, FromPort: 465, ToPort: 465, CidrIp: 0.0.0.0/0}
       Tags:
         - {Key: Project, Value: dudu-support}
@@ -340,7 +340,7 @@ Resources:
       TTL: 60
       ResourceRecords: [!GetAtt ElasticIp.PublicIp]
 
-  # trivy:ignore:AWS-0136:exp:2026-10-01
+  # trivy:ignore:AWS-0136:exp:2026-09-15
   Alerts:
     Type: AWS::SNS::Topic
     Properties:
