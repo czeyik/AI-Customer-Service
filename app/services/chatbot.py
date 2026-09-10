@@ -192,6 +192,7 @@ class ChatbotService:
             "trip_id": request.trip_id,
             "ride_details": None,
             "ride_details_collected": issue_type == "partnership",
+            "details_complete": issue_type == "partnership",
             "evidence": [item.model_dump(mode="json") for item in request.attachments],
             "attachment_count": len(request.attachments),
         }
@@ -303,8 +304,19 @@ class ChatbotService:
         elif conversation.intake_state == "awaiting_ride_details":
             self._capture_supplied(data, request)
             if not data.get("ride_details_collected"):
-                data["ride_details"] = None if self._is_skip(text, language) else text.strip()
+                finished = self._is_skip(text, language) or self._is_done(text, language)
+                data["ride_details"] = None if finished else text.strip()
                 data["ride_details_collected"] = True
+                data["details_complete"] = finished
+
+        elif conversation.intake_state == "awaiting_additional_details":
+            self._capture_supplied(data, request)
+            if self._is_skip(text, language) or self._is_done(text, language):
+                data["details_complete"] = True
+            elif text.strip():
+                data["ride_details"] = "\n".join(
+                    part for part in (data.get("ride_details"), text.strip()) if part
+                )
 
         next_state = self._next_intake_state(data)
         if next_state is None:
@@ -468,9 +480,11 @@ class ChatbotService:
         if request.trip_id:
             data["trip_id"] = request.trip_id
             data["ride_details_collected"] = True
+            data["details_complete"] = True
         if request.ride_details:
             data["ride_details"] = request.ride_details.strip()
             data["ride_details_collected"] = True
+            data["details_complete"] = True
         if include_attachments and request.attachments:
             data.setdefault("evidence", []).extend(
                 item.model_dump(mode="json") for item in request.attachments
@@ -484,6 +498,7 @@ class ChatbotService:
             ("email", "awaiting_email"),
             ("phone_number", "awaiting_phone"),
             ("ride_details_collected", "awaiting_ride_details"),
+            ("details_complete", "awaiting_additional_details"),
         ):
             if not data.get(key):
                 return state
@@ -517,8 +532,25 @@ class ChatbotService:
     def _is_skip(self, text: str, language: str) -> bool:
         return text.strip().lower().rstrip(".!。") in {
             "en": {"skip", "not applicable", "none", "no evidence"},
-            "ms": {"langkau", "tidak berkenaan", "tiada", "tiada bukti"},
-            "zh": {"跳过", "不适用", "没有", "没有证据"},
+            "ms": {"langkau", "tidak berkenaan", "tiada", "tiada bukti", "skip"},
+            "zh": {"跳过", "不适用", "没有", "没有证据", "skip"},
+        }[language]
+
+    def _is_done(self, text: str, language: str) -> bool:
+        return text.strip().lower().rstrip(".!。") in {
+            "en": {"done", "finished", "that's all", "that is all"},
+            "ms": {"selesai", "dah selesai", "itu sahaja", "done"},
+            "zh": {"完成", "好了", "就这些", "done"},
+        }[language]
+
+    def attachment_follow_up(self, conversation: Conversation) -> str:
+        language = conversation.preferred_language
+        if conversation.intake_state != "idle":
+            return self._state_prompt(language, conversation.intake_state)
+        return {
+            "en": "Please describe what happened in a text message. I’ll then collect the contact and ride details needed for a support ticket.",
+            "ms": "Sila terangkan perkara yang berlaku dalam mesej teks. Saya kemudian akan mengumpulkan butiran hubungan dan perjalanan yang diperlukan untuk tiket sokongan.",
+            "zh": "请用文字说明发生的情况。随后我会收集建立客服工单所需的联系方式和行程资料。",
         }[language]
 
     def _bot_identity(self, language: str) -> str:
@@ -535,21 +567,24 @@ class ChatbotService:
                 "awaiting_name": "Great, thank you! May I have your name for the support ticket?",
                 "awaiting_email": "Thanks! What valid email address should our support team use for this ticket?",
                 "awaiting_phone": "Thank you! Please share the WhatsApp phone number you would like us to use for follow-up.",
-                "awaiting_ride_details": "We’re almost done! Please share any relevant ride details, such as the trip ID, date/time, pickup and destination. You may also attach supporting pictures if helpful. Reply Skip if this does not apply.",
+                "awaiting_ride_details": "We’re almost done! Please share the available trip ID, date/time, pickup location and destination. You may send the details across multiple messages and attach supporting pictures or videos. Reply Done after submitting everything, or Skip if no ride details apply.",
+                "awaiting_additional_details": "Do you have any other relevant details or supporting pictures or videos? Send them now, or reply Done if you have submitted everything needed.",
             },
             "ms": {
                 "awaiting_consent": f"Untuk mengatur susulan oleh pegawai, bolehkah kami menyimpan butiran isu anda dalam tiket sokongan? Balas Ya atau Tidak. Notis Privasi: {PRIVACY_NOTICE_URL}",
                 "awaiting_name": "Baik, terima kasih! Boleh saya dapatkan nama anda untuk tiket sokongan?",
                 "awaiting_email": "Terima kasih! Apakah alamat e-mel sah yang patut digunakan oleh pasukan sokongan kami untuk tiket ini?",
                 "awaiting_phone": "Terima kasih! Sila berikan nombor telefon WhatsApp yang anda mahu kami gunakan untuk susulan.",
-                "awaiting_ride_details": "Kita hampir selesai! Sila kongsikan butiran perjalanan yang berkaitan, seperti ID perjalanan, tarikh/masa, lokasi pengambilan dan destinasi. Anda juga boleh melampirkan gambar sokongan jika membantu. Balas Langkau jika tidak berkenaan.",
+                "awaiting_ride_details": "Kita hampir selesai! Sila kongsikan ID perjalanan, tarikh/masa, lokasi pengambilan dan destinasi yang tersedia. Anda boleh menghantar butiran dalam beberapa mesej dan melampirkan gambar atau video sokongan. Balas Selesai selepas menghantar semuanya, atau Langkau jika tiada butiran perjalanan berkaitan.",
+                "awaiting_additional_details": "Adakah anda mempunyai butiran lain atau gambar atau video sokongan? Hantar sekarang, atau balas Selesai jika semua maklumat yang diperlukan telah dihantar.",
             },
             "zh": {
                 "awaiting_consent": f"为了安排人工客服跟进，你是否同意我们将问题资料保存至客服工单？请回复同意或不同意。隐私声明：{PRIVACY_NOTICE_URL}",
                 "awaiting_name": "好的，谢谢！可以告诉我用于客服工单的姓名吗？",
                 "awaiting_email": "谢谢！我们的客服团队应使用哪个有效电子邮箱地址跟进此工单？",
                 "awaiting_phone": "谢谢！请提供你希望我们用于后续联系的 WhatsApp 电话号码。",
-                "awaiting_ride_details": "我们快完成了！请提供相关行程资料，例如行程编号、日期/时间、上车地点和目的地。如有帮助，你也可以附上相关图片。如不适用，请回复“跳过”。",
+                "awaiting_ride_details": "我们快完成了！请提供现有的行程编号、日期/时间、上车地点和目的地。你可以分多条消息发送资料，并附上相关图片或视频。全部提交后请回复“完成”；如无相关行程资料，请回复“跳过”。",
+                "awaiting_additional_details": "你还有其他相关资料或支持图片、视频吗？请现在发送；如果所需资料已全部提交，请回复“完成”。",
             },
         }
         return prompts[language][state]
