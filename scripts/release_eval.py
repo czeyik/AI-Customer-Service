@@ -202,9 +202,9 @@ def run(
     provider = None
     try:
         cco = AdminUser(
-            username="wave12-cco",
-            display_name="Wave 12 CCO",
-            email="wave12-cco@example.invalid",
+            username="release-cco",
+            display_name="Release CCO",
+            email="release-cco@example.invalid",
             password_hash="not-used",
             totp_secret_ref="release-evaluation/not-used",
             is_cco=True,
@@ -236,7 +236,7 @@ def run(
                     db,
                     ChatRequest(
                         channel="whatsapp",
-                        external_user_id=f"wave12-{mode}-{language}-{scenario.name}",
+                        external_user_id=f"release-{mode}-{language}-{scenario.name}",
                         text=scenario.text[language],
                         preferred_language=language,
                         user_role=scenario.role,
@@ -246,7 +246,7 @@ def run(
                 latencies.append(time.monotonic() - started)
                 conversation = (
                     db.query(Conversation)
-                    .filter_by(external_user_id=f"wave12-{mode}-{language}-{scenario.name}")
+                    .filter_by(external_user_id=f"release-{mode}-{language}-{scenario.name}")
                     .one()
                 )
                 errors = []
@@ -320,7 +320,7 @@ def run(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the Wave 12 trilingual release evaluation")
+    parser = argparse.ArgumentParser(description="Run the trilingual release evaluation")
     parser.add_argument("--mode", choices=("outage", "live"), default="outage")
     parser.add_argument(
         "--input-price", type=float, default=0, help="USD per million input tokens"

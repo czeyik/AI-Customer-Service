@@ -1,9 +1,8 @@
-# Wave 7 Trilingual Knowledge Corpus — Draft for CCO Approval
+# Approved Trilingual Knowledge Corpus
 
 Owner: Jane, Chief Communication Officer
 Status: APPROVED by Jane — 9 September 2026
-Drafted: 9 September 2026
-Proposed version: 1
+Version: 1
 Effective date: 9 September 2026
 
 This document is the CCO-approved launch corpus for the eight existing knowledge topics in all
@@ -11,8 +10,8 @@ three launch languages. Each record uses its section in this document as the app
 
 ## 1. Accounts and login
 
-Proposed key: `accounts-login`
-Approved source: `docs/wave-7-knowledge-corpus.md#accounts-login`
+Key: `accounts-login`
+Source: `docs/knowledge-corpus.md#accounts-login`
 
 ### English
 
@@ -36,8 +35,8 @@ sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun pe
 
 ## 2. Bookings and cancellations
 
-Proposed key: `bookings-cancellations`
-Approved source: `docs/wave-7-knowledge-corpus.md#bookings-cancellations`
+Key: `bookings-cancellations`
+Source: `docs/knowledge-corpus.md#bookings-cancellations`
 
 ### English
 
@@ -62,8 +61,8 @@ boleh membantu membuat tiket sokongan untuk semakan pegawai.
 
 ## 3. Fares and payments
 
-Proposed key: `fares-payments`
-Approved source: `docs/wave-7-knowledge-corpus.md#fares-payments`
+Key: `fares-payments`
+Source: `docs/knowledge-corpus.md#fares-payments`
 
 ### English
 
@@ -87,8 +86,8 @@ dibuat untuk semakan pegawai. Jangan hantar nombor penuh kad pembayaran.
 
 ## 4. Promotions and vouchers
 
-Proposed key: `promotions-vouchers`
-Approved source: `docs/wave-7-knowledge-corpus.md#promotions-vouchers`
+Key: `promotions-vouchers`
+Source: `docs/knowledge-corpus.md#promotions-vouchers`
 
 ### English
 
@@ -113,8 +112,8 @@ pegawai.
 
 ## 5. Driver onboarding basics
 
-Proposed key: `driver-onboarding-basics`
-Approved source: `docs/wave-7-knowledge-corpus.md#driver-onboarding-basics`
+Key: `driver-onboarding-basics`
+Source: `docs/knowledge-corpus.md#driver-onboarding-basics`
 
 ### English
 
@@ -138,9 +137,9 @@ umum pendaftaran pemandu dan membantu membuat tiket sokongan untuk semakan pegaw
 
 ## 6. Safety incidents
 
-Proposed key: `safety-incidents`
-Approved source: `docs/wave-7-knowledge-corpus.md#safety-incidents`; Malaysian emergency number
-confirmed in `docs/wave-3-customer-copy.md`
+Key: `safety-incidents`
+Source: `docs/knowledge-corpus.md#safety-incidents`; Malaysian emergency number confirmed in
+`docs/customer-copy.md`
 
 ### English
 
@@ -168,8 +167,8 @@ hingga 6:00 petang waktu Malaysia; ini bukan sokongan manusia 24 jam sehari.
 
 ## 7. Support ticket response targets
 
-Proposed key: `support-ticket-response-targets`
-Approved source: `docs/wave-7-knowledge-corpus.md#support-ticket-response-targets`; derived from
+Key: `support-ticket-response-targets`
+Source: `docs/knowledge-corpus.md#support-ticket-response-targets`; derived from
 `docs/requirements-summary.md` (R6 and R12)
 
 ### English
@@ -199,8 +198,8 @@ WhatsApp 联系号码和简短的问题说明。
 
 ## 8. Business collaboration inquiries
 
-Proposed key: `business-collaboration-inquiries`
-Approved source: `docs/wave-7-knowledge-corpus.md#business-collaboration-inquiries`; derived from
+Key: `business-collaboration-inquiries`
+Source: `docs/knowledge-corpus.md#business-collaboration-inquiries`; derived from
 `docs/requirements-summary.md` (R1, R4, and R5)
 
 ### English
@@ -230,6 +229,6 @@ pihak DUDU Car.
 
 Approval decision: Jane approved the complete corpus, its recorded sources, and effective date on
 9 September 2026, as confirmed by Cze Yik.
-Approved keys: All eight proposed keys in English, Bahasa Malaysia, and Simplified Chinese.
+Approved keys: All eight keys in English, Bahasa Malaysia, and Simplified Chinese.
 Exceptions or corrections: None.
 Effective date: 9 September 2026.

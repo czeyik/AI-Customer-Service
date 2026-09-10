@@ -10,7 +10,7 @@ def send(base_url: str, number: int) -> tuple[bool, float]:
     payload = json.dumps(
         {
             "channel": "whatsapp",
-            "external_user_id": f"wave11-load-{number}",
+            "external_user_id": f"platform-load-{number}",
             "text": "What is DUDU Car?",
             "user_role": "rider",
         }

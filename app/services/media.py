@@ -338,7 +338,7 @@ def process_next_media(
                 if object_store:
                     object_store.delete(object_key)
             except Exception:
-                # ponytail: S3/PostgreSQL are not atomic; Wave 11 reconciliation must alert on
+                # ponytail: S3/PostgreSQL are not atomic; production reconciliation must alert on
                 # cleanup failures and remove any object without a matching approved row.
                 pass
         attachment.failure_code = (

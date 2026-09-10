@@ -118,7 +118,7 @@ the privacy contact is `support@duducar.co`.
 Lifecycle decisions confirmed by Cze Yik on 9 September 2026: expiry uses permanent deletion,
 only Cze Yik as privacy owner may authorize a narrow audited legal hold, backups expire after at
 most 35 days, and retention must be reapplied before a restored environment serves traffic. The
-technical procedure and complete data inventory are in `docs/wave-10-privacy-data-lifecycle.md`.
+technical procedure and complete data inventory are in `docs/privacy-data-lifecycle.md`.
 
 Provider decision confirmed by Cze Yik on 9 September 2026: Z.AI with GLM-5.3-Flash is the only
 hosted pilot model; API content is processed in Singapore under Z.AI's API DPA, and only approved
