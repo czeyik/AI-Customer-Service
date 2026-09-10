@@ -23,6 +23,7 @@ from app.models import (
     MediaAttachment,
     Ticket,
     WhatsAppInboundMessage,
+    WhatsAppOutboundMessage,
 )
 from app.routers import admin as admin_router
 from app.routers.webhooks_meta import receive_webhook
@@ -32,6 +33,7 @@ from app.services.media import (
     DownloadedMedia,
     MediaProcessingError,
     MediaRejected,
+    PrivateObjectStore,
     delete_attachment,
     process_next_media,
     validate_media,
@@ -296,6 +298,45 @@ def test_signed_media_webhook_is_queued_exactly_once(db_session: Session) -> Non
     assert attachment.status == "queued"
     assert attachment.object_key is None
     assert db_session.query(WhatsAppInboundMessage).count() == 1
+    assert "describe what happened" in db_session.query(WhatsAppOutboundMessage).one().body
+
+
+def test_media_reply_keeps_intake_open_and_prompts_for_done(db_session: Session) -> None:
+    conversation = Conversation(
+        channel="whatsapp",
+        external_user_id="60108865432",
+        preferred_language="en",
+        intake_state="awaiting_additional_details",
+        intake_data={"ride_details_collected": True, "details_complete": False},
+    )
+    db_session.add(conversation)
+    db_session.commit()
+
+    call_webhook(db_session, media_payload("wamid.more-media", "media-more"))
+
+    db_session.refresh(conversation)
+    reply = db_session.query(WhatsAppOutboundMessage).one().body
+    assert conversation.intake_state == "awaiting_additional_details"
+    assert "quarantined for security checks" in reply
+    assert "reply Done" in reply
+
+
+def test_object_store_uses_explicit_regional_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:
+    arguments = {}
+    client = object()
+
+    def fake_client(service: str, **kwargs):
+        arguments.update(service=service, **kwargs)
+        return client
+
+    monkeypatch.setattr("boto3.client", fake_client)
+
+    assert PrivateObjectStore(media_settings()).client is client
+    assert arguments == {
+        "service": "s3",
+        "region_name": "ap-southeast-5",
+        "endpoint_url": "https://s3.ap-southeast-5.amazonaws.com",
+    }
 
 
 @pytest.mark.parametrize(

@@ -10,11 +10,13 @@ the documented go/no-go approval authorizes the limited pilot.
 
 ## Release candidate
 
-The release candidate is not frozen yet. Freeze one reviewed commit SHA only after the local suite,
-evaluation, and security checks pass. The same application and ClamAV digests must then pass
-temporary staging before production promotion. Record the SHA, both full image digests, migration
-head, GitHub CI/security run IDs, staging evidence, production deployment run ID, and rollback
-digest pair here; mutable tags are not release evidence.
+The release candidate is frozen at `77ce6c9a23f125b3e3ef5f52cf0672d6dbb9646b`. PR 2 merged it to
+`dev` as `0a6b3b3177a797c13e9bcc69582843388d55fc31`; GitHub CI run 34392289697 and security run
+34392289872 passed. Its ARM64 application digest is
+`sha256:d724de8f53a73567b0357c23985765e2cbb7d355cf2946c6ee86516d15ce9d12`; its ClamAV
+digest is `sha256:f0ffa992f925fd37687efab9ac004878ec7a29bff46d21146c7c4fa40c91f0bc`.
+Both ECR child-image scans completed with zero findings. Temporary staging runs this exact pair at
+migration `c81d4e2a7f10`. Mutable tags are not release evidence.
 
 ## DUDU evaluation
 
@@ -39,24 +41,27 @@ latency, token counts, estimated cost, and pass/failure counts only; do not stor
 request IDs, credentials, or tester data in the evidence.
 
 An authenticated, non-generation `GET /api/paas/v4/models` check on 10 September 2026 confirmed
-that the configured Z.AI account currently exposes the exact `glm-5.3-flash` model. The endpoint
-does not publish its token prices, so the current non-secret input and output rates still need to
-be confirmed from the account billing page before the billable evaluation.
+that the configured Z.AI account exposes the exact `glm-5.3-flash` model. Z.AI's official pricing
+page lists USD 0.15/million input tokens and USD 0.50/million output tokens. The first authorized
+live run attempted exactly 15 provider calls: 14 succeeded and one safely fell back. Cze Yik then
+authorized exactly one 15-call rerun. It passed 15/15 provider calls and all 36 scenarios, used
+6,989 input and 1,964 output tokens, had 3.679-second p95, and cost an estimated USD 0.002030. No
+further model call is authorized or required.
 
 ## Release gate
 
 | Evidence | State |
 | --- | --- |
 | All earlier gates | PASS (PG-01 through PG-11) |
-| Clean full test suite and dependency integrity | PASS locally: 149 passed, 2 opt-in integrations skipped; PENDING RC |
-| Trilingual deterministic outage evaluation | PASS locally: 36/36; 15/15 adapter failures safely fell back |
-| Hosted `glm-5.3-flash` evaluation, actual latency/tokens/cost | AUTHORIZED; PENDING EXECUTION |
-| Secret, dependency, static, source/image and dynamic scans | PASS LOCALLY WITH TIME-LIMITED OWNER EXCEPTIONS; PENDING RC |
-| Temporary staging deployment and failure checks | AUTHORIZED; PENDING EXECUTION |
-| Real WhatsApp text, JPEG/PNG, MP4/3GP, duplicate and delivery checks | AUTHORIZED; PENDING EXECUTION |
-| Two named admins review media and complete the ticket lifecycle | PENDING OWNER/JANE TEST |
-| Production TLS/readiness, alarms, backup, rollback pair and spend | PARTIAL: TLS/readiness, alarms, rollback pair and AWS spend healthy |
-| Production named admins and active approved corpus | BLOCKED: preflight found 0 active admins and 0 active documents |
+| Clean full test suite and dependency integrity | PASS RC: 149 passed, 2 opt-in integrations skipped; GitHub CI passed |
+| Trilingual deterministic outage evaluation | PASS RC: 36/36; 15/15 adapter failures safely fell back |
+| Hosted `glm-5.3-flash` evaluation, actual latency/tokens/cost | PASS: authorized rerun 15/15 provider calls and 36/36 scenarios |
+| Secret, dependency, static, source/image and dynamic scans | PASS RC WITH TIME-LIMITED OWNER EXCEPTIONS |
+| Temporary staging deployment and failure checks | PASS: exact digest pair; readiness, capacity, DB, ClamAV and S3 checks |
+| Real WhatsApp text, JPEG/PNG, MP4/3GP, duplicate and delivery checks | PARTIAL: live text/JPEG and delivery/read passed; corrective media review and live video retest pending |
+| Two named admins review media and complete the ticket lifecycle | PARTIAL: assignment, note and open → in-progress → closed passed; corrected media review pending |
+| Production TLS/readiness, alarms, backup, rollback pair and spend | PASS: RC dark-deployed; readiness, five alarms, backup, rollback and budget healthy |
+| Production named admins and active approved corpus | PASS: 2 active admins with matching TOTP references; 24 approved records |
 | Current Meta messaging/media policy review | PASS (10 September 2026) |
 | P0/P1 and waiver review | PENDING GO/NO-GO |
 | Go/no-go decision | PENDING |
@@ -84,11 +89,18 @@ Production preflight on 10 September found healthy API, worker, PostgreSQL, Clam
 containers, readiness 200 with valid TLS, all five project alarms `OK`, no pending outbound/media
 work, both an active and prior rollback digest pair, and AWS budget actual spend USD 0 at the time
 of the check. Both send switches remain disabled. The fresh production database has no active
-named administrator and no active approved knowledge document, so it cannot pass admin review or
-serve grounded pilot answers. Cze Yik and Jane must be provisioned through the trusted operator
-path, their TOTP values stored directly in Secrets Manager, and Jane must publish the 24 approved
-corpus records before release testing. Credentials and personal contact details must not enter
-this document or chat.
+named administrator and no active approved knowledge document, so it could not pass admin review
+or serve grounded pilot answers. Cze Yik and Jane were subsequently provisioned with the required
+recovery and CCO roles, and Jane published the 24 approved corpus records. Both TOTP references now
+match the compact two-entry secret. Credentials and personal contact details must not enter this
+document or chat.
+
+Temporary staging deployed the immutable candidate pair successfully. It passed 1,000/1,000
+public HTTPS readiness requests at four-way concurrency with 0.060-second p95, returned 503 while
+PostgreSQL was unavailable and recovered, failed closed while ClamAV was unavailable and recovered,
+accepted a clean scan, rejected EICAR, and completed an `aws:kms` encrypted S3 write/read/delete
+round-trip. Both outbound switches stayed false. The initial strict hosted-model finding was
+cleared by the single owner-authorized rerun recorded above.
 
 The current Trivy 0.74.0 source scan found two critical AWS-0104 findings because the application
 needs public HTTPS egress to dynamic Meta, Z.AI and AWS endpoints and SMTP/TLS egress to the
@@ -111,8 +123,8 @@ Do not mark this section approved from an inferred instruction. Cze Yik records 
 reviewing the completed evidence above.
 
 - Decision and timestamp: PENDING
-- Approved release SHA and digest pair: PENDING
-- Open P0/P1 findings: PENDING
+- Approved release SHA and digest pair: candidate evidence recorded above; OWNER APPROVAL PENDING
+- Open P0/P1 findings: corrected media review and remaining representative live-media checks pending
 - Waivers, owner, expiry, and remediation date: Cze Yik accepted AWS-0104 for required TCP 443/465
   egress and AWS-0136 for AWS-managed SNS encryption through 30 September 2026; expires 1 October
   2026; remediate before broader launch

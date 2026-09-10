@@ -169,7 +169,7 @@ def test_web_flow_collects_phone_ride_details_and_evidence(db_session: Session) 
     )
     assert "ride details" in ride_prompt.answer
 
-    completed = service.handle(
+    details_collected = service.handle(
         db_session,
         ChatRequest(
             channel="web",
@@ -183,6 +183,13 @@ def test_web_flow_collects_phone_ride_details_and_evidence(db_session: Session) 
                 )
             ],
         ),
+    )
+    assert details_collected.ticket is None
+    assert "reply Done" in details_collected.answer
+
+    completed = service.handle(
+        db_session,
+        ChatRequest(channel="web", external_user_id=user, text="Done"),
     )
     ticket = db_session.query(Ticket).filter_by(public_id=completed.ticket.public_id).one()
     assert ticket.phone_number == "+60182935060"

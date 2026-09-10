@@ -255,7 +255,7 @@ def _queue_media(
         )
     )
     if rejected:
-        return {
+        status = {
             "en": "I can’t accept sensitive documents or payment information. "
             "Please send only relevant ride pictures or videos.",
             "ms": "Saya tidak boleh menerima dokumen sensitif atau maklumat pembayaran. "
@@ -263,14 +263,16 @@ def _queue_media(
             "zh": "我无法接收敏感证件或付款资料。"
             "请仅发送与行程有关的图片或视频。",
         }[conversation.preferred_language]
-    return {
-        "en": "Thanks — your attachment is quarantined for security checks. "
-        "It will be added to your ticket only if it passes.",
-        "ms": "Terima kasih — lampiran anda dikuarantin untuk pemeriksaan keselamatan. "
-        "Ia hanya akan ditambah pada tiket jika lulus.",
-        "zh": "谢谢——您的附件已隔离并接受安全检查。"
-        "只有通过检查后才会加入工单。",
-    }[conversation.preferred_language]
+    else:
+        status = {
+            "en": "Thanks — your attachment is quarantined for security checks. "
+            "It will be added to your ticket only if it passes.",
+            "ms": "Terima kasih — lampiran anda dikuarantin untuk pemeriksaan keselamatan. "
+            "Ia hanya akan ditambah pada tiket jika lulus.",
+            "zh": "谢谢——您的附件已隔离并接受安全检查。"
+            "只有通过检查后才会加入工单。",
+        }[conversation.preferred_language]
+    return f"{status}\n\n{chatbot_service.attachment_follow_up(conversation)}"
 
 
 def _apply_status_updates(db: Session, payload: dict[str, Any]) -> int:

@@ -155,10 +155,13 @@ class PrivateObjectStore:
         self.settings = settings or get_settings()
         import boto3
 
+        endpoint_url = self.settings.media_s3_endpoint_url or (
+            f"https://s3.{self.settings.media_region}.amazonaws.com"
+        )
         self.client = boto3.client(
             "s3",
             region_name=self.settings.media_region,
-            endpoint_url=self.settings.media_s3_endpoint_url or None,
+            endpoint_url=endpoint_url,
         )
 
     def put(self, key: str, stream: BinaryIO, mime_type: str, sha256: str) -> None:
