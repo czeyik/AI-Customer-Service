@@ -1,12 +1,13 @@
 # Wave 12 Release Validation and Pilot Activation
 
-Status: **IN PROGRESS**
+Status: **PASS**
 Owner and go/no-go authority: Cze Yik
 Support lead and CCO: Jane
 Target public beta: 10–14 September 2026
 
-Production remains dark. `META_SEND_ENABLED` and `NOTIFICATION_SEND_ENABLED` must stay false until
-the documented go/no-go approval authorizes the capped public beta.
+Production is live for the capped public beta. `META_SEND_ENABLED` and `PUBLIC_BETA_ENABLED` are
+true; `NOTIFICATION_SEND_ENABLED` remains false under the owner-approved waiver through
+14 September 2026.
 
 ## Release candidate
 
@@ -72,7 +73,7 @@ further model call is authorized or required.
 | Current Meta messaging/media policy review | PASS (10 September 2026) |
 | P0/P1 and waiver review | PASS: no unresolved P0/P1; beta-only security and notification waivers recorded |
 | Go/no-go decision | GO: owner authorized capped public-beta activation on 10 September 2026 |
-| Capped public-beta activation and observation | ACTIVE: enabled at 2026-09-10T10:23:37Z; 60-minute observation in progress |
+| Capped public-beta activation and observation | PASS: enabled at 2026-09-10T10:23:37Z; approved 60-minute observation completed without a trigger |
 
 The local outage evaluation found one release defect: a generic word such as “policy” could make
 an unrelated question appear grounded when the approved corpus happened to contain that word.
@@ -162,6 +163,14 @@ the approved cap values and the prior application rollback digest. At activation
 production validation. One image response queued before activation was delivered; immediate
 post-activation evidence showed readiness 200, zero recent failure, no pending support notification,
 all five alarms `OK`, and AWS actual spend USD 0.005 against USD 30.
+
+The observation window ended at 2026-09-10T11:23:37Z. The final check at 11:24 UTC returned
+readiness 200 with all five containers healthy and all five alarms `OK`. The approved switches and
+immutable current/rollback digest pair were intact. Since activation there were zero new inbound
+messages, outbound failures, duplicates, dead letters, pending support notifications or beta-volume
+warnings. AWS actual spend remained USD 0.005 against the USD 30 ceiling. No pause or rollback
+trigger occurred, so the observation and PG-12 pass. The capped public beta remains live through
+14 September; the staged public launch remains deferred.
 
 Twelve notifications created by the two owner-controlled validation tickets were marked
 `cancelled` before activation, with one retained `support_notification_cancelled` audit event per

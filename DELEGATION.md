@@ -56,7 +56,7 @@ Real customer traffic must remain disabled until every gate below is `PASS`.
 | 9 | PG-09 | Application security | PASS |
 | 10 | PG-10 | Privacy, retention, and deletion | PASS |
 | 11 | PG-11 | Production platform and operations | PASS |
-| 12 | PG-12 | Release validation and pilot activation | IN_PROGRESS |
+| 12 | PG-12 | Release validation and pilot activation | PASS |
 
 Valid statuses: `NOT_STARTED`, `IN_PROGRESS`, `BLOCKED`, `PASS`.
 
@@ -979,6 +979,16 @@ final `GO`; `PUBLIC_BETA_ENABLED=true` and `META_SEND_ENABLED=true` activated at
 support notification and AWS actual USD 0.005 against USD 30. One image response queued before
 activation reached `delivered`. The approved 60-minute observation is in progress; Wave 12 remains
 `IN_PROGRESS` until it completes.
+
+Eleventh resume update — 2026-09-10: The approved observation ended at
+2026-09-10T11:23:37Z and `PASS`ed. Final evidence at 11:24 UTC showed public readiness 200, all five
+containers healthy, all five CloudWatch alarms `OK`, the approved live/waived switch states, the
+current immutable application index and prior rollback index intact, zero inbound message after
+activation, zero outbound failure, zero duplicate, zero dead letter, zero pending support
+notification and zero beta-volume warning. AWS actual spend remained USD 0.005 against the USD 30
+ceiling. No rollback trigger occurred. PG-12 and Wave 12 are `PASS`; there is no Wave 13. The
+capped public beta remains live through 14 September under its approved limits and waivers. The
+staged public launch remains deferred.
 
 ## Fresh-Chat Prompt
 
