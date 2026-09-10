@@ -178,6 +178,12 @@ beta defined above and approved its USD 30 AWS ceiling. The staged public launch
 availability, security, capacity and budget contract are explicitly deferred. Promotion to
 `t4g.medium` or any post-beta public launch requires separate approval.
 
+Activation amendment approved by Cze Yik on 10 September 2026: support notifications may remain
+disabled through 14 September because production SMTP and notification templates are not
+provisioned. Cze Yik and Jane monitor the admin dashboard during this waiver. This does not waive
+customer Meta replies, ticket creation, audit logging, urgent handling or any security/data-loss
+rollback trigger.
+
 Sources checked 4 September 2026: `docs/requirements-summary.md`,
 `docs/security-launch-checklist.md`, [AWS Regions](https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions.html),
 and [WhatsApp pricing](https://whatsappbusiness.com/products/platform-pricing/). Amendment sources

@@ -68,11 +68,11 @@ further model call is authorized or required.
 | Two named admins review media and complete the ticket lifecycle | PASS: both reviewed approved media; assignment, note and open → in-progress → closed passed |
 | Production TLS/readiness, alarms, backup, rollback pair and spend | PASS: RC dark-deployed; readiness, five alarms, backup, rollback and budget healthy |
 | Production named admins and active approved corpus | PASS: 2 active admins with matching TOTP references; 24 approved records |
-| Public-beta daily/global/total controls | LOCAL PASS: atomic shared counters, calendar boundaries, one capacity notice and warnings; real PostgreSQL concurrency passed; image/deployment proof pending |
+| Public-beta daily/global/total controls | PASS: atomic shared counters, calendar boundaries, one capacity notice and warnings; real PostgreSQL concurrency and production image/configuration passed |
 | Current Meta messaging/media policy review | PASS (10 September 2026) |
-| P0/P1 and waiver review | PENDING GO/NO-GO |
-| Go/no-go decision | PENDING |
-| Limited cohort activation and observation | PENDING |
+| P0/P1 and waiver review | PASS: no unresolved P0/P1; beta-only security and notification waivers recorded |
+| Go/no-go decision | GO: owner authorized capped public-beta activation on 10 September 2026 |
+| Capped public-beta activation and observation | ACTIVE: enabled at 2026-09-10T10:23:37Z; 60-minute observation in progress |
 
 The local outage evaluation found one release defect: a generic word such as “policy” could make
 an unrelated question appear grounded when the approved corpus happened to contain that word.
@@ -129,11 +129,14 @@ Official AWS sources reviewed 10 September 2026:
 Do not mark this section approved from an inferred instruction. Cze Yik records the decision after
 reviewing the completed evidence above.
 
-- Decision and timestamp: CAPPED PUBLIC-BETA CONTRACT APPROVED 10 September 2026; activation
-  remains `NO-GO` until its enforceable limits and renewed validation pass. The staged public
-  launch from 15 September and its availability/security/budget contract are deferred.
-- Approved release SHA and digest pair: candidate evidence recorded above; OWNER APPROVAL PENDING
-- Open P0/P1 findings: none identified; final owner review pending
+- Decision and timestamp: `GO` for the capped public beta; Cze Yik authorized immediate activation
+  on 10 September 2026. Activation completed at 2026-09-10T10:23:37Z. The staged public launch from
+  15 September and its availability/security/budget contract remain deferred.
+- Approved release SHA and digest pair: local release commit
+  `579ac9efc85400c0e8dae55f9b57acb4cfbdb9c5`; application index
+  `sha256:c31c606bd0f2bc6a7d7ad5a0b16df6b26a25b00435dbdf655e4ada8c75c51bcb` and qualified ClamAV
+  index `sha256:f0ffa992f925fd37687efab9ac004878ec7a29bff46d21146c7c4fa40c91f0bc`
+- Open P0/P1 findings: none identified
 - Waivers, owner, expiry, and remediation date: Cze Yik accepted AWS-0104 for required TCP 443/465
   egress and AWS-0136 for AWS-managed SNS encryption for the capped public beta through
   14 September 2026 only; remediate or obtain a new explicit decision before any later launch
@@ -141,10 +144,24 @@ reviewing the completed evidence above.
   USD 0.003893; other current actuals unavailable or zero
 - Approved invitee list location and count (no personal data here): not applicable; the approved
   beta is public and controlled by enforceable traffic limits
-- Authorization to enable Meta outbound and support notifications: PENDING
+- Authorization to enable Meta outbound and support notifications: Meta outbound authorized and
+  enabled; support notifications waived and disabled through 14 September while both admins
+  monitor the dashboard
 - Pre-release staging, hosted-model and two-tester WhatsApp/media validation: AUTHORIZED 10
   September 2026
 - Observation window: first 60 minutes after activation, then daily review; APPROVED BY OWNER
+
+The final local suite passed 159 tests with two opt-in integrations skipped. A real PostgreSQL
+concurrency check passed, and Gitleaks, pip-audit, Bandit, Trivy source/configuration and the final
+ARM64 image scan reported no unaccepted finding. GitHub Actions was unavailable under the owner's
+monthly quota, so no workflow run was used; the owner directed immediate activation after these
+local equivalent gates. The USD 30 beta budget is `UPDATE_COMPLETE` with USD 20/25/28 equivalent
+notifications. Dark deployment passed readiness, five healthy containers, all five alarms `OK`,
+the approved cap values and the prior application rollback digest. At activation,
+`PUBLIC_BETA_ENABLED=true`, `META_SEND_ENABLED=true` and `NOTIFICATION_SEND_ENABLED=false` passed
+production validation. One image response queued before activation was delivered; immediate
+post-activation evidence showed readiness 200, zero recent failure, no pending support notification,
+all five alarms `OK`, and AWS actual spend USD 0.005 against USD 30.
 
 Twelve notifications created by the two owner-controlled validation tickets were marked
 `cancelled` before activation, with one retained `support_notification_cancelled` audit event per

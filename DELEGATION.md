@@ -961,6 +961,25 @@ claims; compilation and `git diff --check` passed. No commit, push, GitHub Actio
 production deployment, send-switch change or live traffic occurred. Activation remains `NO-GO`
 pending review and boundary/load/rollback validation of the new image.
 
+Tenth resume update — 2026-09-10: Cze Yik directed the capped public beta to go live immediately
+and accepted a 10–14 September notification waiver after preflight proved production SMTP and the
+approved notification-template map were not provisioned. Support notifications remain disabled;
+Cze Yik and Jane monitor the admin dashboard. This waiver does not extend to customer replies,
+ticketing, auditing or rollback triggers. Local commit
+`579ac9efc85400c0e8dae55f9b57acb4cfbdb9c5` passed 159 tests with two opt-in skips, real PostgreSQL
+concurrency, compilation, diff, Gitleaks, pip-audit, Bandit, Trivy source/configuration and final
+ARM64 image checks. GitHub Actions was unavailable under the owner's monthly quota, so the owner
+directed activation on local equivalent evidence. The USD 30 beta budget stack reached
+`UPDATE_COMPLETE`. Application index
+`sha256:c31c606bd0f2bc6a7d7ad5a0b16df6b26a25b00435dbdf655e4ada8c75c51bcb` deployed with the
+qualified ClamAV index and prior application index retained for rollback. Cze Yik authorized the
+final `GO`; `PUBLIC_BETA_ENABLED=true` and `META_SEND_ENABLED=true` activated at
+2026-09-10T10:23:37Z while `NOTIFICATION_SEND_ENABLED=false`. Immediate evidence showed readiness
+200, all five containers healthy, all five alarms `OK`, zero recent outbound failure, no pending
+support notification and AWS actual USD 0.005 against USD 30. One image response queued before
+activation reached `delivered`. The approved 60-minute observation is in progress; Wave 12 remains
+`IN_PROGRESS` until it completes.
+
 ## Fresh-Chat Prompt
 
 > Read `DELEGATION.md`, `AGENTS.md`, `docs/requirements-summary.md`, and
