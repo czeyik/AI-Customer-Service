@@ -53,9 +53,12 @@ Website and seed sources have equal authority within their stated scope. Unresol
 require clarification, not an inferred override.
 
 `WEBSITE_KNOWLEDGE_URLS` is an explicit JSON list of exact CCO-selected HTTPS URLs. It defaults to
-empty. Staging no longer crawls the sitemap automatically. Redirects stay within the configured
-allowlist; nested lists, inline text, table conditions and links are retained. Oversized source
-blocks require review rather than silent splitting or truncation.
+empty; the 18 approved production URLs and shared effective date are recorded in the release
+validation record. Staging no longer crawls the sitemap automatically. Redirects stay within the
+configured allowlist; nested lists, inline text, table conditions and links are retained. The
+current `/about-us` page governs human customer-service hours, `/dudu-later` governs its own
+service-specific claims, and `/car-types` is included for vehicle and fare information. Oversized
+source blocks require review rather than silent splitting or truncation.
 
 The CCO activation endpoint accepts `{"effective_at": "2026-09-10T00:00:00Z"}`. Activation remains
 authenticated and audited. Content hashes exclude the approval schedule, so activating an unchanged
@@ -82,6 +85,32 @@ new evidence to that case. Rejected uploads and other groups remain excluded. Cu
 are visible in the staff ticket view.
 
 ## Executable evidence
+
+### SMART local validation — 10 September 2026
+
+The verified source is commit `23ab970ee077027aa902b903f169affa136a22ce`. The final-source
+PostgreSQL run used `dudu-support:smart-check` and passed **210 tests, 2 skipped**. The refreshed
+outage report in `docs/evaluation/smart-outage.json` records **300/300** non-escalation sessions
+(100/100 in EN, MS and ZH), **18/18** necessary handoffs, **30/30** cooperative intake sessions,
+**60/60** held-out routing cases, zero unexpected offers, and zero unintended mutations. Its 519
+provider-path calls all used the local outage fallback; p95 was 0.015 seconds.
+
+The completed hosted-model report in `docs/evaluation/smart-live-verified.json` records **295/300**
+automated non-escalation sessions overall: EN **99/100**, MS **97/100**, and ZH **99/100**. It
+also records **18/18** necessary handoffs, **30/30** correct intake completions, zero unintended
+mutations, and **60/60** held-out routing cases. There were five non-mutating unexpected offers;
+the non-escalation family failures were corporate 1, fraud 3 and safety 1. The report measured
+531 provider calls / 527 successes, 602,547 input tokens, 67,608 completion tokens and 9,290
+reported reasoning tokens at USD **0.124186**; the sample projection is USD **2.339 per 10,000
+calls**, with a 3.413-second non-escalation p95.
+
+The automated routing, handoff, intake, held-out, mutation and semantic review gates pass for this
+development slice: all 300 records have `answer_correct=true` and `grounded_relevant=true`, with
+100/100 in each language. The report now records `cco_review_status=complete`, while
+`rollout_ready` remains `false` until the independent release holdout, production deployment and
+post-deploy controls are complete. These synthetic results do not constitute production observation
+evidence. The direct hosted-model report predates the final equal-timestamp outbox transport
+assertion; the final-source PostgreSQL run covers that transport change.
 
 - `python -m pytest -q`: application and regression checks. Set `TEST_POSTGRES_URL` to a fresh
   disposable PostgreSQL database for concurrency checks; install `pg_trgm` and run migrations first.
