@@ -1,8 +1,9 @@
 # SMART implementation and release evidence
 
-The revised conversation implementation is deployed to production in **dark mode**; it is not
-serving customer-context traffic. `META_SEND_ENABLED` and `LLM_CUSTOMER_CONTEXT_ENABLED` remain
-`false`. Website snapshots are staged as inactive drafts and are not yet effective.
+The revised conversation implementation is deployed to production with customer-context transmission
+**enabled by explicit owner instruction**. `LLM_CUSTOMER_CONTEXT_ENABLED=true` and
+`META_SEND_ENABLED=false`; outbound Meta sending remains off. The owner directed that privacy-copy
+publication is deferred for now.
 
 ## Conversation and intake
 
@@ -63,8 +64,9 @@ source blocks require review rather than silent splitting or truncation.
 The CCO activation endpoint accepts `{"effective_at": "2026-09-11T23:00:00+08:00"}`. Activation remains
 authenticated and audited. Content hashes exclude the approval schedule, so activating an unchanged
 snapshot does not make the next crawl produce a duplicate draft. Changed content remains inactive
-until approved. The production database now contains 18 version-1 website drafts and no active website
-documents; no page has been assigned an invented approver.
+until approved. The production database now contains 18 active version-1 website documents and no
+remaining website drafts. All are approved under `jane` with effective instant
+`2026-09-11T23:00:00+08:00` and audited publication events.
 
 ## Durability and evidence ownership
 
@@ -108,8 +110,7 @@ calls**, with a 3.413-second non-escalation p95.
 The automated routing, handoff, intake, held-out, mutation and semantic review gates pass for this
 development slice: all 300 records have `answer_correct=true` and `grounded_relevant=true`, with
 100/100 in each language. The report now records `cco_review_status=complete`, while
-`rollout_ready` remains `false` until the independent release holdout, privacy approval, authenticated
-website activation, controlled enablement and post-deploy controls are complete. These synthetic results do not constitute production observation
+`rollout_ready` remains `false` until post-enable observation and the final GO record are complete. These synthetic results do not constitute production observation
 evidence. The direct hosted-model report predates the final equal-timestamp outbox transport
 assertion; the final-source PostgreSQL run covers that transport change.
 
@@ -120,9 +121,10 @@ offers, and zero unintended mutations. The hosted run used 299 provider calls / 
 had a 3.265-second p95, and measured USD **0.071649**. The generated answers and sources are in
 `docs/evaluation/smart-independent-holdout.json`; the separate CCO review artifact is
 `docs/evaluation/smart-independent-holdout-review.json` with 60/60 `answer_correct` and
-`grounded_relevant` scores, including 20/20 in each language. Semantic review is complete; the
-owner-authorized staging bypass was used for a dark production deployment, while website/privacy
-gates, controlled enablement, observation and live GO remain required.
+`grounded_relevant` scores, including 20/20 in each language. Semantic and corpus review are complete;
+the owner-authorized staging bypass was used for direct production deployment, privacy publication is
+deferred by owner instruction, and context enablement is complete. Observation and live GO remain
+required.
 
 - `python -m pytest -q`: application and regression checks. Set `TEST_POSTGRES_URL` to a fresh
   disposable PostgreSQL database for concurrency checks; install `pg_trgm` and run migrations first.
@@ -152,11 +154,10 @@ reported aggregate completion usage. Missing reasoning breakdowns are recorded a
 assumed to be zero. These are measured-sample projections, not a hard maximum for the 10,000-call
 beta. The existing USD 15 model allowance and beta message caps remain unchanged.
 
-Before live activation: approve and publish the revised privacy copy/effective date, confirm provider
-DPA coverage, review and activate the staged website snapshots through the authenticated CCO flow,
-and record the owner decision. The production dark deployment is already pinned to the immutable
-pair recorded in `docs/release-validation.md`; only then should the context flag and authorized Meta
-settings be enabled through the existing controlled release process.
+The 18 website snapshots are active under the approved effective date. The owner explicitly deferred
+privacy-copy publication and authorized context enablement; the production API and worker now carry
+`LLM_CUSTOMER_CONTEXT_ENABLED=true` while `META_SEND_ENABLED=false`. Record the post-enable
+observation and final GO before restoring outbound Meta settings.
 
 For rollback, first disable `LLM_CUSTOMER_CONTEXT_ENABLED`, preserve the durable inbox and drain
 or pause its worker deliberately, then use the existing `/opt/dudu/rollback-images` process.
