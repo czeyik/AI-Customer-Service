@@ -1,8 +1,8 @@
 # SMART implementation and release evidence
 
-The revised conversation implementation is local and **not activated in production**.
-`LLM_CUSTOMER_CONTEXT_ENABLED` defaults to `false`. The existing model setting alone does not
-permit transmitting customer questions under the revised processing scope.
+The revised conversation implementation is deployed to production in **dark mode**; it is not
+serving customer-context traffic. `META_SEND_ENABLED` and `LLM_CUSTOMER_CONTEXT_ENABLED` remain
+`false`. Website snapshots are staged as inactive drafts and are not yet effective.
 
 ## Conversation and intake
 
@@ -60,10 +60,11 @@ current `/about-us` page governs human customer-service hours, `/dudu-later` gov
 service-specific claims, and `/car-types` is included for vehicle and fare information. Oversized
 source blocks require review rather than silent splitting or truncation.
 
-The CCO activation endpoint accepts `{"effective_at": "2026-09-10T00:00:00Z"}`. Activation remains
+The CCO activation endpoint accepts `{"effective_at": "2026-09-11T23:00:00+08:00"}`. Activation remains
 authenticated and audited. Content hashes exclude the approval schedule, so activating an unchanged
 snapshot does not make the next crawl produce a duplicate draft. Changed content remains inactive
-until approved. No website pages were published or assigned an invented approver.
+until approved. The production database now contains 18 version-1 website drafts and no active website
+documents; no page has been assigned an invented approver.
 
 ## Durability and evidence ownership
 
@@ -88,7 +89,7 @@ are visible in the staff ticket view.
 
 ### SMART local validation — 10 September 2026
 
-The verified source is commit `23ab970ee077027aa902b903f169affa136a22ce`. The final-source
+The verified source is commit `3e6b81376cc36fedaae56d296bc59df2a07c2a6b`. The final-source
 PostgreSQL run used `dudu-support:smart-check` and passed **210 tests, 2 skipped**. The refreshed
 outage report in `docs/evaluation/smart-outage.json` records **300/300** non-escalation sessions
 (100/100 in EN, MS and ZH), **18/18** necessary handoffs, **30/30** cooperative intake sessions,
@@ -107,8 +108,8 @@ calls**, with a 3.413-second non-escalation p95.
 The automated routing, handoff, intake, held-out, mutation and semantic review gates pass for this
 development slice: all 300 records have `answer_correct=true` and `grounded_relevant=true`, with
 100/100 in each language. The report now records `cco_review_status=complete`, while
-`rollout_ready` remains `false` until the independent release holdout, production deployment and
-post-deploy controls are complete. These synthetic results do not constitute production observation
+`rollout_ready` remains `false` until the independent release holdout, privacy approval, authenticated
+website activation, controlled enablement and post-deploy controls are complete. These synthetic results do not constitute production observation
 evidence. The direct hosted-model report predates the final equal-timestamp outbox transport
 assertion; the final-source PostgreSQL run covers that transport change.
 
@@ -119,8 +120,9 @@ offers, and zero unintended mutations. The hosted run used 299 provider calls / 
 had a 3.265-second p95, and measured USD **0.071649**. The generated answers and sources are in
 `docs/evaluation/smart-independent-holdout.json`; the separate CCO review artifact is
 `docs/evaluation/smart-independent-holdout-review.json` with 60/60 `answer_correct` and
-`grounded_relevant` scores, including 20/20 in each language. Semantic review is complete; staging
-WhatsApp validation, website/privacy gates, production readiness, and GO remain required.
+`grounded_relevant` scores, including 20/20 in each language. Semantic review is complete; the
+owner-authorized staging bypass was used for a dark production deployment, while website/privacy
+gates, controlled enablement, observation and live GO remain required.
 
 - `python -m pytest -q`: application and regression checks. Set `TEST_POSTGRES_URL` to a fresh
   disposable PostgreSQL database for concurrency checks; install `pg_trgm` and run migrations first.
@@ -150,10 +152,11 @@ reported aggregate completion usage. Missing reasoning breakdowns are recorded a
 assumed to be zero. These are measured-sample projections, not a hard maximum for the 10,000-call
 beta. The existing USD 15 model allowance and beta message caps remain unchanged.
 
-Before activation: approve and publish the revised privacy copy/effective date, confirm provider
-DPA coverage, select and review website snapshots, complete the CCO semantic evaluation, and pass
-staging WhatsApp, concurrency, outage and production readiness controls using the same immutable
-image. Then enable the context flag through the existing controlled release process.
+Before live activation: approve and publish the revised privacy copy/effective date, confirm provider
+DPA coverage, review and activate the staged website snapshots through the authenticated CCO flow,
+and record the owner decision. The production dark deployment is already pinned to the immutable
+pair recorded in `docs/release-validation.md`; only then should the context flag and authorized Meta
+settings be enabled through the existing controlled release process.
 
 For rollback, first disable `LLM_CUSTOMER_CONTEXT_ENABLED`, preserve the durable inbox and drain
 or pause its worker deliberately, then use the existing `/opt/dudu/rollback-images` process.
