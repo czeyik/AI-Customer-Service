@@ -9,9 +9,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from app.database import SessionLocal
+from app.config import get_settings
 from app.models import AdminUser
 from app.services.knowledge import ingest_knowledge
-from app.services.website_knowledge import extract_page, sitemap_urls
+from app.services.website_knowledge import extract_page
 
 
 def document_key(url: str) -> str:
@@ -24,7 +25,9 @@ def main() -> None:
     parser.add_argument("--cco-username", required=True)
     parser.add_argument("--url", action="append", help="Stage only this approved duducar.co URL")
     args = parser.parse_args()
-    urls = args.url or sitemap_urls()
+    urls = args.url or get_settings().website_knowledge_urls
+    if not urls:
+        raise SystemExit("Set WEBSITE_KNOWLEDGE_URLS to CCO-selected support pages before staging")
     with SessionLocal() as db:
         actor = db.query(AdminUser).filter_by(username=args.cco_username).first()
         if not actor:

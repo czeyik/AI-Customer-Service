@@ -15,7 +15,7 @@ from app.models import AdminUser
 from app.services.knowledge import ingest_knowledge
 
 
-CORPUS_PATH = ROOT / "docs" / "wave-7-knowledge-corpus.md"
+CORPUS_PATH = ROOT / "docs" / "knowledge-corpus.md"
 LANGUAGE_HEADINGS = {"English": "en", "Bahasa Malaysia": "ms", "Simplified Chinese": "zh"}
 TAGS = {
     "accounts-login": ["account", "login", "password", "profile"],
@@ -35,9 +35,9 @@ def corpus_records(corpus_path: Path = CORPUS_PATH) -> list[dict]:
     topics = re.split(r"(?m)^## \d+\. ", text)[1:]
     for topic in topics:
         title, body = topic.split("\n", 1)
-        key_match = re.search(r"(?m)^Proposed key: `([^`]+)`", body)
+        key_match = re.search(r"(?m)^Key: `([^`]+)`", body)
         if not key_match:
-            raise ValueError(f"missing proposed key for {title}")
+            raise ValueError(f"missing key for {title}")
         key = key_match.group(1)
         for heading, language in LANGUAGE_HEADINGS.items():
             content_match = re.search(
@@ -51,7 +51,7 @@ def corpus_records(corpus_path: Path = CORPUS_PATH) -> list[dict]:
                     "document_key": key,
                     "title": title.strip(),
                     "source_type": "cco_approved_corpus",
-                    "source_uri": f"docs/wave-7-knowledge-corpus.md#{key}",
+                    "source_uri": f"docs/knowledge-corpus.md#{key}",
                     "language": language,
                     "chunks": [content],
                     "tags": TAGS[key],

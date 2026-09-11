@@ -1,2 +1,2 @@
-# Synthetic Base32 TOTP fixture committed in Wave 6; not a production credential.
+# Synthetic Base32 TOTP test fixture; not a production credential.
 aaebd40bd2ece93bf693d954ce7c7eb9f20b3aba:tests/test_admin_ticket_operations.py:generic-api-key:28

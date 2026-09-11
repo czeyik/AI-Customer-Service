@@ -64,7 +64,7 @@ class Conversation(Base, TimestampMixin):
     attachments = relationship("MediaAttachment", back_populates="conversation")
 
     __table_args__ = (
-        Index("ix_conversation_channel_external_user", "channel", "external_user_id"),
+        Index("ix_conversation_channel_external_user", "channel", "external_user_id", unique=True),
     )
 
 
@@ -92,6 +92,9 @@ class WhatsAppInboundMessage(Base, TimestampMixin):
     message_type = Column(String(40), nullable=False)
     payload = Column(JSON, default=dict, nullable=False)
     processed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    status = Column(String(20), default="queued", nullable=False, index=True)
+    lease_until = Column(DateTime, nullable=True)
+    claim_token = Column(String(36), nullable=True)
 
 
 class WhatsAppOutboundMessage(Base, TimestampMixin):
@@ -168,6 +171,7 @@ class MediaAttachment(Base, TimestampMixin):
     )
     conversation_id = Column(String(36), ForeignKey("conversations.id"), nullable=True, index=True)
     ticket_id = Column(String(36), ForeignKey("tickets.id"), nullable=True, index=True)
+    evidence_group = Column(String(36), nullable=True, index=True)
     media_type = Column(String(20), nullable=False)
     declared_mime_type = Column(String(120), nullable=False)
     detected_mime_type = Column(String(120), nullable=True)

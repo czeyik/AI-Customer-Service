@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     clamav_timeout_seconds: float = 20.0
 
     llm_enabled: bool = False
+    llm_customer_context_enabled: bool = False
+    intake_expiry_minutes: int = Field(default=60, ge=5, le=1440)
+    website_knowledge_urls: list[str] = Field(default_factory=list)
     zai_api_key: str = ""
     llm_model: str = "glm-5.3-flash"
     llm_timeout_seconds: float = 8.0

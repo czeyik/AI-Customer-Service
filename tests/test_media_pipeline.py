@@ -26,6 +26,7 @@ from app.models import (
     WhatsAppOutboundMessage,
 )
 from app.routers import admin as admin_router
+from app.services.inbound import process_next_inbound
 from app.routers.webhooks_meta import receive_webhook
 from app.services import media as media_module
 from app.services.media import (
@@ -139,7 +140,10 @@ def call_webhook(db: Session, payload: dict):
         },
         receive,
     )
-    return asyncio.run(receive_webhook(request, db))
+    result = asyncio.run(receive_webhook(request, db))
+    while process_next_inbound(db):
+        pass
+    return result
 
 
 class FakeMetaClient:
@@ -298,7 +302,7 @@ def test_signed_media_webhook_is_queued_exactly_once(db_session: Session) -> Non
     assert attachment.status == "queued"
     assert attachment.object_key is None
     assert db_session.query(WhatsAppInboundMessage).count() == 1
-    assert "describe what happened" in db_session.query(WhatsAppOutboundMessage).one().body
+    assert "quarantined" in db_session.query(WhatsAppOutboundMessage).one().body
 
 
 def test_media_reply_keeps_intake_open_and_prompts_for_done(db_session: Session) -> None:
@@ -307,7 +311,7 @@ def test_media_reply_keeps_intake_open_and_prompts_for_done(db_session: Session)
         external_user_id="60108865432",
         preferred_language="en",
         intake_state="awaiting_additional_details",
-        intake_data={"ride_details_collected": True, "details_complete": False},
+        intake_data={"consent": True, "name": "Alex", "email": "alex@example.com", "phone_number": "+60123456789", "issue_collected": True, "ride_details_collected": True, "details_complete": False},
     )
     db_session.add(conversation)
     db_session.commit()
@@ -396,6 +400,7 @@ def test_clean_media_reaches_ticket_and_authorized_reviewer(
         password_hash="unused",
         totp_secret_ref="jane-ref",
     )
+    attachment.ticket = ticket
     db_session.add_all([ticket, admin])
     db_session.commit()
     storage = FakeStore()

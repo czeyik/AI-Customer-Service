@@ -18,7 +18,7 @@ The approved project direction is:
 The complete, authoritative baseline is
 [`docs/requirements-summary.md`](docs/requirements-summary.md).
 
-## What Works In This MVP
+## Current Capabilities
 
 - `POST /api/chat` accepts support messages and returns multilingual answers.
 - The bot uses approved knowledge chunks before answering.
@@ -29,7 +29,7 @@ The complete, authoritative baseline is
 - Named CCO sessions can draft, publish, remove, and roll back versioned knowledge through
   `/api/knowledge/documents`; inactive versions never reach customer answers.
 - `/webhooks/meta` strictly verifies WhatsApp webhooks, deduplicates Meta message IDs, and commits
-  each Wave 3 state transition with a durable outbound queue row.
+  each conversation state transition with a durable outbound queue row.
 - `/admin` provides the named-administrator ticket inbox, assignment, status, and internal-note
   workflow after password + individual 2FA login.
 - Signed WhatsApp image/video events enter a quarantine queue; the media worker authenticates to
@@ -42,13 +42,6 @@ The complete, authoritative baseline is
 - Production enables HTTPS redirect, HSTS, secure session cookies, restrictive browser headers,
   explicit hosts/CORS, disabled API documentation, non-root containers, and fail-closed AWS
   Secrets Manager configuration.
-
-## Remaining Work Against The Approved Requirements
-
-The current code predates the consolidated requirements. Before launch it still needs:
-
-- DUDU-specific trilingual release evaluation of the hosted model and outage fallback.
-- Production infrastructure, backup/restore proof, and release validation.
 
 ## Quick Start With Docker
 
@@ -124,7 +117,7 @@ migration and run `alembic check` against an up-to-date database before opening 
 The security workflow runs secret, dependency, static, source/configuration, container, and ZAP
 dynamic scans with the approved release gates. The threat model, exact policy, versions, and
 evidence map are in
-[`docs/wave-9-application-security.md`](docs/wave-9-application-security.md).
+[`docs/application-security.md`](docs/application-security.md).
 
 ## WhatsApp Transport
 
@@ -144,7 +137,7 @@ outbound worker separately:
 python -m app.workers.whatsapp
 ```
 
-The webhook never calls Meta inline. It stores the unique inbound message ID, Wave 3 state change,
+The webhook never calls Meta inline. It stores the unique inbound message ID, conversation state change,
 and reply together; the worker sends queued replies with bounded retries and moves permanent or
 exhausted failures to a dead-letter state. Raw HTTP access logging is disabled because Meta's
 verification request includes the private verify token in its query string.
@@ -206,17 +199,17 @@ python -m app.workers.retention --once
 Production runs the worker daily. Backups expire after at most 35 days, and every restore must
 complete a zero-failure `--once` pass before traffic is enabled. Legal holds are managed only by
 the named privacy owner through `scripts/manage_legal_hold.py`. The inventory and runbook are in
-[`docs/wave-10-privacy-data-lifecycle.md`](docs/wave-10-privacy-data-lifecycle.md).
+[`docs/privacy-data-lifecycle.md`](docs/privacy-data-lifecycle.md).
 
 ## Production platform
 
-Wave 11 uses one AWS account with isolated staging and production CloudFormation stacks. The
-initial production host is an ARM64 EC2 `t4g.small`; the AWS ceiling is USD 20 per month and any
+Production uses one AWS account with isolated staging and production CloudFormation stacks. The
+initial production host is an ARM64 EC2 `t4g.small`; the public-beta AWS ceiling is USD 30 per month and any
 promotion to `t4g.medium` requires explicit owner approval. Runtime access uses an EC2 role and
 Systems Manager, secrets stay in Secrets Manager, and releases promote immutable ECR digests while
-Meta outbound traffic remains disabled. The architecture, deployment, restore, rollback, alerting,
-and capacity gates are in
-[`docs/wave-11-production-platform.md`](docs/wave-11-production-platform.md).
+outbound traffic is governed by production feature switches. The architecture, deployment, restore,
+rollback, alerting, and capacity gates are in
+[`docs/production-platform.md`](docs/production-platform.md).
 
 ## Try The Chat API
 
@@ -261,18 +254,16 @@ Set `LLM_ENABLED=true` and provision `ZAI_API_KEY` outside Git. Calls have an ei
 bounded input/output, no tools, and receive approved knowledge rather than customer messages.
 Invalid, unsafe, ungrounded, or failed responses use the deterministic approved-knowledge path.
 
-Run the repeatable Wave 12 trilingual outage evaluation with:
+Run the repeatable trilingual outage evaluation with:
 
 ```bash
 python scripts/release_eval.py --mode outage
 ```
 
 The authorized hosted-model command, evidence fields, go/no-go record, and activation procedure
-are in [`docs/wave-12-release-validation.md`](docs/wave-12-release-validation.md).
+are in [`docs/release-validation.md`](docs/release-validation.md).
 
 ## Safety Gate
 
-Before any real rider, driver, or business-partner pilot, complete
+Before enabling real rider, driver, or business-partner traffic, complete
 [`docs/security-launch-checklist.md`](docs/security-launch-checklist.md).
-
-The current code is an MVP foundation, not a final production contact-center platform.

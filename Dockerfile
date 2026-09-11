@@ -18,7 +18,8 @@ RUN pip install --no-cache-dir --require-hashes -r requirements.txt \
 COPY --chown=app:app app ./app
 COPY --chown=app:app migrations ./migrations
 COPY --chown=app:app scripts ./scripts
-COPY --chown=app:app docs/wave-7-knowledge-corpus.md ./docs/wave-7-knowledge-corpus.md
+COPY --chown=app:app data/evaluation ./data/evaluation
+COPY --chown=app:app docs/knowledge-corpus.md ./docs/knowledge-corpus.md
 COPY --chown=app:app infra/production ./infra/production
 COPY --chown=app:app alembic.ini ./alembic.ini
 

@@ -36,8 +36,11 @@ to request general support information.
 
 We use service providers to operate the chatbot, including WhatsApp/Meta, secure hosting and
 storage providers, and Z.AI acting on our instructions. Z.AI processes approved support knowledge
-in Singapore to draft answers. Customer messages, names, telephone numbers, email addresses,
-ticket records, identifiers, and attachments are not sent to Z.AI. We apply the safeguards
+in Singapore together with a minimized version of your current question and limited sanitized
+conversation context, such as the support topic, previous question and answer, and which ticket
+fields have been supplied. Names, telephone numbers, email addresses, raw identifiers, account
+data, ticket bodies, attachments and full conversation history are excluded. If we cannot
+confidently minimize a question, the chatbot asks you to rephrase it locally. We apply the safeguards
 required by applicable law to this processing outside Malaysia.
 
 ### Add under Section IV — Storage of Personal Data
@@ -82,9 +85,12 @@ maklumat sokongan umum.
 
 Kami menggunakan penyedia perkhidmatan untuk mengendalikan chatbot, termasuk WhatsApp/Meta,
 penyedia pengehosan dan storan selamat, serta Z.AI yang bertindak mengikut arahan kami. Z.AI
-memproses maklumat sokongan yang diluluskan di Singapura untuk menyediakan draf jawapan. Mesej
-pelanggan, nama, nombor telefon, alamat e-mel, rekod tiket, pengecam, dan lampiran tidak dihantar
-kepada Z.AI. Kami menggunakan perlindungan yang dikehendaki oleh undang-undang yang terpakai bagi
+memproses maklumat sokongan yang diluluskan di Singapura bersama versi soalan semasa yang
+diminimumkan dan konteks perbualan terhad yang telah disanitasi, seperti topik sokongan, soalan
+dan jawapan terdahulu serta medan tiket yang telah diisi. Nama, nombor telefon, alamat e-mel,
+pengecam mentah, data akaun, kandungan tiket, lampiran dan sejarah perbualan penuh tidak dihantar
+kepada Z.AI. Jika soalan tidak dapat diminimumkan dengan yakin, chatbot meminta anda
+menyatakannya semula secara setempat. Kami menggunakan perlindungan yang dikehendaki oleh undang-undang yang terpakai bagi
 pemprosesan di luar Malaysia ini.
 
 ### Tambah di bawah Bahagian IV — Penyimpanan Data Peribadi
@@ -118,11 +124,13 @@ the privacy contact is `support@duducar.co`.
 Lifecycle decisions confirmed by Cze Yik on 9 September 2026: expiry uses permanent deletion,
 only Cze Yik as privacy owner may authorize a narrow audited legal hold, backups expire after at
 most 35 days, and retention must be reapplied before a restored environment serves traffic. The
-technical procedure and complete data inventory are in `docs/wave-10-privacy-data-lifecycle.md`.
+technical procedure and complete data inventory are in `docs/privacy-data-lifecycle.md`.
 
 Provider decision confirmed by Cze Yik on 9 September 2026: Z.AI with GLM-5.3-Flash is the only
-hosted pilot model; API content is processed in Singapore under Z.AI's API DPA, and only approved
-support knowledge—not customer messages or identifiers—is sent.
+hosted pilot model; API content is processed in Singapore under Z.AI's API DPA, with the original approved-knowledge-only scope. SMART.md records the revised 10 September
+2026 implementation authorization for minimized questions and bounded sanitized context.
+Publication/effective-date approval and confirmation that the provider DPA covers this revised
+scope remain activation requirements; `LLM_CUSTOMER_CONTEXT_ENABLED` defaults to false.
 
 ## References reviewed
 

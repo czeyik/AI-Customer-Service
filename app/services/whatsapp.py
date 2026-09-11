@@ -4,7 +4,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 
 from app.config import Settings, get_settings
 from app.models import AuditLog, WhatsAppOutboundMessage
@@ -120,13 +120,20 @@ def process_next_outbound(
         return False
 
     now = now or datetime.utcnow()
+    older = aliased(WhatsAppOutboundMessage)
     message = (
         db.query(WhatsAppOutboundMessage)
         .filter(
             WhatsAppOutboundMessage.status.in_(("queued", "retry")),
             WhatsAppOutboundMessage.next_attempt_at <= now,
+            ~db.query(older.id).filter(
+                older.recipient == WhatsAppOutboundMessage.recipient,
+                older.status.in_(("queued", "retry")),
+                (older.created_at < WhatsAppOutboundMessage.created_at) |
+                ((older.created_at == WhatsAppOutboundMessage.created_at) & (older.id < WhatsAppOutboundMessage.id)),
+            ).exists(),
         )
-        .order_by(WhatsAppOutboundMessage.created_at)
+        .order_by(WhatsAppOutboundMessage.created_at, WhatsAppOutboundMessage.id)
         .with_for_update(skip_locked=True)
         .first()
     )

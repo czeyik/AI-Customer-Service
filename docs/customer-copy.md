@@ -1,8 +1,8 @@
-# Wave 3 Customer Copy — Draft for CCO Approval
+# Approved Customer Copy
 
 Owner: Jane, Chief Communication Officer  
 Status: APPROVED by Jane — 5 September 2026  
-Drafted: 4 September 2026; updated 5 September 2026
+Last updated: 5 September 2026
 
 Use the user's current language. `DUDU Car automated assistant` must appear in the first reply of
 each conversation. Keep the privacy-notice link in the consent request. The assistant's voice is

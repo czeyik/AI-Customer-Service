@@ -25,6 +25,7 @@ from app.models import (
     WhatsAppInboundMessage,
     WhatsAppOutboundMessage,
 )
+from app.services.inbound import process_next_inbound
 from app.routers.webhooks_meta import (
     MAX_WEBHOOK_BYTES,
     _bounded_body,
@@ -105,7 +106,10 @@ def call_webhook(db: Session, data: dict, signature: str | None = None):
         {"type": "http", "method": "POST", "path": "/webhooks/meta", "headers": headers},
         receive,
     )
-    return asyncio.run(receive_webhook(request, db))
+    result = asyncio.run(receive_webhook(request, db))
+    while process_next_inbound(db):
+        pass
+    return result
 
 
 def test_webhook_rejects_oversized_body_before_reading_it() -> None:
@@ -241,7 +245,7 @@ def test_public_beta_sends_only_one_capacity_notice_per_user_day(
     get_settings.cache_clear()
 
 
-def test_webhook_rolls_back_inbox_when_chat_processing_fails(
+def test_webhook_preserves_durable_inbox_when_chat_processing_fails(
     db_session: Session, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     def fail(*args, **kwargs):
@@ -249,10 +253,10 @@ def test_webhook_rolls_back_inbox_when_chat_processing_fails(
 
     monkeypatch.setattr("app.routers.webhooks_meta.chatbot_service.handle", fail)
 
-    with pytest.raises(RuntimeError, match="chat failed"):
-        call_webhook(db_session, payload("wamid.rollback", "Hello"))
+    call_webhook(db_session, payload("wamid.rollback", "Hello"))
 
-    assert db_session.query(WhatsAppInboundMessage).count() == 0
+    assert db_session.query(WhatsAppInboundMessage).count() == 1
+    assert db_session.query(WhatsAppInboundMessage).one().status == "processing"
     assert db_session.query(WhatsAppOutboundMessage).count() == 0
     assert db_session.query(Message).count() == 0
 
@@ -263,18 +267,19 @@ def test_whatsapp_completes_one_multiturn_ticket_despite_retry(db_session: Sessi
         ("wamid.2", "Yes"),
         ("wamid.3", "Test Rider"),
         ("wamid.4", "rider@example.com"),
-        ("wamid.5", "Skip"),
+        ("wamid.5", "My ride receipt is missing"),
+        ("wamid.6", "Skip"),
     ]
     result = None
     for message_id, text in turns:
         result = call_webhook(db_session, payload(message_id, text))
-    retry = call_webhook(db_session, payload("wamid.5", "Skip"))
+    retry = call_webhook(db_session, payload("wamid.6", "Skip"))
 
     assert result is not None and result.processed == 1
     assert retry.duplicates == 1
     assert db_session.query(Ticket).count() == 1
-    assert db_session.query(WhatsAppInboundMessage).count() == 5
-    assert db_session.query(WhatsAppOutboundMessage).count() == 5
+    assert db_session.query(WhatsAppInboundMessage).count() == 6
+    assert db_session.query(WhatsAppOutboundMessage).count() == 6
     ticket = db_session.query(Ticket).one()
     assert ticket.phone_number == "+60108865432"
     assert ticket.consent_given
@@ -296,6 +301,7 @@ class FakeClient:
 def queue_message(db: Session) -> WhatsAppOutboundMessage:
     inbound = WhatsAppInboundMessage(
         provider_message_id="wamid.queue",
+        status="done",
         sender="60108865432",
         phone_number_id=PHONE_NUMBER_ID,
         message_type="text",
@@ -518,3 +524,16 @@ def test_meta_temporary_error_code_is_retryable_even_on_http_400(
         whatsapp_module.MetaWhatsAppClient(send_settings()).send_text("60108865432", "Hello")
 
     assert (exc.value.code, exc.value.retryable) == ("131016", True)
+
+
+def test_equal_timestamp_replies_wait_for_earlier_retry(db_session):
+    now = datetime.utcnow()
+    for index in (1, 2):
+        incoming = WhatsAppInboundMessage(provider_message_id=f"same-time-{index}", status="done", sender="60108865432", phone_number_id=PHONE_NUMBER_ID, message_type="text")
+        db_session.add(incoming)
+        db_session.flush()
+        db_session.add(WhatsAppOutboundMessage(id=str(index).zfill(36), inbound_message_id=incoming.id, recipient=incoming.sender, body="Safe reply", created_at=now, next_attempt_at=now + timedelta(seconds=60) if index == 1 else now, status="retry" if index == 1 else "queued"))
+    db_session.commit()
+    client = FakeClient(["wamid.sent"])
+    assert not process_next_outbound(db_session, client, now=now, settings=send_settings())
+    assert client.calls == 0

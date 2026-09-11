@@ -31,6 +31,7 @@ class ChatRequest(BaseModel):
     ride_details: str | None = Field(default=None, max_length=2000)
     consent_to_ticket: bool = False
     create_ticket: bool = False
+    prompt_id: str | None = Field(default=None, max_length=36)
     attachments: list[AttachmentPayload] = Field(default_factory=list, max_length=5)
 
 
@@ -42,6 +43,7 @@ class TicketResponse(BaseModel):
 
 
 class ChatResponse(BaseModel):
+    prompt_id: str | None = None
     answer: str
     language: str
     confidence: float = 0.0
