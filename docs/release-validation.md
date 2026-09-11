@@ -1,6 +1,6 @@
 # Release Validation and Public-Beta Activation
 
-Status: **SMART local validation complete; release pending CCO review, staging validation, and GO**
+Status: **SMART local validation complete; release pending website/privacy gates, staging validation, and GO**
 Go/no-go owner: Cze Yik
 Support lead and CCO: Jane
 Beta: 10–14 September 2026
@@ -29,8 +29,8 @@ recorded for this candidate.
 | Hosted-model usage | 531 calls / 527 successes; 602,547 input and 67,608 completion tokens; 9,290 reasoning tokens reported |
 | Hosted-model cost and latency | USD 0.124186 measured; USD 2.339 sample projection per 10,000 calls; 3.413-second p95 |
 | Consequential false mutations | PASS: 0 |
-| Semantic answer correctness / grounded relevance | PASS: 300/300 development records reviewed for each field; fresh holdout review pending |
-| CCO review and rollout readiness | Development review complete; fresh holdout review pending; `rollout_ready=false` until all production gates finish |
+| Semantic answer correctness / grounded relevance | PASS: 300/300 development records and 60/60 fresh holdout records reviewed for each field; EN/MS/ZH fresh holdout 20/20 each |
+| CCO review and rollout readiness | Semantic review complete; `rollout_ready=false` until website/privacy, deployment, staging, and post-deploy gates finish |
 
 The hosted run had five non-mutating unexpected offers, with family failures corporate 1, fraud 3,
 and safety 1; these are included in the reported 295/300 routing result. The outage artifact was
@@ -52,10 +52,9 @@ immutable local image `sha256:cc7dce73d738b0eae39c8df616fe71bddd8390da11f74dcbe4
 
 Automated results are **60/60 non-escalating** (EN/MS/ZH 20/20 each), zero unexpected offers,
 zero unintended mutations, 299 provider calls / 297 successes, 3.265-second p95, and measured
-cost USD 0.071649. Semantic review remains pending in
-[`smart-independent-holdout-review.json`](evaluation/smart-independent-holdout-review.json);
-all 60 `answer_correct` and `grounded_relevant` fields are intentionally unscored until the CCO
-reviews the generated answers.
+cost USD 0.071649. The completed review is recorded in
+[`smart-independent-holdout-review.json`](evaluation/smart-independent-holdout-review.json): all
+60 `answer_correct` and `grounded_relevant` fields are true, with 20/20 in each language.
 
 Approved website allowlist supplied by the owner on 11 September 2026:
 

@@ -1,6 +1,6 @@
 {
   "source_artifact": "smart-independent-holdout.json",
-  "cco_review_status": "pending",
+  "cco_review_status": "complete",
   "review_instructions": {
     "answer_correct": "Mark true only when the response gives the correct factual answer or expected disposition for the question.",
     "grounded_relevant": "Mark true only when an answerable response is relevant and supported by an approved active source; use null when the question is not answerable from approved knowledge.",
@@ -18,8 +18,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-001",
@@ -32,8 +32,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-002",
@@ -46,8 +46,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-003",
@@ -60,8 +60,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-004",
@@ -74,8 +74,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-005",
@@ -88,8 +88,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-006",
@@ -102,8 +102,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-007",
@@ -116,8 +116,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-008",
@@ -130,8 +130,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-009",
@@ -144,8 +144,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-010",
@@ -158,8 +158,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-011",
@@ -172,8 +172,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-012",
@@ -186,8 +186,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-013",
@@ -200,8 +200,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-014",
@@ -214,8 +214,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-015",
@@ -228,8 +228,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-016",
@@ -242,8 +242,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-017",
@@ -256,8 +256,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-018",
@@ -270,8 +270,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "en-019",
@@ -284,8 +284,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-000",
@@ -298,8 +298,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-001",
@@ -312,8 +312,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-002",
@@ -326,8 +326,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-003",
@@ -340,8 +340,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-004",
@@ -354,8 +354,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-005",
@@ -368,8 +368,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-006",
@@ -382,8 +382,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-007",
@@ -396,8 +396,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-008",
@@ -410,8 +410,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-009",
@@ -424,8 +424,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-010",
@@ -438,8 +438,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-011",
@@ -452,8 +452,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-012",
@@ -466,8 +466,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-013",
@@ -480,8 +480,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-014",
@@ -494,8 +494,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-015",
@@ -508,8 +508,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-016",
@@ -522,8 +522,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-017",
@@ -536,8 +536,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-018",
@@ -550,8 +550,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "ms-019",
@@ -564,8 +564,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-000",
@@ -578,8 +578,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-001",
@@ -592,8 +592,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-002",
@@ -606,8 +606,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-003",
@@ -620,8 +620,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-004",
@@ -634,8 +634,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-005",
@@ -648,8 +648,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-006",
@@ -662,8 +662,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-007",
@@ -676,8 +676,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-008",
@@ -690,8 +690,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-009",
@@ -704,8 +704,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-010",
@@ -718,8 +718,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-011",
@@ -732,8 +732,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-012",
@@ -746,8 +746,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-013",
@@ -760,8 +760,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-014",
@@ -774,8 +774,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-015",
@@ -788,8 +788,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-016",
@@ -802,8 +802,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-017",
@@ -816,8 +816,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-018",
@@ -830,8 +830,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     },
     {
       "id": "zh-019",
@@ -844,8 +844,8 @@
       ],
       "non_escalating": true,
       "unintended_mutation": false,
-      "answer_correct": null,
-      "grounded_relevant": null
+      "answer_correct": true,
+      "grounded_relevant": true
     }
   ]
 }

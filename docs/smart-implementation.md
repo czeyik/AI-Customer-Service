@@ -118,7 +118,9 @@ Its outage and hosted-model runs both recorded **60/60** non-escalating cases, z
 offers, and zero unintended mutations. The hosted run used 299 provider calls / 297 successes,
 had a 3.265-second p95, and measured USD **0.071649**. The generated answers and sources are in
 `docs/evaluation/smart-independent-holdout.json`; the separate CCO review artifact is
-`docs/evaluation/smart-independent-holdout-review.json` with all semantic scores pending.
+`docs/evaluation/smart-independent-holdout-review.json` with 60/60 `answer_correct` and
+`grounded_relevant` scores, including 20/20 in each language. Semantic review is complete; staging
+WhatsApp validation, website/privacy gates, production readiness, and GO remain required.
 
 - `python -m pytest -q`: application and regression checks. Set `TEST_POSTGRES_URL` to a fresh
   disposable PostgreSQL database for concurrency checks; install `pg_trgm` and run migrations first.
@@ -134,10 +136,10 @@ had a 3.265-second p95, and measured USD **0.071649**. The generated answers and
   which does not include Meta delivery time.
 
 The matrix is in `data/evaluation/smart-non-escalation.tsv`; its 20 held-out scenarios are reported
-separately from translations. These development scenarios have been rerun during fixes; a fresh
-independent holdout must accompany the CCO release review. Captured synthetic answers, family failures, denominators and usage
-are in `docs/evaluation/`. CCO semantic review and staging WhatsApp end-to-end validation are still
-required before release eligibility. Successful API calls are not counted as correct answers.
+separately from translations. These development scenarios have been rerun during fixes; the fresh
+independent holdout is recorded above with its completed review. Staging WhatsApp end-to-end
+validation and the remaining release gates are still required before eligibility. Successful API
+calls are not counted as correct answers.
 
 ## Pricing and activation
 
