@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from app.config import Settings
 from app.services.answer_generation import ProviderResponse
@@ -45,3 +46,17 @@ def test_live_evaluation_counts_provider_usage_without_equating_it_to_correctnes
     assert report["prompt_tokens"] == report["provider_calls"] * 100
     assert report["passed"] < report["scenarios"]
     assert report["failures"]
+
+
+def test_smart_evaluation_accepts_an_independent_holdout_matrix(tmp_path: Path):
+    matrix = tmp_path / "holdout.tsv"
+    matrix.write_text(
+        "family\ten\tms\tzh\n"
+        "booking\tHow do I check a ride request?\tBagaimana saya menyemak permintaan perjalanan?\t如何查看叫车请求？\n",
+        encoding="utf-8",
+    )
+    report = run_smart("outage", matrix_path=matrix, all_held_out=True)
+    assert report["distinct_non_escalation_scenarios"] == 1
+    assert report["translated_sessions"] == 3
+    assert report["held_out_total"] == 3
+    assert report["held_out_passed"] == 3

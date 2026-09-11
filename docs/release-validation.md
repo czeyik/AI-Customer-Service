@@ -25,12 +25,12 @@ recorded for this candidate.
 | Approved website extraction preflight | PASS: all 18 selected URLs extracted successfully; activation remains audited |
 | Hosted-model automated routing | PASS: 295/300 overall; EN 99/100, MS 97/100, ZH 99/100 |
 | Hosted-model necessary handoffs and intake | PASS: 18/18 and 30/30 |
-| Held-out routing cases | PASS: 60/60 development cases; fresh independent release holdout still to be attached |
+| Held-out routing cases | PASS: 60/60 development cases and 60/60 fresh independent release cases |
 | Hosted-model usage | 531 calls / 527 successes; 602,547 input and 67,608 completion tokens; 9,290 reasoning tokens reported |
 | Hosted-model cost and latency | USD 0.124186 measured; USD 2.339 sample projection per 10,000 calls; 3.413-second p95 |
 | Consequential false mutations | PASS: 0 |
-| Semantic answer correctness / grounded relevance | PASS: 300/300 reviewed for each field; EN/MS/ZH each 100/100 |
-| CCO review and rollout readiness | CCO review artifact complete; `rollout_ready=false` until production gates finish |
+| Semantic answer correctness / grounded relevance | PASS: 300/300 development records reviewed for each field; fresh holdout review pending |
+| CCO review and rollout readiness | Development review complete; fresh holdout review pending; `rollout_ready=false` until all production gates finish |
 
 The hosted run had five non-mutating unexpected offers, with family failures corporate 1, fraud 3,
 and safety 1; these are included in the reported 295/300 routing result. The outage artifact was
@@ -39,6 +39,23 @@ are not staging or production evidence.
 
 Artifacts: [`smart-live-verified.json`](evaluation/smart-live-verified.json),
 [`smart-outage.json`](evaluation/smart-outage.json), and [`smart-implementation.md`](smart-implementation.md).
+
+### Fresh independent holdout — 12 September 2026
+
+The owner-approved matrix is [`smart-independent-holdout.tsv`](../data/evaluation/smart-independent-holdout.tsv)
+(20 new scenarios in EN/MS/ZH, 60 cases; SHA-256
+`909b4b3122d88004039d05518fea7768d7645a40220eda1b2eed2fc3702d4bd7`). The outage report is
+[`smart-independent-holdout-outage.json`](evaluation/smart-independent-holdout-outage.json).
+The hosted-model report is [`smart-independent-holdout.json`](evaluation/smart-independent-holdout.json)
+(SHA-256 `e3477d6a3ef3cf7e6eccc1936c823984c97487b5138ac5b6f41516c306e460c0`) and was run on the
+immutable local image `sha256:cc7dce73d738b0eae39c8df616fe71bddd8390da11f74dcbe4f137800ec4a419`.
+
+Automated results are **60/60 non-escalating** (EN/MS/ZH 20/20 each), zero unexpected offers,
+zero unintended mutations, 299 provider calls / 297 successes, 3.265-second p95, and measured
+cost USD 0.071649. Semantic review remains pending in
+[`smart-independent-holdout-review.json`](evaluation/smart-independent-holdout-review.json);
+all 60 `answer_correct` and `grounded_relevant` fields are intentionally unscored until the CCO
+reviews the generated answers.
 
 Approved website allowlist supplied by the owner on 11 September 2026:
 

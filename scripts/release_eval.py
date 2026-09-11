@@ -334,6 +334,12 @@ def main() -> None:
     parser.add_argument(
         "--max-cost", type=float, default=15, help="Maximum evaluation cost in USD"
     )
+    parser.add_argument(
+        "--matrix", type=Path, help="Alternate TSV matrix for the SMART suite"
+    )
+    parser.add_argument(
+        "--all-held-out", action="store_true", help="Mark every alternate SMART matrix row as held out"
+    )
     args = parser.parse_args()
     if min(args.input_price, args.output_price, args.max_cost) < 0:
         raise SystemExit("prices cannot be negative")
@@ -341,7 +347,10 @@ def main() -> None:
         raise SystemExit("live mode requires the current positive input and output prices")
     if args.suite == "smart":
         from scripts.smart_eval import run_smart
-        report = run_smart(args.mode, input_price=args.input_price, output_price=args.output_price, intake_only=args.intake_only)
+        report = run_smart(
+            args.mode, input_price=args.input_price, output_price=args.output_price,
+            intake_only=args.intake_only, matrix_path=args.matrix, all_held_out=args.all_held_out,
+        )
         print(json.dumps(report, ensure_ascii=False, sort_keys=True))
         return
     report = run(

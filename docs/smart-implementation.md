@@ -112,6 +112,14 @@ post-deploy controls are complete. These synthetic results do not constitute pro
 evidence. The direct hosted-model report predates the final equal-timestamp outbox transport
 assertion; the final-source PostgreSQL run covers that transport change.
 
+The owner-approved fresh independent matrix is
+`data/evaluation/smart-independent-holdout.tsv` (20 scenarios in each of EN/MS/ZH, 60 cases).
+Its outage and hosted-model runs both recorded **60/60** non-escalating cases, zero unexpected
+offers, and zero unintended mutations. The hosted run used 299 provider calls / 297 successes,
+had a 3.265-second p95, and measured USD **0.071649**. The generated answers and sources are in
+`docs/evaluation/smart-independent-holdout.json`; the separate CCO review artifact is
+`docs/evaluation/smart-independent-holdout-review.json` with all semantic scores pending.
+
 - `python -m pytest -q`: application and regression checks. Set `TEST_POSTGRES_URL` to a fresh
   disposable PostgreSQL database for concurrency checks; install `pg_trgm` and run migrations first.
 - `python scripts/release_eval.py --suite smart --mode outage --input-price 0.15 --output-price 0.50`:

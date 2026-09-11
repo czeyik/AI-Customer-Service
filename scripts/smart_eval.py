@@ -24,10 +24,15 @@ from scripts.release_eval import RecordingProvider, OutageProvider, SCENARIOS
 MATRIX = Path(__file__).resolve().parents[1] / "data/evaluation/smart-non-escalation.tsv"
 
 
-def run_smart(mode="outage", *, input_price=0.15, output_price=0.50, reviews=None, languages=None, intake_only=False):
+def run_smart(mode="outage", *, input_price=0.15, output_price=0.50, reviews=None, languages=None,
+              intake_only=False, matrix_path=None, all_held_out=False):
+    matrix = Path(matrix_path) if matrix_path else MATRIX
     if languages is None:
         with ThreadPoolExecutor(max_workers=3) as pool:
-            parts = list(pool.map(lambda language: run_smart(mode, input_price=input_price, output_price=output_price, reviews=reviews, languages=(language,), intake_only=intake_only), ("en", "ms", "zh")))
+            parts = list(pool.map(lambda language: run_smart(
+                mode, input_price=input_price, output_price=output_price, reviews=reviews,
+                languages=(language,), intake_only=intake_only, matrix_path=matrix,
+                all_held_out=all_held_out), ("en", "ms", "zh")))
         report = dict(parts[0])
         for key in ("records", "necessary_cases", "intake_sessions"):
             report[key] = [row for part in parts for row in part[key]]
@@ -39,9 +44,11 @@ def run_smart(mode="outage", *, input_price=0.15, output_price=0.50, reviews=Non
         report["p95_seconds"] = latency[math.ceil(len(latency)*.95)-1] if latency else None
         report["projected_10000_calls_usd"] = round(report["measured_cost_usd"] / max(report["provider_calls"], 1) * 10000, 3) if mode == "live" else None
         return report
-    with MATRIX.open() as source:
+    with matrix.open() as source:
         scenarios = list(csv.DictReader(source, delimiter="\t"))
-    assert len(scenarios) >= 100 and len({row["en"] for row in scenarios}) == len(scenarios)
+    assert scenarios and len({row["en"] for row in scenarios}) == len(scenarios)
+    if matrix == MATRIX:
+        assert len(scenarios) >= 100
     settings = Settings(_env_file=None, llm_customer_context_enabled=True)
     if mode == "live":
         settings = Settings().model_copy(update={"llm_customer_context_enabled": True})
@@ -82,7 +89,8 @@ def run_smart(mode="outage", *, input_price=0.15, output_price=0.50, reviews=Non
                 offered = bool(conversation.intake_data.get("pending_offer"))
                 mutation = conversation.intake_state != "idle" or conversation.risk_level != "normal"
                 review = (reviews or {}).get(key, {})
-                records.append(dict(id=key, family=scenario["family"], language=language, held_out=index % 5 == 4,
+                records.append(dict(id=key, family=scenario["family"], language=language,
+                    held_out=all_held_out or index % 5 == 4,
                     question=scenario[language], answer=response.answer, sources=response.sources,
                     stage=conversation.intake_state, ticket_offered=offered, unintended_mutation=mutation,
                     non_escalating=not mutation and not offered and response.ticket is None,
