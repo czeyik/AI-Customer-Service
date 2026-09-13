@@ -31,11 +31,18 @@ Read AGENTS.md and follow its minimal-code rules. LangChain and one necessary pr
 are intentional additions. No further dependency is justified merely because an example uses it.
 No delegation/subagents are requested.
 
-This handoff defines local implementation, checks, and preparation for release when the user hands
-it to an execution agent. It does not itself authorize production deployment, external messages,
-changing feature switches, publishing knowledge, or claiming CCO approval. Carry forward actual
-authorization in the execution session; do not manufacture it from historical notes. Missing live
-test access does not prevent independent local implementation and verification.
+The user explicitly included pushing this refactor to production in the execution scope on
+13 September 2026. When asked to execute this handoff, complete implementation, source publication,
+staging validation and production deployment through wave 8. Do not stop after local completion or
+ask for the same deployment authorization again once the stated gates pass. This document update
+does not start execution now.
+
+Production deployment includes the necessary Git push, PR/merge through repository policy, image
+publication, tested migration and release workflow. Preserve the currently authorized customer-
+sending and notification settings: deployment alone does not authorize enabling previously disabled
+external messages, extending the beta, publishing knowledge, or inventing CCO approval. Carry forward
+actual session authorization and honor real repository/environment protection gates. Missing access
+does not prevent independent work; record the exact remaining access or gate when reached.
 
 ## 2. Fixed architecture decisions
 
@@ -235,6 +242,7 @@ API tests must distinguish retrying a confirmation from making a new unrelated r
 | app/models.py, new Alembic revision | Add dialogue JSON/revision; migrate existing drafts |
 | app/services/inbound.py, app/routers/chat.py, webhooks_meta.py | Transport with updated state/evidence/attempt semantics |
 | app/config.py, .env.example, requirements files | Necessary integration and bounded execution settings |
+| infra/production/deploy.sh, .github/workflows/release.yml if needed | Tested quiesce/migrate/start sequence and immutable staging-to-production promotion |
 | Existing tests, evaluation scripts and docs | Adapt assertions; evaluate new owner; remove stale descriptions |
 
 Prefer these files over a new package hierarchy. A small additional test file is acceptable.
@@ -452,10 +460,11 @@ release-validation tests, current launch contract and baseline checkpoint.
 **Exit:** offline evidence complete; authorized live evidence recorded or specifically pending;
 measured cost/latency assessed against unchanged launch limits.
 
-### Wave 7 — Cleanup, documentation and release handoff
+### Wave 7 — Cleanup and release preparation
 
 **Read:** final diffs, README/requirements, docs/smart-implementation.md, release/platform/privacy
-docs, CI configuration and ledger. Do not repeat unchanged paid evaluations without cause.
+docs, infra/production/deploy.sh, compose.yml, .github/workflows/release.yml, CI configuration
+and ledger. Do not repeat unchanged paid evaluations without cause.
 
 **Steps:**
 
@@ -467,21 +476,110 @@ docs, CI configuration and ledger. Do not repeat unchanged paid evaluations with
    LLM/context switches and deterministic outage behavior.
 3. Update README, requirements, implementation/data-flow and release docs to describe actual tools,
    state, limits and commands. Fix documentation drift without rewriting historical evidence.
-4. Document release: quiesce/drain old application and media writers, snapshot, run preflight/apply
-   tested migration, start only new writers, verify readiness and sample draft/case/media integrity,
-   resume traffic using the existing release process. Preserve inbound arrivals through established
-   queue/provider retry behavior. Do not mix old/new state writers.
+4. Implement and document the release sequence in the existing deployment script. At the reference
+   revision it runs migrations before replacing running containers; that is insufficient for this
+   state conversion. Validate configuration and pull images before downtime. Quiesce/drain old API
+   and combined-worker writers (including media/retention), verify no active writer/claim remains,
+   take a fresh recoverable backup, run preflight/apply the tested migration, then start only new
+   writers. Verify readiness and draft/case/media integrity. Keep PostgreSQL/data volumes intact.
+   Preserve queued events; webhook arrivals during maintenance must receive a retryable failure
+   rather than a successful acknowledgment for an unpersisted event. Prevent mixed old/new writers.
 5. Document rollback: after new-format turns commit, an old image cannot safely use dormant legacy
    snapshots. Use the new runtime with LLM disabled or a compatible forward fix. Old-image rollback
    requires no new writes or a separately tested reverse conversion preserving all new records.
    Never restore an old database snapshot over new customer records.
 6. Run required final tests, dependency integrity, Docker build and schema drift checks. Assess
-   security/dependency CI effects from the added framework and record actual results.
-7. Mark local implementation complete only when true. Distinguish pending live/release gates.
-   Production deployment and external sending require actual execution-session authorization.
+   security/dependency CI effects from the added framework and record actual results. Add one focused
+   runnable deployment check proving stop/backup/preflight/migration/start ordering and failure
+   handling. A failed migration must not restart an incompatible old writer or erase the backup.
+7. Mark local implementation complete only when true. Record pending live/release gates, then
+   continue to wave 8. Local completion is not completion of the production deployment scope.
 
 **Exit:** one production dialogue implementation, reproducible dependencies, complete local checks,
-accurate docs, explicit migration/rollback procedure and concise release handoff.
+accurate docs and a tested migration/deployment/recovery procedure ready for wave 8.
+
+### Wave 8 — Publish, validate in staging and deploy to production
+
+**Read:** wave 6 evidence and wave 7 checkpoint, .github/workflows/release.yml, ci.yml, security.yml,
+infra/production/deploy.sh and compose.yml, docs/production-platform.md, docs/release-validation.md,
+docs/launch-contract.md. Discover current GitHub/AWS state read-only before making changes; historical
+SHAs, image digests, secret versions, approvals and deployment results are not this release's evidence.
+
+**Entry:** waves 1–7 local work complete. Before production dispatch, actual provider compatibility,
+new hosted/semantic evaluation, staging and candidate CI/security gates must pass; GitHub/AWS access
+and applicable platform approvals must be available. Steps below establish those release gates.
+Do not reuse the previous SMART release's one-off staging waiver or expired exceptions. If a gate
+is pending, finish available preparation and record the specific requirement.
+
+**Steps:**
+
+1. Commit the focused refactor and push its branch. Open/update the release PR into dev, the integration
+   branch used by the recorded release, following current repository protections. Include behavior,
+   migration/recovery and verification results. Resolve actual CI/security failures and merge through
+   the normal permitted workflow. Do not force-push protected branches or bypass required approvals.
+2. Record the full 40-character merged candidate SHA. Require CI and Security success on the candidate
+   actually being released. Keep the release ref fixed during staging; subsequent source changes need
+   their own checks and staging. A documentation-only evidence commit is distinct from the image SHA.
+3. Inspect AWS account/region and the existing dudu-support-foundation, dudu-support-staging and
+   dudu-support-production stacks. Resolve instances and ECR from stack outputs, not copied IDs.
+   Keep ap-southeast-5 and existing infrastructure/budget limits. Record current production image pair,
+   migration head and relevant feature-switch values without printing runtime secrets.
+4. Dispatch .github/workflows/release.yml with environment=staging on the ref for that exact candidate.
+   The current staging workflow builds its checked-out GITHUB_SHA, not the release_sha input; verify
+   the run's actual SHA matches the candidate. It builds/publishes ARM64 images and resolves immutable
+   app and ClamAV digests. Wait for workflow and SSM completion; record run ID, SHA and both digests.
+5. In isolated staging, exercise the populated legacy-to-new migration, pending/paused/review drafts,
+   evidence ownership, inbox recovery, duplicate events, model outage and the new fallback recovery
+   procedure. Check database, ClamAV, storage and worker health. Complete required end-to-end channel
+   checks with authorized test recipients/windows; do not send to arbitrary customers or staff.
+   If a fix is necessary, return to the affected wave and stage the new candidate before promotion.
+6. Schedule production within the documented 02:00–04:00 Asia/Kuala_Lumpur maintenance window unless
+   an existing session instruction authorizes a different window. Confirm recoverable backup capacity,
+   completed staging results and applicable budget/contract dates. Do not extend the 10–14 September
+   beta or expired waivers automatically. A dark deployment may still proceed if permitted; customer
+   activation must remain within the applicable contract.
+7. Record the predeployment META_SEND_ENABLED, NOTIFICATION_SEND_ENABLED, LLM_ENABLED and
+   LLM_CUSTOMER_CONTEXT_ENABLED values. The deployment script requires META_SEND_ENABLED=false.
+   Temporarily disable sending when necessary using the established secret/configuration path; avoid
+   unrelated secret edits. Keep previously disabled switches disabled. Confirm the wave 7 deployment
+   procedure will quiesce writers, back up and preflight after image/configuration validation;
+   the production dispatch in step 8 executes that procedure once.
+8. Dispatch the same release workflow with environment=production and release_sha set to the exact
+   staging-tested 40-character candidate. Use the tested workflow ref. Promote the identical app and
+   ClamAV digest pair; do not rebuild for production. Monitor the workflow/SSM result through completion.
+   Do not report deployment from a workflow dispatch acknowledgment alone.
+9. Verify the public https://support.duducaradmin.com/ready response, running API/worker image digests,
+   applied migration head, container health and new schema. Confirm converted draft/case/media counts,
+   absence of mixed-version writers, and inbox/outbox recovery. Use minimized aggregate evidence;
+   do not copy customer records into release documentation. Exercise a bounded authorized smoke test
+   proving the running release invokes LangChain and preserves ticket/confirmation behavior.
+10. Restore only pre-existing authorized traffic/notification settings after checks pass, or apply a
+    newer explicit session instruction. Keep LLM/context settings consistent with the approved model
+    evaluation and provider-data boundary. The last recorded production state had Meta sending off;
+    deployment success must not silently enable it. Record deployed and customer-sending status
+    separately. Previously disabled customer sending does not prevent completing a dark deployment.
+11. Observe production for 60 minutes after the final intended configuration. Monitor public readiness,
+    alarms/resources, provider/tool errors, queue age, duplicates/dead letters, mutation errors,
+    latency, traffic and spend using existing monitoring. Preserve the launch-contract thresholds.
+    Immediately stop outbound for security/data-loss/unauthorized-action triggers; on other threshold
+    breaches, use the tested fallback/forward-fix procedure. After new-state writes, do not blindly
+    run /opt/dudu/rollback-images with an old incompatible application. Observation with no customer
+    traffic is deployment-health evidence, not a claim of live customer-service quality.
+12. Record the actual source SHA, workflow/SSM IDs, immutable digests, migration, staging results,
+    backup reference, production checks, restored switch states and observation start/end/outcome in
+    docs/release-validation.md. Update the SMART ledger and commit/push the release evidence through
+    normal repository policy without rebuilding the already validated artifact. Report the exact
+    deployed version and whether customer sending is enabled. If a protection gate or credential is
+    missing, report its concrete requirement; never label an attempted deployment successful.
+
+**Checks:** required candidate CI/security, staging migration and recovery, identical digest promotion,
+successful production workflow/SSM, public/internal readiness, correct running code/schema, intact
+customer state and durable queues, and a completed 60-minute observation without unresolved triggers.
+
+**Exit:** the LangChain refactor is running in production on the tested immutable images, its migration
+and operational checks pass, intended authorized settings are in place, observation is recorded,
+and release evidence is published. No additional deployment permission question is needed solely
+because this wave reaches production; honor actual platform gates and unresolved material decisions.
 
 ## 5. Commands and references
 
@@ -496,10 +594,12 @@ docker build --target test -t dudu-support:langchain-check .
 git diff --check
 ~~~
 
-During implementation, migrations and alembic check run only against disposable databases.
+During waves 1–7, migrations and alembic check run only against disposable databases.
 Set DATABASE_URL and TEST_POSTGRES_URL to disposable test databases using the existing setup;
 the latter enables real concurrency checks. Never use staging/production or a valuable personal
-database for tests. Reuse PostgreSQL/pg_trgm prerequisites documented in README.
+database for tests. Reuse PostgreSQL/pg_trgm prerequisites documented in README. Wave 8 explicitly
+applies the tested release migration to staging and production through the deployment workflow;
+never point fixture-driven/destructive tests at production.
 
 ~~~bash
 alembic upgrade head
@@ -535,11 +635,14 @@ the owner. Do not invent working provider behavior or migrate unsafe data.
 | 4. Agent/tools | Not started | Depends on waves 1–3 |
 | 5. Handler cutover | Not started | Depends on wave 4 |
 | 6. Evaluation | Not started | Depends on wave 5 |
-| 7. Cleanup/handoff | Not started | Depends on wave 6 offline results |
+| 7. Release preparation | Not started | Depends on wave 6 offline results |
+| 8. Production deployment | Not started | Depends on waves 1–7 and all required release gates |
 
 ### Latest checkpoint
 
 - Completed: replaced old SMART.md with this execution plan; no implementation performed.
+- Scope update: user requested production deployment in the waves; wave 8 now includes publication,
+  staging, production migration/deployment, verification, observation and release evidence.
 - Next: start wave 1 after the user requests execution.
 - Live provider compatibility: unverified for the proposed LangChain integration.
 - Deployment for this refactor: not deployed; no feature switches changed.
