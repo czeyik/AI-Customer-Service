@@ -22,10 +22,12 @@ PRODUCTION_SETTINGS = {
 }
 
 
-def test_production_configuration_accepts_explicit_safe_values() -> None:
-    settings = Settings(_env_file=None, **PRODUCTION_SETTINGS)
+@pytest.mark.parametrize("llm_enabled", [True, False])
+def test_production_configuration_accepts_explicit_safe_values(llm_enabled: bool) -> None:
+    settings = Settings(_env_file=None, **(PRODUCTION_SETTINGS | {"llm_enabled": llm_enabled}))
 
     assert settings.is_production
+    assert settings.llm_enabled is llm_enabled
     assert settings.llm_timeout_seconds == 30.0
     assert settings.llm_max_input_chars == 15000
 
@@ -73,7 +75,6 @@ def test_production_send_requires_meta_transport_credentials() -> None:
         ("media_bucket", ""),
         ("media_region", "ap-southeast-1"),
         ("media_signed_url_seconds", 3600),
-        ("llm_enabled", False),
         ("zai_api_key", ""),
         ("llm_model", "glm-5.3"),
         ("llm_timeout_seconds", 31),

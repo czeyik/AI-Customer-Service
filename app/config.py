@@ -165,8 +165,6 @@ class Settings(BaseSettings):
         if not 1 <= self.clamav_timeout_seconds <= 30:
             errors.append("CLAMAV_TIMEOUT_SECONDS must be between 1 and 30")
 
-        if not self.llm_enabled:
-            errors.append("LLM_ENABLED must be true")
         if len(self.zai_api_key) < 16:
             errors.append("ZAI_API_KEY must be set")
         if self.llm_model != "glm-5.3-flash":

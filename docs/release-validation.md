@@ -67,7 +67,12 @@ the local runtime image. Cutover now validates configuration before downtime, pr
 references on failed retries, checks durable row counts and typed state, and waits for a complete
 worker cycle. Production promotion requires successful staging for the exact SHA and an immutable
 ECR repository. The [runbook](production-platform.md) covers deployment and compatible-runtime recovery.
-Candidate publication, CI/Security, staging, production and observation remain pending.
+Source is published in [PR #7](https://github.com/czeyik/AI-Customer-Service/pull/7). A follow-up
+removes the production validator’s obsolete requirement that the LLM stay enabled, making the
+documented `LLM_ENABLED=false` recovery operable; 73 config/handler/platform tests pass with two
+skips. Candidate CI/Security is refreshing for that change. Staging, production and observation
+remain pending. GitHub’s default `main` still lacks Release, so the validated source must also pass
+its protected PR flow before manual staging dispatch is available.
 
 ## Historical SMART release — production state recorded 12 September 2026
 

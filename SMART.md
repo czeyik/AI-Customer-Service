@@ -707,7 +707,7 @@ the owner. Do not invent working provider behavior or migrate unsafe data.
 
 ### Latest checkpoint
 
-- Waves 1–7 are complete. Wave 8 preparation is in progress; no LangChain candidate has been published, staged or deployed yet.
+- Waves 1–7 are complete. Wave 8 preparation is in progress; the candidate is published in [PR #7](https://github.com/czeyik/AI-Customer-Service/pull/7), with staging and production pending.
 - Original branch `smart-release-20260911`, starting revision `52c6247571d460c5f8d0a3b3d5eb47ce1fed33ed`; prior uncommitted work and the local AGENTS.md deletion remain preserved.
 - Publication uses isolated branch `langchain-release-20260915` from current `origin/dev` (`7f8f13f74161aa6ba9064e558ad00ae9a6486ead`) at `/tmp/dudu-langchain-release-20260915`.
 - Wave 6 [reviewed acceptance](docs/evaluation/langchain-live-wave6-reviewed-20260915.json) remains authoritative: 348/348 dispositions, 30/30 intakes, 18/18 handoffs, 9/9 focused; all 309 answers and 60 held-out paraphrases pass semantic review; `rollout_ready=true`.
@@ -723,7 +723,9 @@ the owner. Do not invent working provider behavior or migrate unsafe data.
 - Runtime verification image: `dudu-support:wave7-runtime`, index `sha256:e4c5e58a4a56b94bcac9402ec7c7bbc0d3aabea9ab3a48b7f241d87df7e6ea9f`. [Wave 7 evidence and source hashes](docs/evaluation/langchain-wave7-local-20260915.json).
 - AWS authentication works via profile `dudu-production` in account `173454940059`, region `ap-southeast-5`. Foundation and production exist; staging is absent. GitHub access works; `dev` requires successful `test` and an up-to-date branch, with no review requirement.
 - Current production secret reports Meta sending true, notifications false, LLM true and customer context true; runtime container values remain to be checked. Preparation has not changed production. Staging/dark deployment must disable sending.
-- Next: copy the focused candidate and referenced evidence into the publication worktree, commit/push and open its PR; complete candidate CI/Security, isolated staging and all Wave 8 gates. Keep the 02:00–04:00 Asia/Kuala_Lumpur production window.
+- Publication follow-up fixed production validation rejecting the documented `LLM_ENABLED=false` recovery switch. Shared provider gating was independently reviewed; config/handler/platform checks pass **73 tests, 2 skipped**. Other provider settings remain unchanged.
+- Foundation update completed; the deploy role now has repository-scoped ECR immutability-read permission. GitHub release role variable and staging/production environments are configured.
+- Next: complete refreshed PR #7 CI/Security, merge into `dev`, and publish the validated source to default `main` through its protected PR flow so GitHub registers Release. Recreate isolated staging, then finish all Wave 8 gates within the 02:00–04:00 Asia/Kuala_Lumpur production window.
 
 ### Remaining work
 
