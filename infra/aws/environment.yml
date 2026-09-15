@@ -1,0 +1,503 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Isolated DUDU support EC2 environment
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues: [staging, production]
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: AWS::Route53::HostedZone::Id
+  AlertEmail:
+    Type: String
+  AlertPhone:
+    Type: String
+    Default: ""
+  RepositoryArn:
+    Type: String
+  InstanceType:
+    Type: String
+    AllowedValues: [t4g.small, t4g.medium]
+    Default: t4g.small
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64
+
+Conditions:
+  HasAlertPhone: !Not [!Equals [!Ref AlertPhone, ""]]
+
+Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.24.0.0/24
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - {Key: Name, Value: !Sub "dudu-${Environment}"}
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+
+  GatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.24.0.0/26
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      Tags:
+        - {Key: Name, Value: !Sub "dudu-${Environment}-public"}
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+
+  DefaultRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachment
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref RouteTable
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Public TLS only; operator access uses SSM
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - {IpProtocol: tcp, FromPort: 80, ToPort: 80, CidrIp: 0.0.0.0/0}
+        - {IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0}
+        - {IpProtocol: udp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0}
+      SecurityGroupEgress:
+        # Cze Yik: staging/dark-deployment exception renewed 15 September; release-validation.md.
+        # trivy:ignore:AWS-0104:exp:2026-09-17
+        - {IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0}
+        # trivy:ignore:AWS-0104:exp:2026-09-17
+        - {IpProtocol: tcp, FromPort: 465, ToPort: 465, CidrIp: 0.0.0.0/0}
+      Tags:
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+
+  RuntimeSecret:
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name: !Sub dudu-support/${Environment}/runtime-env
+      Description: Docker env file; provision values directly and keep outbound disabled
+      Tags:
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+
+  DataBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub dudu-support-${Environment}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: alias/aws/s3
+            BucketKeyEnabled: true
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration: {Status: Enabled}
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireDatabaseBackups
+            Status: Enabled
+            Prefix: backups/postgresql/
+            ExpirationInDays: 35
+            NoncurrentVersionExpiration: {NoncurrentDays: 35}
+            AbortIncompleteMultipartUpload: {DaysAfterInitiation: 1}
+      Tags:
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+
+  DataBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref DataBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt DataBucket.Arn
+              - !Sub ${DataBucket.Arn}/*
+            Condition: {Bool: {aws:SecureTransport: "false"}}
+
+  ApplicationLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      LogGroupName: !Sub /dudu-support/${Environment}/containers
+      RetentionInDays: 30
+      Tags:
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: {Service: ec2.amazonaws.com}
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+        - PolicyName: RuntimeDataAndObservability
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref RuntimeSecret
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:ListBucketVersions
+                  - s3:GetBucketLocation
+                Resource: !GetAtt DataBucket.Arn
+                Condition:
+                  StringLike:
+                    s3:prefix:
+                      - approved/*
+                      - backups/postgresql/*
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:DeleteObjectVersion
+                Resource:
+                  - !Sub ${DataBucket.Arn}/approved/*
+                  - !Sub ${DataBucket.Arn}/backups/postgresql/*
+              - Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:GetDownloadUrlForLayer
+                Resource: !Ref RepositoryArn
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                Resource: !Sub ${ApplicationLogGroup.Arn}:*
+              - Effect: Allow
+                Action: cloudwatch:PutMetricData
+                Resource: "*"
+                Condition:
+                  StringEquals: {cloudwatch:namespace: DUDU/Host}
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [!Ref InstanceRole]
+
+  Instance:
+    Type: AWS::EC2::Instance
+    DependsOn: DefaultRoute
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      CreditSpecification: {CPUCredits: standard}
+      IamInstanceProfile: !Ref InstanceProfile
+      SubnetId: !Ref PublicSubnet
+      SecurityGroupIds: [!Ref SecurityGroup]
+      MetadataOptions:
+        HttpEndpoint: enabled
+        HttpTokens: required
+        HttpPutResponseHopLimit: 2
+        InstanceMetadataTags: enabled
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            Encrypted: true
+            VolumeSize: 16
+            VolumeType: gp3
+            DeleteOnTermination: false
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euxo pipefail
+          dnf install -y docker jq amazon-cloudwatch-agent
+          systemctl enable --now docker amazon-ssm-agent
+          install -d -m 0750 /opt/dudu /run/dudu /root/.docker/cli-plugins
+          curl -fsSL https://github.com/docker/compose/releases/download/v2.40.1/docker-compose-linux-aarch64 -o /root/.docker/cli-plugins/docker-compose
+          echo 'ec4a385c4cd2afa4f5d429e6fe7dd6b2ae3dc251dc4e9332f1ad2cef8fa44554  /root/.docker/cli-plugins/docker-compose' | sha256sum -c -
+          chmod 0755 /root/.docker/cli-plugins/docker-compose
+          fallocate -l 2G /swapfile
+          chmod 0600 /swapfile
+          mkswap /swapfile
+          swapon /swapfile
+          echo '/swapfile none swap sw 0 0' >> /etc/fstab
+          cat >/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'EOF'
+          {
+            "agent":{"metrics_collection_interval":60},
+            "logs":{"logs_collected":{"files":{"collect_list":[{
+              "file_path":"/var/lib/docker/containers/*/*.log",
+              "log_group_name":"${ApplicationLogGroup}",
+              "log_stream_name":"{instance_id}",
+              "retention_in_days":30
+            }]}}},
+            "metrics":{"namespace":"DUDU/Host","append_dimensions":{"InstanceId":"${!aws:InstanceId}"},
+              "metrics_collected":{"disk":{"measurement":["used_percent"],"resources":["/"]},
+              "mem":{"measurement":["mem_used_percent"]},"swap":{"measurement":["swap_used_percent"]}}}
+          }
+          EOF
+          /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+          cat >/usr/local/sbin/dudu-health-metric <<'EOF'
+          #!/bin/bash
+          value=0
+          curl -fsS --max-time 10 https://${DomainName}/ready >/dev/null && value=1
+          aws cloudwatch put-metric-data --region ${AWS::Region} --namespace DUDU/Host \
+            --metric-data "MetricName=HttpsReady,Dimensions=[{Name=Environment,Value=${Environment}}],Value=$value,Unit=Count"
+          EOF
+          chmod 0755 /usr/local/sbin/dudu-health-metric
+          cat >/etc/systemd/system/dudu-health.service <<'EOF'
+          [Unit]
+          Description=Publish DUDU HTTPS readiness
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/local/sbin/dudu-health-metric
+          EOF
+          cat >/etc/systemd/system/dudu-health.timer <<'EOF'
+          [Unit]
+          Description=Check DUDU HTTPS readiness every minute
+          [Timer]
+          OnBootSec=3min
+          OnUnitActiveSec=60s
+          Unit=dudu-health.service
+          [Install]
+          WantedBy=timers.target
+          EOF
+          systemctl daemon-reload
+          systemctl enable --now dudu-health.timer
+      Tags:
+        - {Key: Name, Value: !Sub "dudu-support-${Environment}"}
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+        - {Key: Domain, Value: !Ref DomainName}
+
+  ElasticIp:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref Instance
+      Tags:
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+
+  DnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: A
+      TTL: 60
+      ResourceRecords: [!GetAtt ElasticIp.PublicIp]
+
+  # Cze Yik: staging/dark-deployment exception renewed 15 September; release-validation.md.
+  # trivy:ignore:AWS-0136:exp:2026-09-17
+  Alerts:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub dudu-support-${Environment}-alerts
+      KmsMasterKeyId: alias/aws/sns
+      Subscription:
+        - {Endpoint: !Ref AlertEmail, Protocol: email}
+        - !If
+          - HasAlertPhone
+          - {Endpoint: !Ref AlertPhone, Protocol: sms}
+          - !Ref AWS::NoValue
+      Tags:
+        - {Key: Project, Value: dudu-support}
+        - {Key: Environment, Value: !Ref Environment}
+
+  StatusAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub dudu-${Environment}-instance-status
+      Namespace: AWS/EC2
+      MetricName: StatusCheckFailed
+      Dimensions: [{Name: InstanceId, Value: !Ref Instance}]
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 2
+      DatapointsToAlarm: 2
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: breaching
+      AlarmActions: [!Ref Alerts]
+      OKActions: [!Ref Alerts]
+
+  CpuAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub dudu-${Environment}-cpu-high
+      Namespace: AWS/EC2
+      MetricName: CPUUtilization
+      Dimensions: [{Name: InstanceId, Value: !Ref Instance}]
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 3
+      DatapointsToAlarm: 3
+      Threshold: 80
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: breaching
+      AlarmActions: [!Ref Alerts]
+      OKActions: [!Ref Alerts]
+
+  MemoryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub dudu-${Environment}-memory-high
+      Namespace: DUDU/Host
+      MetricName: mem_used_percent
+      Dimensions: [{Name: InstanceId, Value: !Ref Instance}]
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 3
+      DatapointsToAlarm: 3
+      Threshold: 85
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: breaching
+      AlarmActions: [!Ref Alerts]
+      OKActions: [!Ref Alerts]
+
+  ApplicationErrorMetric:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref ApplicationLogGroup
+      FilterName: !Sub dudu-${Environment}-application-errors
+      FilterPattern: "?ERROR ?Traceback ?dead_letter ?failed"
+      MetricTransformations:
+        - MetricNamespace: DUDU/Application
+          MetricName: !Sub ${Environment}-errors
+          MetricValue: "1"
+          DefaultValue: 0
+
+  ApplicationErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub dudu-${Environment}-application-errors
+      Namespace: DUDU/Application
+      MetricName: !Sub ${Environment}-errors
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref Alerts]
+
+  HttpsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub dudu-${Environment}-https-health
+      Namespace: DUDU/Host
+      MetricName: HttpsReady
+      Dimensions: [{Name: Environment, Value: !Ref Environment}]
+      Statistic: Minimum
+      Period: 60
+      EvaluationPeriods: 2
+      DatapointsToAlarm: 2
+      Threshold: 1
+      ComparisonOperator: LessThanThreshold
+      TreatMissingData: breaching
+      AlarmActions: [!Ref Alerts]
+      OKActions: [!Ref Alerts]
+
+  BackupVault:
+    Type: AWS::Backup::BackupVault
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BackupVaultName: !Sub dudu-support-${Environment}
+
+  BackupRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: {Service: backup.amazonaws.com}
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores
+
+  BackupPlan:
+    Type: AWS::Backup::BackupPlan
+    Properties:
+      BackupPlan:
+        BackupPlanName: !Sub dudu-support-${Environment}-daily
+        BackupPlanRule:
+          - RuleName: DailyEncryptedInstanceBackup
+            TargetBackupVault: !Ref BackupVault
+            ScheduleExpression: cron(0 18 * * ? *)
+            StartWindowMinutes: 60
+            CompletionWindowMinutes: 180
+            Lifecycle: {DeleteAfterDays: 35}
+
+  BackupSelection:
+    Type: AWS::Backup::BackupSelection
+    Properties:
+      BackupPlanId: !Ref BackupPlan
+      BackupSelection:
+        SelectionName: !Sub dudu-support-${Environment}-instance
+        IamRoleArn: !GetAtt BackupRole.Arn
+        Resources:
+          - !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/${Instance}
+
+Outputs:
+  InstanceId: {Value: !Ref Instance}
+  PublicIp: {Value: !GetAtt ElasticIp.PublicIp}
+  BucketName: {Value: !Ref DataBucket}
+  RuntimeSecretArn: {Value: !Ref RuntimeSecret}
+  LogGroupName: {Value: !Ref ApplicationLogGroup}

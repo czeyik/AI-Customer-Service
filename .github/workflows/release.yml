@@ -1,0 +1,186 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deploy target
+        required: true
+        type: choice
+        options: [staging, production]
+      release_sha:
+        description: Commit SHA already validated in staging (required for production)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  deployments: read
+  id-token: write
+
+concurrency:
+  group: release-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      AWS_REGION: ap-southeast-5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+        if: inputs.environment == 'staging'
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+        if: inputs.environment == 'staging'
+      - name: Resolve release and repository
+        id: release
+        shell: bash
+        env:
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          REQUESTED_RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          set -euo pipefail
+          sha="$REQUESTED_RELEASE_SHA"
+          if [[ "$DEPLOY_ENVIRONMENT" == staging ]]; then
+            sha="$GITHUB_SHA"
+          elif [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Production requires the exact 40-character SHA that passed staging" >&2
+            exit 1
+          fi
+          repository=$(aws cloudformation describe-stacks --stack-name dudu-support-foundation \
+            --query "Stacks[0].Outputs[?OutputKey=='RepositoryUri'].OutputValue" --output text)
+          {
+            echo "sha=$sha"
+            echo "repository=$repository"
+            echo "registry=${repository%/*}"
+          } >> "$GITHUB_OUTPUT"
+      - name: Verify successful staging deployment
+        if: inputs.environment == 'production'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_SHA: ${{ steps.release.outputs.sha }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Production requires a validated 40-character candidate SHA" >&2
+            exit 1
+          fi
+
+          if ! deployments_json=$(gh api --paginate \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "repos/$REPOSITORY/deployments?sha=$CANDIDATE_SHA&environment=staging&per_page=100"); then
+            echo "Unable to read staging deployments; refusing production release" >&2
+            exit 1
+          fi
+          deployment_id=$(jq -r -s --arg candidate "$CANDIDATE_SHA" '
+            add
+            | map(select(.sha == $candidate and .environment == "staging"))
+            | sort_by([(.created_at // ""), (.id // 0)])
+            | if length == 0 then empty else .[-1].id end
+          ' <<<"$deployments_json")
+          if [[ ! "$deployment_id" =~ ^[0-9]+$ ]]; then
+            echo "No staging deployment exists for candidate $CANDIDATE_SHA; refusing production release" >&2
+            exit 1
+          fi
+
+          if ! statuses_json=$(gh api --paginate \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "repos/$REPOSITORY/deployments/$deployment_id/statuses?per_page=100"); then
+            echo "Unable to read status for staging deployment $deployment_id; refusing production release" >&2
+            exit 1
+          fi
+          latest_state=$(jq -r -s '
+            add
+            | sort_by([(.created_at // ""), (.id // 0)])
+            | if length == 0 then empty else .[-1].state end
+          ' <<<"$statuses_json")
+          if [[ "$latest_state" != success ]]; then
+            echo "Latest staging deployment status for $CANDIDATE_SHA is ${latest_state:-missing}; refusing production release" >&2
+            exit 1
+          fi
+          echo "Staging deployment $deployment_id succeeded for candidate $CANDIDATE_SHA"
+      - name: Build ARM release images in staging
+        if: inputs.environment == 'staging'
+        run: |
+          set -euo pipefail
+          aws ecr get-login-password | docker login --username AWS --password-stdin "${{ steps.release.outputs.registry }}"
+          repository="${{ steps.release.outputs.repository }}"
+          name=${repository##*/}
+          sha="${{ steps.release.outputs.sha }}"
+          if ! aws ecr describe-images --repository-name "$name" --image-ids imageTag="app-$sha" >/dev/null 2>&1; then
+            docker buildx build --platform linux/arm64 --push --tag "$repository:app-$sha" .
+          fi
+          if ! aws ecr describe-images --repository-name "$name" --image-ids imageTag="clamav-$sha" >/dev/null 2>&1; then
+            docker buildx build --platform linux/arm64 --push \
+              --file infra/production/Dockerfile.clamav --tag "$repository:clamav-$sha" .
+          fi
+      - name: Resolve immutable digests
+        id: images
+        env:
+          RELEASE_REPOSITORY: ${{ steps.release.outputs.repository }}
+          RELEASE_SHA: ${{ steps.release.outputs.sha }}
+        run: |
+          set -euo pipefail
+          repository="$RELEASE_REPOSITORY"
+          name=${repository##*/}
+          sha="$RELEASE_SHA"
+          if ! tag_mutability=$(aws ecr describe-repositories --repository-name "$name" \
+            --query 'repositories[0].imageTagMutability' --output text); then
+            echo "Unable to verify ECR tag mutability; refusing release" >&2
+            exit 1
+          fi
+          if [[ "$tag_mutability" != IMMUTABLE ]]; then
+            echo "ECR repository $name is not immutable (reported: ${tag_mutability:-missing}); refusing release" >&2
+            exit 1
+          fi
+          app_digest=$(aws ecr describe-images --repository-name "$name" \
+            --image-ids imageTag="app-$sha" --query 'imageDetails[0].imageDigest' --output text)
+          clamav_digest=$(aws ecr describe-images --repository-name "$name" \
+            --image-ids imageTag="clamav-$sha" --query 'imageDetails[0].imageDigest' --output text)
+          {
+            echo "app=$repository@$app_digest"
+            echo "clamav=$repository@$clamav_digest"
+          } >> "$GITHUB_OUTPUT"
+      - name: Deploy through Systems Manager
+        env:
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          set -euo pipefail
+          instance=$(aws cloudformation describe-stacks \
+            --stack-name "dudu-support-$DEPLOY_ENVIRONMENT" \
+            --query "Stacks[0].Outputs[?OutputKey=='InstanceId'].OutputValue" --output text)
+          commands=$(jq -cn \
+            --arg registry "${{ steps.release.outputs.registry }}" \
+            --arg app "${{ steps.images.outputs.app }}" \
+            --arg clamav "${{ steps.images.outputs.clamav }}" \
+            --arg sha "${{ steps.release.outputs.sha }}" \
+            '["set -euo pipefail",
+              "cloud-init status --wait",
+              "aws ecr get-login-password --region ap-southeast-5 | docker login --username AWS --password-stdin " + $registry,
+              "docker pull " + $app,
+              "docker pull " + $clamav,
+              "incoming=/opt/dudu/incoming-" + $sha + "; install -d -m 0750 $incoming",
+              "container=$(docker create " + $app + ")",
+              "docker cp $container:/app/infra/production/. $incoming/",
+              "docker rm $container",
+              "chmod 0755 $incoming/deploy.sh",
+              "$incoming/deploy.sh " + $app + " " + $clamav]')
+          command_id=$(aws ssm send-command --instance-ids "$instance" \
+            --document-name AWS-RunShellScript \
+            --parameters "$(jq -cn --argjson commands "$commands" '{commands:$commands}')" \
+            --query Command.CommandId --output text)
+          aws ssm wait command-executed --command-id "$command_id" --instance-id "$instance" || true
+          aws ssm get-command-invocation --command-id "$command_id" --instance-id "$instance" \
+            --query '{Status:Status,Output:StandardOutputContent,Error:StandardErrorContent}'
+          test "$(aws ssm get-command-invocation --command-id "$command_id" --instance-id "$instance" \
+            --query Status --output text)" = Success

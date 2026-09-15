@@ -1,4 +1,4 @@
-from app.services.retrieval import embed_text, score_text, tokenize
+from app.services.retrieval import score_text, tokenize
 
 
 def test_tokenize_removes_common_stopwords() -> None:
@@ -8,12 +8,16 @@ def test_tokenize_removes_common_stopwords() -> None:
     assert "how" not in tokens
 
 
+def test_generic_policy_words_do_not_turn_unknown_topics_into_knowledge_hits() -> None:
+    assert tokenize("What is the moon policy?") == {"moon"}
+    assert tokenize("Apakah polisi bulan?") == {"apakah", "bulan"}
+    assert "政策" not in tokenize("月球政策是什么？")
+
+
 def test_score_text_rewards_relevant_overlap() -> None:
     score = score_text("fare payment refund", "Fare estimates and payment issues can be reviewed.")
     assert score > 0
 
 
-def test_embedding_is_fixed_size() -> None:
-    vector = embed_text("driver onboarding document approval")
-    assert len(vector) == 64
-
+def test_tokenize_builds_searchable_chinese_bigrams() -> None:
+    assert {"车费", "付款"} <= tokenize("车费和付款")

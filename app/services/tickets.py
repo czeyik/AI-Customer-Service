@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 
 from app.models import Ticket
 from app.schemas import ChatRequest, TicketResponse
+from app.services.ticket_drafts import normalize_phone_number, validate_ticket_fields
+from app.services.ticket_operations import queue_new_ticket_notifications
 
 
 def generate_public_ticket_id() -> str:
@@ -21,6 +23,15 @@ def create_ticket(
     urgency: str,
     safety_flags: list[str],
 ) -> Ticket:
+    phone_number = normalize_phone_number(request.phone_number)
+    validate_ticket_fields(
+        consent=request.consent_to_ticket,
+        name=request.name,
+        email=str(request.email) if request.email else None,
+        phone_number=phone_number,
+        description=description,
+    )
+
     public_id = generate_public_ticket_id()
     while db.query(Ticket).filter(Ticket.public_id == public_id).first():
         public_id = generate_public_ticket_id()
@@ -32,19 +43,21 @@ def create_ticket(
         external_user_id=request.external_user_id,
         name=request.name,
         email=str(request.email) if request.email else None,
+        phone_number=phone_number,
         account_id=request.account_id,
         user_role=request.user_role,
         issue_type=issue_type,
         language=request.preferred_language or "en",
         description=description,
         trip_id=request.trip_id,
+        ride_details=request.ride_details,
         consent_given=request.consent_to_ticket,
         attachment_count=len(request.attachments),
         extra={"safety_flags": safety_flags},
     )
     db.add(ticket)
-    db.commit()
-    db.refresh(ticket)
+    db.flush()
+    queue_new_ticket_notifications(db, ticket)
     return ticket
 
 
@@ -55,4 +68,3 @@ def to_ticket_response(ticket: Ticket) -> TicketResponse:
         urgency=ticket.urgency,
         issue_type=ticket.issue_type,
     )
-

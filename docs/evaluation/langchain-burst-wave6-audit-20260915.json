@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "langchain": "1.4.0",
+    "langchain-openai": "1.6.2"
+  },
+  "duplicate_replies": 0,
+  "external_delivery": "not part of this synthetic queue check",
+  "generated_at": "2026-09-15T03:32:27.871418+00:00",
+  "limits": {
+    "agent_seconds": 60.0,
+    "business_tools_per_turn": 10,
+    "input_characters_per_model_call": 15000,
+    "model_call_seconds": 30.0,
+    "model_requests_per_turn": 5,
+    "output_tokens_per_model_call": 300
+  },
+  "mode": "outage",
+  "model": "glm-5.3-flash",
+  "reply_queued_p95_seconds": 0.078379,
+  "revision": "52c6247571d460c5f8d0a3b3d5eb47ce1fed33ed",
+  "senders": 8,
+  "simulated_provider_seconds": 0,
+  "total_seconds": 0.07863429200369865,
+  "workers": 4
+}

@@ -9,15 +9,29 @@
   <body>
     <header class="topbar">
       <h1>Support Inbox</h1>
-      <a href="/admin/logout">Log out</a>
+      <form method="post" action="/admin/logout">
+        <input type="hidden" name="csrf_token" value="{{ csrf }}">
+        <button type="submit">Log out</button>
+      </form>
     </header>
     <main class="container">
+      {% if notifications %}
+        <section class="notifications">
+          <h2>Notifications</h2>
+          <ul>
+            {% for notification in notifications %}
+              <li>{{ notification.event_type.replace('_', ' ') }} — <a href="/admin/tickets/{{ notification.payload.public_id }}">{{ notification.payload.public_id }}</a></li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
       <table>
         <thead>
           <tr>
             <th>Ticket</th>
             <th>Urgency</th>
             <th>Status</th>
+            <th>Assigned</th>
             <th>Issue</th>
             <th>Channel</th>
             <th>Created</th>
@@ -29,16 +43,16 @@
               <td><a href="/admin/tickets/{{ ticket.public_id }}">{{ ticket.public_id }}</a></td>
               <td><span class="pill {{ ticket.urgency }}">{{ ticket.urgency }}</span></td>
               <td>{{ ticket.status }}</td>
+              <td>{{ ticket.assigned_admin.display_name if ticket.assigned_admin else "Unassigned" }}</td>
               <td>{{ ticket.issue_type }}</td>
               <td>{{ ticket.channel }}</td>
               <td>{{ ticket.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
             </tr>
           {% else %}
-            <tr><td colspan="6" class="empty">No tickets yet.</td></tr>
+            <tr><td colspan="7" class="empty">No tickets yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </main>
   </body>
 </html>
-
