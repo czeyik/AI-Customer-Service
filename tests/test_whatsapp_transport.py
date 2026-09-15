@@ -225,6 +225,27 @@ def test_public_beta_limits_are_calendar_aligned_and_atomic(
     get_settings.cache_clear()
 
 
+@pytest.mark.parametrize(
+    ("now", "allowed"),
+    [
+        (datetime(2026, 9, 15, tzinfo=timezone.utc), True),
+        (datetime(2026, 9, 30, 15, 59, 59, tzinfo=timezone.utc), True),
+        (datetime(2026, 9, 30, 16, tzinfo=timezone.utc), False),
+    ],
+)
+def test_extended_beta_keeps_limits_and_expires_at_malaysia_midnight(
+    db_session: Session, monkeypatch: pytest.MonkeyPatch, now: datetime, allowed: bool
+) -> None:
+    monkeypatch.setenv("PUBLIC_BETA_ENABLED", "true")
+    monkeypatch.setenv("PUBLIC_BETA_END_DATE", "2026-09-30")
+    monkeypatch.setenv("PUBLIC_BETA_MESSAGES_PER_USER_DAY", "1")
+    get_settings.cache_clear()
+
+    counts = _consume_public_beta_limits(db_session, "extension-user", now)
+    assert counts == ([1, 1, 1, 1] if allowed else None)
+    assert _consume_public_beta_limits(db_session, "extension-user", now) is None
+
+
 def test_public_beta_sends_only_one_capacity_notice_per_user_day(
     db_session: Session, monkeypatch: pytest.MonkeyPatch
 ) -> None:
