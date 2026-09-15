@@ -53,6 +53,19 @@ IDENTIFIER_PATTERN = re.compile(
     r"(?i)\b(?:account|trip|booking|ride|ticket|akaun|perjalanan)(?:[ _-]?id| number| no\.?|编号)?"
     r"\s*[:=#]?\s*([A-Z]*[-_]?[0-9][A-Z0-9_-]*)\b|DUDU-[A-Z0-9-]+"
 )
+REVIEW_MARKERS = (
+    "please review these ticket details",
+    "sila semak butiran tiket ini",
+    "请检查工单资料",
+)
+FIELD_LABELS = {
+    "name": ("name:", "nama:", "姓名：", "姓名:"),
+    "email": ("email:", "e-mel:", "邮箱：", "邮箱:"),
+    "phone_number": ("contact phone:", "telefon hubungan:", "联系电话：", "联系电话:"),
+    "description": ("issue:", "isu:", "问题：", "问题:"),
+    "trip_id": ("trip id:", "id perjalanan:", "行程编号：", "行程编号:"),
+    "ride_details": ("ride details:", "butiran perjalanan:", "行程详情：", "行程详情:"),
+}
 
 
 def provider_question(text: str, local_values: dict[str, str] | None = None) -> str | None:
@@ -79,3 +92,23 @@ def provider_question(text: str, local_values: dict[str, str] | None = None) -> 
     ):
         return None
     return sanitized if len(sanitized) <= 1600 else None
+
+
+def sanitize_history_text(
+    text: str, local_values: dict[str, str] | None = None
+) -> str | None:
+    """Return model-safe history text, replacing state snapshots as one bounded marker."""
+    lowered = text.lower()
+    if any(marker in lowered for marker in REVIEW_MARKERS):
+        present = [
+            field
+            for field, labels in FIELD_LABELS.items()
+            if any(label in lowered for label in labels)
+        ]
+        return f"[TICKET_REVIEW fields_present={','.join(present)}]"
+    if text.lstrip().startswith(("{", "[")) and any(
+        f'"{field}"' in lowered for field in FIELD_LABELS
+    ):
+        present = [field for field in FIELD_LABELS if f'"{field}"' in lowered]
+        return f"[DIALOGUE_TOOL_RESULT fields_present={','.join(present)}]"
+    return provider_question(redact_sensitive(text).text, local_values)

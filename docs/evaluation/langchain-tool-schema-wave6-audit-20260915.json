@@ -1,0 +1,56 @@
+{
+  "all_seven_tools_schema_characters": 3440,
+  "dependencies": {
+    "langchain": "1.4.0",
+    "langchain-openai": "1.6.2"
+  },
+  "generated_at": "2026-09-15T03:39:36.116387+00:00",
+  "limits": {
+    "agent_seconds": 60.0,
+    "business_tools_per_turn": 10,
+    "input_characters_per_model_call": 15000,
+    "model_call_seconds": 30.0,
+    "model_requests_per_turn": 5,
+    "output_tokens_per_model_call": 300
+  },
+  "measurement": "Serialized native tool schemas including structured final response; same current schemas before/after state filtering. No provider calls.",
+  "model": "glm-5.3-flash",
+  "revision": "52c6247571d460c5f8d0a3b3d5eb47ce1fed33ed",
+  "states": [
+    {
+      "business_tools": [
+        "search_knowledge"
+      ],
+      "schema_characters": 1098,
+      "state": "faq"
+    },
+    {
+      "business_tools": [
+        "search_knowledge",
+        "update_ticket_draft",
+        "set_draft_status"
+      ],
+      "schema_characters": 2176,
+      "state": "active_intake"
+    },
+    {
+      "business_tools": [
+        "search_knowledge",
+        "update_ticket_draft",
+        "set_draft_status",
+        "prepare_ticket_review",
+        "request_ticket_submission"
+      ],
+      "schema_characters": 2599,
+      "state": "complete_intake"
+    },
+    {
+      "business_tools": [
+        "search_knowledge",
+        "get_owned_case"
+      ],
+      "schema_characters": 1351,
+      "state": "owned_case_lookup"
+    }
+  ]
+}

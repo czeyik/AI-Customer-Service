@@ -233,6 +233,14 @@ def test_privacy_owner_hold_blocks_expiry_until_audited_release(db_session: Sess
     conversation = Conversation(
         channel="whatsapp",
         external_user_id="held-user",
+        dialogue_data={
+            "schema_version": 1,
+            "pending_offer": {
+                "description": "Held private narrative",
+                "issue_type": "unconfirmed_question",
+                "originating_turn": "held-message",
+            },
+        },
         created_at=NOW - timedelta(days=100),
         updated_at=NOW - timedelta(days=100),
     )
@@ -287,6 +295,7 @@ def test_privacy_owner_hold_blocks_expiry_until_audited_release(db_session: Sess
 
     held = run_retention(db_session, now=NOW, settings=SETTINGS)
     assert (held.messages, held.tickets) == (0, 0)
+    assert db_session.get(Conversation, conversation_id).dialogue_data["pending_offer"]
     release_legal_hold(db_session, actor=owner, hold=ticket_hold, now=NOW, settings=SETTINGS)
     release_legal_hold(db_session, actor=owner, hold=conversation_hold, now=NOW, settings=SETTINGS)
     assert db_session.query(AuditLog).filter_by(event_type="legal_hold_created").count() == 2
@@ -298,6 +307,83 @@ def test_privacy_owner_hold_blocks_expiry_until_audited_release(db_session: Sess
     assert db_session.get(Conversation, conversation_id) is None
     assert db_session.query(LegalHold).count() == 0
     assert db_session.query(AuditLog).filter(AuditLog.event_type.like("legal_hold_%")).count() == 0
+
+
+def test_retained_unlinked_media_keeps_ownership_but_scrubs_expired_dialogue(
+    db_session: Session,
+) -> None:
+    expired = NOW - timedelta(days=100)
+    evidence_group = "71d54ccf-f79e-46fd-81de-84481226e2fc"
+    conversation = Conversation(
+        channel="whatsapp",
+        external_user_id="retained-media-user",
+        intake_state="awaiting_email",
+        intake_data={
+            "name": "Private Name",
+            "email": "private@example.com",
+            "phone_number": "+60123456789",
+            "account_id": "private-account",
+            "trip_id": "private-trip",
+            "evidence_group": evidence_group,
+        },
+        dialogue_data={
+            "schema_version": 1,
+            "pending_offer": {
+                "description": "A private issue narrative",
+                "issue_type": "unconfirmed_question",
+                "originating_turn": "old-message",
+            },
+            "evidence_group": evidence_group,
+            "last_case_reference": "DUDU-20260914-ABCDE",
+        },
+        dialogue_revision=4,
+        created_at=expired,
+        updated_at=expired,
+    )
+    db_session.add(conversation)
+    db_session.flush()
+    db_session.add_all(
+        [
+            Message(
+                id="old-message",
+                conversation_id=conversation.id,
+                direction="inbound",
+                content="A private issue narrative",
+                created_at=expired,
+                updated_at=expired,
+            ),
+            MediaAttachment(
+                provider_media_id="recent-unlinked-media",
+                conversation_id=conversation.id,
+                evidence_group=evidence_group,
+                media_type="image",
+                declared_mime_type="image/png",
+                status="queued",
+                created_at=NOW - timedelta(days=1),
+                updated_at=NOW - timedelta(days=1),
+            ),
+        ]
+    )
+    db_session.commit()
+    conversation_id = conversation.id
+
+    result = run_retention(db_session, now=NOW, settings=SETTINGS)
+
+    assert (result.messages, result.conversations, result.attachments) == (1, 0, 0)
+    retained = db_session.get(Conversation, conversation_id)
+    assert retained.intake_state == "idle"
+    assert retained.intake_data == {"evidence_group": evidence_group}
+    assert retained.dialogue_data == {
+        "schema_version": 1,
+        "draft": None,
+        "pending_offer": None,
+        "pending_prompt": None,
+        "evidence_group": evidence_group,
+        "last_case_reference": "DUDU-20260914-ABCDE",
+        "pending_case_update": None,
+        "last_receipt": None,
+    }
+    assert retained.dialogue_revision == 5
 
 
 def test_object_failure_alerts_and_next_run_retries(

@@ -29,8 +29,12 @@ EXPOSE 8000
 
 FROM runtime AS test
 
+USER root
+RUN apk add --no-cache bash jq
+USER app
+
 COPY --chown=app:app . .
-RUN PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q -p no:cacheprovider
+RUN --mount=type=tmpfs,target=/tmp PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q -p no:cacheprovider
 
 FROM runtime AS final
 

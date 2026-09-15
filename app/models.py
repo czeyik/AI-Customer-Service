@@ -59,6 +59,8 @@ class Conversation(Base, TimestampMixin):
     risk_level = Column(String(40), default="normal", nullable=False)
     intake_state = Column(String(40), default="idle", nullable=False)
     intake_data = Column(JSON, default=dict, nullable=False)
+    dialogue_data = Column(JSON, default=dict, nullable=False)
+    dialogue_revision = Column(Integer, default=0, nullable=False)
 
     messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan")
     attachments = relationship("MediaAttachment", back_populates="conversation")

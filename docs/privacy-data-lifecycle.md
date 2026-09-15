@@ -6,13 +6,13 @@ Approved by Cze Yik on 9 September 2026.
 
 | Data | Owner | Lifecycle |
 | --- | --- | --- |
-| Conversations, messages, WhatsApp copies | Privacy owner | Permanently delete each copy after 90 days; remove empty state after detaching retained tickets/media |
+| Conversations, dialogue drafts/control metadata, messages, WhatsApp copies | Privacy owner | Permanently delete each copy after 90 days; remove empty state after detaching retained tickets/media |
 | Closed tickets, notes, notifications, audit/index rows | Support/privacy owner | Permanently delete 36 calendar months after `closed_at`; reopened tickets do not age |
 | S3 media | Privacy owner | Delete with its ticket; object deletion must succeed before metadata deletion |
 | Application/CloudWatch logs | Security owner | No content, contacts, or object URLs; CloudWatch expires after 30 days |
 | Rate-limit buckets | Security owner | Hashed identities only; delete expired windows |
 | Encrypted backups | Infrastructure/privacy owner | Expire within 35 days; reapply retention before restored traffic |
-| Z.AI | CCO/provider owner | Approved knowledge, minimized question and bounded sanitized context; no raw identifiers, ticket bodies, account data, media or full history |
+| Z.AI | CCO/provider owner | Approved knowledge, minimized question, bounded sanitized context and tool results with opaque field references; no raw identifiers, ticket bodies, account data, media or full history |
 
 Meta-held data is outside the application deletion boundary. Temporary media files close after
 scanning and are not durable storage. There is no external conversation/search index.

@@ -165,16 +165,22 @@ class PrivateObjectStore:
         )
 
     def put(self, key: str, stream: BinaryIO, mime_type: str, sha256: str) -> None:
+        from botocore.exceptions import ClientError
+
         stream.seek(0)
-        self.client.upload_fileobj(
-            stream,
-            self.settings.media_bucket,
-            key,
-            ExtraArgs={
-                "ContentType": mime_type,
-                "Metadata": {"sha256": sha256},
-            },
-        )
+        try:
+            self.client.put_object(
+                Bucket=self.settings.media_bucket, Key=key, Body=stream,
+                ContentType=mime_type, Metadata={"sha256": sha256}, IfNoneMatch="*",
+            )
+        except ClientError as exc:
+            if exc.response.get("ResponseMetadata", {}).get("HTTPStatusCode") != 412:
+                raise
+            # A crash after S3 acceptance reuses the same attachment key, including
+            # on versioned buckets. Verify the previous object before linking it.
+            existing = self.client.head_object(Bucket=self.settings.media_bucket, Key=key)
+            if existing.get("Metadata", {}).get("sha256") != sha256 or existing.get("ContentType") != mime_type:
+                raise MediaRejected("stored_object_mismatch") from exc
 
     def signed_url(self, key: str) -> str:
         return self.client.generate_presigned_url(

@@ -50,8 +50,8 @@ class Settings(BaseSettings):
     website_knowledge_urls: list[str] = Field(default_factory=list)
     zai_api_key: str = ""
     llm_model: str = "glm-5.3-flash"
-    llm_timeout_seconds: float = 8.0
-    llm_max_input_chars: int = 8000
+    llm_timeout_seconds: float = 30.0
+    llm_max_input_chars: int = 15000
     llm_max_output_tokens: int = 300
 
     rate_limit_messages_per_minute: int = 20
@@ -165,16 +165,14 @@ class Settings(BaseSettings):
         if not 1 <= self.clamav_timeout_seconds <= 30:
             errors.append("CLAMAV_TIMEOUT_SECONDS must be between 1 and 30")
 
-        if not self.llm_enabled:
-            errors.append("LLM_ENABLED must be true")
         if len(self.zai_api_key) < 16:
             errors.append("ZAI_API_KEY must be set")
         if self.llm_model != "glm-5.3-flash":
             errors.append("LLM_MODEL must be the approved glm-5.3-flash")
-        if not 1 <= self.llm_timeout_seconds <= 8:
-            errors.append("LLM_TIMEOUT_SECONDS must be between 1 and 8")
-        if not 1 <= self.llm_max_input_chars <= 8000:
-            errors.append("LLM_MAX_INPUT_CHARS must be between 1 and 8000")
+        if not 1 <= self.llm_timeout_seconds <= 30:
+            errors.append("LLM_TIMEOUT_SECONDS must be between 1 and 30")
+        if not 1 <= self.llm_max_input_chars <= 15000:
+            errors.append("LLM_MAX_INPUT_CHARS must be between 1 and 15000")
         if not 1 <= self.llm_max_output_tokens <= 300:
             errors.append("LLM_MAX_OUTPUT_TOKENS must be between 1 and 300")
 

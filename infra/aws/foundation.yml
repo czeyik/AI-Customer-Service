@@ -71,6 +71,7 @@ Resources:
                   - ecr:BatchCheckLayerAvailability
                   - ecr:CompleteLayerUpload
                   - ecr:DescribeImages
+                  - ecr:DescribeRepositories
                   - ecr:InitiateLayerUpload
                   - ecr:PutImage
                   - ecr:UploadLayerPart

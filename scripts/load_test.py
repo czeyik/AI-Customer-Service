@@ -23,7 +23,7 @@ def send(base_url: str, number: int) -> tuple[bool, float]:
                 data=payload,
                 headers={"Content-Type": "application/json"},
             ),
-            timeout=35,
+            timeout=90,
         ) as response:
             return response.status == 200, time.monotonic() - started
     except Exception:
