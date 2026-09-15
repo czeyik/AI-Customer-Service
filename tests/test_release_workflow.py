@@ -259,3 +259,42 @@ def test_ecr_mutability_check_executes_workflow_step(
     else:
         assert result.returncode != 0
         assert expected_error in result.stderr
+
+
+@pytest.mark.parametrize('first_status,succeeds', [('InProgress', True), ('Failed', False)])
+def test_ssm_deployment_waits_through_waiter_expiry(tmp_path, first_status, succeeds):
+    workflow, script = _workflow_step('Deploy through Systems Manager')
+    step = next(s for s in workflow['jobs']['release']['steps']
+                if s.get('name') == 'Deploy through Systems Manager')
+    assert step['timeout-minutes'] == 25
+    for expression in ('steps.release.outputs.registry', 'steps.images.outputs.app',
+                       'steps.images.outputs.clamav', 'steps.release.outputs.sha'):
+        script = script.replace('${{ ' + expression + ' }}', 'synthetic')
+    aws = tmp_path / 'aws'
+    aws.write_text(r'''#!/bin/sh
+set -eu
+case "$*" in
+  *describe-stacks*) echo i-synthetic ;;
+  *send-command*)
+    while [ "$1" != --parameters ]; do shift; done
+    printf '%s' "$2" | jq -e '.executionTimeout == ["1200"]' >/dev/null
+    echo synthetic-command ;;
+  *'wait command-executed'*)
+    count=$(cat "$WAIT_COUNT" 2>/dev/null || echo 0)
+    count=$((count+1)); echo "$count" > "$WAIT_COUNT"
+    [ "$count" -gt 1 ] ;;
+  *get-command-invocation*)
+    count=$(cat "$WAIT_COUNT")
+    if [ "$count" -eq 1 ]; then echo "$FIRST_STATUS"; else echo Success; fi ;;
+  *) exit 40 ;;
+esac
+''')
+    aws.chmod(0o755)
+    count = tmp_path / 'wait-count'
+    environment = {**os.environ, 'DEPLOY_ENVIRONMENT': 'staging',
+                   'FIRST_STATUS': first_status, 'WAIT_COUNT': str(count),
+                   'PATH': f'{tmp_path}:{os.environ["PATH"]}'}
+    result = subprocess.run(['bash', '-c', script], env=environment,
+                            capture_output=True, text=True, timeout=10)
+    assert (result.returncode == 0) is succeeds, result.stderr
+    assert int(count.read_text()) == (2 if succeeds else 1)
