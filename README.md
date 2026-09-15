@@ -1,6 +1,6 @@
 # DUDU Car AI Customer Service Chatbot
 
-MVP foundation for a secure, WhatsApp-first informational support chatbot for DUDU Car riders,
+WhatsApp-first informational support chatbot for DUDU Car riders,
 drivers, and organizations interested in business collaboration.
 
 The approved project direction is:
@@ -11,12 +11,16 @@ The approved project direction is:
 - Consent-first complaint, safety, human-escalation, and partnership ticket intake.
 - A purely informational bot: no refunds, cancellations, account changes, approvals, payments, or
   other business-state changes.
-- Hosted GLM-5.3-Flash, with a deterministic approved-knowledge outage fallback.
-- PostgreSQL, Docker Compose, secure media storage, and multiple named administrator accounts in
-  the launch target.
+- One bounded LangChain dialogue agent using hosted GLM-5.3-Flash, with a deterministic
+  approved-knowledge outage fallback.
+- PostgreSQL, Docker Compose, secure media storage, and multiple named administrator accounts.
 
 The complete, authoritative baseline is
-[`docs/requirements-summary.md`](docs/requirements-summary.md).
+[`docs/requirements-summary.md`](docs/requirements-summary.md). The durable dialogue design is in
+[`docs/architecture.md`](docs/architecture.md); current deployment evidence is in
+[`docs/release-validation.md`](docs/release-validation.md). See the
+[`docs/README.md`](docs/README.md) documentation index and
+[`docs/evaluation/README.md`](docs/evaluation/README.md) evidence index for the remaining records.
 
 ## Current Capabilities
 
@@ -83,16 +87,16 @@ publishes them:
 docker compose exec api python scripts/stage_website.py --cco-username jane
 ```
 
-The importer accepts only HTTPS pages on `duducar.co`, reads at most 100 sitemap URLs and 2 MB per
-page, and removes scripts, navigation, forms, and footers. Jane must review and activate each
-language version through her authenticated session.
+The importer accepts the exact HTTPS pages configured in `WEBSITE_KNOWLEDGE_URLS`, reads at most
+2 MB per page, and removes scripts, navigation, forms, and footers. The allowlist defaults to empty.
+Jane must review and activate each language version through her authenticated session.
 
 Knowledge management uses Jane's normal named-admin session, not a shared API key. A CCO client
 can obtain its CSRF token from `GET /api/knowledge/session`, list the bounded version history at
 `GET /api/knowledge/documents`, and use the documented publish, activate, remove, and rollback
 endpoints. Every mutation records Jane's account, source URI, version, and replacement details.
-Customer retrieval queries only effective `active` versions and uses the indexed PostgreSQL
-trigram candidate search before bounded in-process ranking.
+Customer retrieval ranks all effective `active` chunks up to the 500-chunk ceiling, including
+titles and tags. A larger corpus requires clarification until SQL ranking is introduced.
 
 ## Reproducible Checks And Migrations
 
@@ -113,6 +117,10 @@ alembic upgrade head
 
 The application does not create tables at startup. After changing SQLAlchemy models, add a
 migration and run `alembic check` against an up-to-date database before opening a pull request.
+For migration and concurrency checks, use disposable PostgreSQL databases: `DATABASE_URL` for the
+application and `TEST_POSTGRES_URL` for PostgreSQL integration tests. Install the `pg_trgm` extension
+and run `alembic upgrade head` before those checks. Never point fixture-driven or destructive tests at
+staging or production.
 
 The security workflow runs secret, dependency, static, source/configuration, container, and ZAP
 dynamic scans with the approved release gates. The threat model, exact policy, versions, and
@@ -137,9 +145,10 @@ outbound worker separately:
 python -m app.workers.whatsapp
 ```
 
-The webhook never calls Meta inline. It stores the unique inbound message ID, conversation state change,
-and reply together; the worker sends queued replies with bounded retries and moves permanent or
-exhausted failures to a dead-letter state. Raw HTTP access logging is disabled because Meta's
+The webhook stores each unique inbound event before acknowledging it. The worker processes that
+durable inbox and commits conversation changes, tickets and queued replies together. It sends replies
+with bounded retries for explicit rejections; uncertain sends await delivery reconciliation.
+Permanent or exhausted failures enter a dead-letter state. Raw HTTP access logging is disabled because Meta's
 verification request includes the private verify token in its query string.
 
 ## Secure media
@@ -224,7 +233,7 @@ curl -X POST http://localhost:8000/api/chat \
   }'
 ```
 
-Create a complaint ticket after consent:
+Start a complaint and obtain the response's consent `prompt_id`:
 
 ```bash
 curl -X POST http://localhost:8000/api/chat \
@@ -233,35 +242,64 @@ curl -X POST http://localhost:8000/api/chat \
     "channel": "web",
     "external_user_id": "demo-user-1",
     "text": "I want to complain because I was overcharged for my trip",
-    "user_role": "rider",
-    "name": "Demo Rider",
-    "email": "demo@example.com",
-    "account_id": "DUDU123",
-    "trip_id": "TRIP456",
-    "consent_to_ticket": true
+    "user_role": "rider"
   }'
 ```
 
-## Hosted LLM Direction
-
-Production uses the hosted model through a provider-neutral adapter:
-
-1. GLM-5.3-Flash as the approved hosted model.
-2. The deterministic approved-knowledge responder during provider outages or rejected output.
-3. DeepSeek V4 Flash retained only as an evaluated alternative, not a pilot provider.
-
-Set `LLM_ENABLED=true` and provision `ZAI_API_KEY` outside Git. Calls have an eight-second timeout,
-bounded input/output, no tools, and receive approved knowledge rather than customer messages.
-Invalid, unsafe, ungrounded, or failed responses use the deterministic approved-knowledge path.
-
-Run the repeatable trilingual outage evaluation with:
+Reply with that `prompt_id`, consent and the required contact details to submit:
 
 ```bash
-python scripts/release_eval.py --mode outage
+curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channel": "web",
+    "external_user_id": "demo-user-1",
+    "text": "Yes, submit my overcharge complaint with these details.",
+    "prompt_id": "<consent-prompt-id>",
+    "name": "Demo Rider",
+    "email": "demo@example.com",
+    "phone_number": "+60123456789",
+    "account_id": "DUDU123",
+    "trip_id": "TRIP456",
+    "consent_to_ticket": true,
+    "create_ticket": true
+  }'
 ```
 
-The authorized hosted-model command, evidence fields, go/no-go record, and activation procedure
-are in [`docs/release-validation.md`](docs/release-validation.md).
+## Dialogue architecture and deployment
+
+The support dialogue uses one bounded LangChain `create_agent` with the approved hosted
+`glm-5.3-flash` model. Local controls, typed validation, atomic PostgreSQL writes and the
+deterministic approved-knowledge fallback remain the authority for consequential behavior. See the
+[architecture](docs/architecture.md) for the tool, privacy, transaction and recovery boundaries.
+
+The last recorded production activation on 15 September 2026 enables customer replies through
+30 September, Malaysia time; support notification sending remains disabled. See
+[`docs/release-validation.md`](docs/release-validation.md) for exact release evidence. Runtime
+examples and defaults do not describe live switches.
+
+Provision `ZAI_API_KEY` outside Git. The agent path requires `LLM_ENABLED=true` and
+`LLM_CUSTOMER_CONTEXT_ENABLED=true` under the approved provider-data boundary. With those enabled,
+the agent receives approved knowledge, minimized messages and opaque field references. Seven
+Python business tools stage validated changes; PostgreSQL commits them after authorization checks.
+Each turn allows five model requests and ten native tool calls, including the structured final
+response, within 60 seconds; each request is capped at 30 seconds, 15,000 input characters and
+300 output tokens. Invalid, unsafe, ungrounded or failed output uses the local recovery path.
+
+Run diagnostics into a temporary output directory; the retained reports and hosted-review inputs are
+listed in the [evaluation evidence index](docs/evaluation/README.md):
+
+```bash
+evaluation_dir=$(mktemp -d)
+python scripts/release_eval.py --suite smart --mode outage \
+  --output "$evaluation_dir/outage.json"
+python scripts/smart_burst.py --output "$evaluation_dir/burst.json"
+```
+
+Hosted evaluation options and review inputs are in the [evaluation index](docs/evaluation/README.md).
+Release decisions and activation evidence are in [release status](docs/release-validation.md).
+Supply current verified pricing for an authorized live evaluation and keep diagnostic outputs in
+the temporary directory.
 
 ## Safety Gate
 

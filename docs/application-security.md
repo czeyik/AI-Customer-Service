@@ -1,6 +1,6 @@
 # Application Security Policy
 
-Last reviewed: 10 September 2026
+Last reviewed: 15 September 2026
 Owner: Cze Yik
 
 - Store production secrets in AWS Secrets Manager and inject them at deployment.
@@ -13,7 +13,8 @@ Owner: Cze Yik
   headers/CORS, private scanned media, and redacted logs.
 - Give the hosted model approved knowledge, a minimized current question and bounded sanitized
   context only after the privacy activation gate. Exclude raw identifiers, ticket bodies, account
-  data, media and full history. Give it no tools. Reject prompt injection,
+  data, media and full history. Seven scoped tools use opaque field references and stage changes
+  for local consent, ownership, lease and revision checks before atomic commit. Reject prompt injection,
   prohibited actions, and unsafe or ungrounded output.
 - Gitleaks, pip-audit, Bandit, Trivy, and OWASP ZAP run on pull requests, `main`/`dev`, weekly, and on
   demand. Secrets, dependency advisories, high/critical image or dynamic findings, and Bandit
