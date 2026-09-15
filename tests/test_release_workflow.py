@@ -261,7 +261,7 @@ def test_ecr_mutability_check_executes_workflow_step(
         assert expected_error in result.stderr
 
 
-@pytest.mark.parametrize('first_status,succeeds', [('InProgress', True), ('Failed', False)])
+@pytest.mark.parametrize('first_status,succeeds', [('InProgress', True), ('Cancelling', True), ('Failed', False)])
 def test_ssm_deployment_waits_through_waiter_expiry(tmp_path, first_status, succeeds):
     workflow, script = _workflow_step('Deploy through Systems Manager')
     step = next(s for s in workflow['jobs']['release']['steps']
@@ -290,6 +290,9 @@ case "$*" in
 esac
 ''')
     aws.chmod(0o755)
+    sleep = tmp_path / 'sleep'
+    sleep.write_text("#!/bin/sh\nprintf '%s\\n' \"$1\" >> \"$WAIT_COUNT.sleep\"\n")
+    sleep.chmod(0o755)
     count = tmp_path / 'wait-count'
     environment = {**os.environ, 'DEPLOY_ENVIRONMENT': 'staging',
                    'FIRST_STATUS': first_status, 'WAIT_COUNT': str(count),
@@ -298,3 +301,5 @@ esac
                             capture_output=True, text=True, timeout=10)
     assert (result.returncode == 0) is succeeds, result.stderr
     assert int(count.read_text()) == (2 if succeeds else 1)
+    if first_status == 'Cancelling':
+        assert (tmp_path / 'wait-count.sleep').read_text() == '5\n'
