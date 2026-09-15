@@ -1,6 +1,6 @@
 # Production Platform and Operations
 
-Status: **Platform evidence below is from the prior release; current candidate gates: [SMART.md](../SMART.md)**
+Status: **Operational runbook. Recorded release state and evidence: [release-validation.md](release-validation.md); current architecture: [architecture.md](architecture.md).**
 Owner: Cze Yik
 Region: AWS Malaysia (`ap-southeast-5`)
 Domain: `support.duducaradmin.com`
@@ -18,8 +18,8 @@ Domain: `support.duducaradmin.com`
   USD 28 remove staging/freeze expansion; at USD 30 disable outbound and stop nonessential resources
   after backup. Review billing daily.
 
-The approved single host provides 99% beta availability, not high availability. Promotion to
-`t4g.medium` or a multi-AZ design requires owner approval.
+The approved single host has a 99% beta availability target; it does not provide high
+availability. Promotion to `t4g.medium` or a multi-AZ design requires owner approval.
 
 ## Monitoring and recovery
 
@@ -39,8 +39,11 @@ python -m app.workers.backup --restore-key <key> --confirm-empty-target
 ## Deployment and rollback
 
 1. Deploy `infra/aws/budget.yml` in `us-east-1`, then `infra/aws/foundation.yml` and the environment
-   stack in `ap-southeast-5`. Apply the foundation update granting the deploy role repository-scoped
-   `ecr:DescribeRepositories` before using the immutable-tag release gate.
+   stack in `ap-southeast-5`. Keep the foundation rollout current before dispatching releases: the
+   GitHub deploy role needs repository-scoped ECR permissions for `ecr:BatchCheckLayerAvailability`,
+   `ecr:BatchGetImage`, `ecr:CompleteLayerUpload`, `ecr:DescribeImages`, `ecr:DescribeRepositories`,
+   `ecr:InitiateLayerUpload`, `ecr:PutImage`, and `ecr:UploadLayerPart` (plus
+   `ecr:GetAuthorizationToken` for registry login).
 2. Provision the runtime secret directly from `infra/production/runtime.env.example`; never commit
    or paste the populated file.
 3. Dispatch `.github/workflows/release.yml` to staging, validate the immutable digest pair, then
@@ -139,8 +142,6 @@ transaction. See [S3 conditional writes](https://docs.aws.amazon.com/AmazonS3/la
 
 ## Evidence
 
-- CloudFormation lint/drift, HTTPS/readiness/security headers, alarm routing, staging failure tests,
-  and digest deploy/rollback passed.
-- Capacity passed 1,000/1,000 requests at four-way concurrency and 0.796-second p95.
-- An encrypted isolated restore, migration, and retention pass completed within RPO/RTO.
-- Release-specific SHAs, digests, scans, and activation evidence: `docs/release-validation.md`.
+Release-specific SHAs, digests, scans, activation state, and pending maintenance are recorded in
+[release-validation.md](release-validation.md). Its production state is recorded evidence; verify
+live AWS state separately before acting.

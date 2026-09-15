@@ -8,12 +8,12 @@ Owner: Cze Yik
 Cze Yik authorized reactivating customer replies through **30 September 2026,
 Asia/Kuala_Lumpur** after the LangChain deployment. The existing message, budget,
 data and availability limits below continue to apply. The authorized
-`PUBLIC_BETA_END_DATE` is `2026-09-30`; the original 10–14 September window below is historical.
+`PUBLIC_BETA_END_DATE` is `2026-09-30` and applies to the beta window below.
 Support notification sending remains disabled under the current session instruction.
 
 ## Scope and limits
 
-- Public WhatsApp beta for Kuala Lumpur and Selangor, 10–14 September 2026.
+- Public WhatsApp beta for Kuala Lumpur and Selangor, 10–30 September 2026.
 - English, Bahasa Malaysia, and Simplified Chinese; approved answers, consent-first tickets, human
   escalation, and approved image/video attachments.
 - Limits: 20 messages/user/minute, 200/user/day, 2,000/day globally, and 10,000 total. Malaysia-time
@@ -41,9 +41,10 @@ or commitments are in scope.
 | Go/no-go, production, releases, rollback, budget, privacy, security, incidents, and recovery | Cze Yik |
 | Support, ticket assignment, customer communication, and approved knowledge/copy | Jane |
 
-Support notifications may remain disabled through 14 September 2026 while both owners monitor the
-admin dashboard. Customer replies, ticketing, auditing, urgent handling, and rollback controls are
-not waived.
+Per the current session instruction, support notifications remain disabled while both owners monitor
+the admin dashboard; current release evidence is recorded in
+[release-validation.md](release-validation.md). Customer replies, ticketing, auditing, urgent
+handling, and rollback controls are not waived.
 
 ## Platform and data policy
 

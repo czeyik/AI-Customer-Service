@@ -1,0 +1,257 @@
+{
+  "recorded_at_utc": "2026-09-15T13:42:14.882496+00:00",
+  "authorization": "Cze Yik explicitly requested customer sending activation and selected 30 September 2026 as the end date.",
+  "source_sha": "5122f81a9b9d1ee234fd05581196c0b94d118baf",
+  "fixed_ref": "customer-replies-20260915",
+  "source_pr": 12,
+  "source_merge_sha": "48e6c40bce2328ba3ba5f443086fe9261e6ae98c",
+  "app_digest": "sha256:ffd2a765cd745b7d5f1e56ea221712623b202b0965248b312c0197d20d834fdb",
+  "clamav_digest": "sha256:0c8ba5a56dbcfbf37bb3b90e46d2e7154eb54ee54c80f33ce583840264659ccd",
+  "validation": {
+    "focused_tests": 65,
+    "ci_run": 34973791316,
+    "security_run": 34973791326,
+    "ci_success": true,
+    "security_success": true,
+    "postgresql_passed": 562,
+    "postgresql_skipped": 2,
+    "arm64_passed": 556,
+    "arm64_skipped": 8
+  },
+  "staging": {
+    "workflow_run": 34974446260,
+    "deployment_id": 6459784323,
+    "release": {
+      "CommandId": "575cc6dc-a8c8-4b37-8c8c-2a3f486d92e1",
+      "Status": "Success",
+      "ExecutionStartDateTime": "2026-09-15T13:26:36.207Z",
+      "ExecutionEndDateTime": "2026-09-15T13:29:25.207Z"
+    },
+    "checks": {
+      "CommandId": "2b87cc50-4d67-4edb-a340-bfa7c3ec84a6",
+      "Status": "Success",
+      "ExecutionStartDateTime": "2026-09-15T13:30:24.508Z",
+      "ExecutionEndDateTime": "2026-09-15T13:31:16.508Z"
+    },
+    "results": [
+      {
+        "prior_total": 100,
+        "durable_inbound_count": 6,
+        "retained_total": 100,
+        "expires_at_utc": "2026-09-30T16:00:00",
+        "obsolete_notices_cancelled": 1,
+        "expired_counter_and_cap_check": true,
+        "rolled_back": true
+      },
+      {
+        "mode": "hosted",
+        "run_id": "activation-hosted-b05a25d12a",
+        "metrics": [
+          {
+            "inbound_turns": 1,
+            "model_attempts": 2,
+            "model_successes": 2,
+            "model_timeouts": 0,
+            "tool_calls": 1,
+            "prompt_tokens": 2855,
+            "completion_tokens": 136,
+            "reasoning_tokens": 18,
+            "reasoning_usage_missing": 0,
+            "fallbacks": 0,
+            "local_control": null,
+            "agent_executions": 1,
+            "agent_failure_fallback": 0,
+            "agent_error": null,
+            "agent_error_code": null,
+            "tool_schema_chars": 2196,
+            "tool_schema_calls": 2,
+            "latency_ms": 14418,
+            "outcome": "answered"
+          }
+        ],
+        "signed_webhook": true,
+        "invalid_signature_rejected": true,
+        "duplicate_events": 1,
+        "outbox_rows": 1,
+        "external_messages_sent": 0
+      },
+      {
+        "status": "ready"
+      }
+    ],
+    "secret_change": {
+      "secret": "dudu-support/staging/runtime-env",
+      "old_version": "b72d6a71-1dc6-44c5-a617-4777398b7ec6",
+      "new_version": "a9b8e1b4-103d-4e0a-9fd7-3d58d4e33a03",
+      "before": {
+        "META_SEND_ENABLED": "false",
+        "NOTIFICATION_SEND_ENABLED": "false",
+        "LLM_ENABLED": "true",
+        "LLM_CUSTOMER_CONTEXT_ENABLED": "true",
+        "PUBLIC_BETA_ENABLED": "false",
+        "PUBLIC_BETA_START_DATE": "2026-09-10",
+        "PUBLIC_BETA_END_DATE": "2026-09-30"
+      },
+      "changes": {
+        "PUBLIC_BETA_END_DATE": "2026-09-30",
+        "PUBLIC_BETA_ENABLED": "true"
+      },
+      "LLM_ENABLED": true,
+      "LLM_CUSTOMER_CONTEXT_ENABLED": true,
+      "NOTIFICATION_SEND_ENABLED": false
+    }
+  },
+  "production": {
+    "workflow_run": 34975560923,
+    "release": {
+      "CommandId": "4b804448-ebeb-44f1-828a-0655c195f49d",
+      "Status": "Success",
+      "ExecutionStartDateTime": "2026-09-15T13:31:59.453Z",
+      "ExecutionEndDateTime": "2026-09-15T13:34:48.453Z"
+    },
+    "activation": {
+      "CommandId": "bbb80a14-67ac-4147-ab95-760a6fbd02e1",
+      "Status": "Success",
+      "ExecutionStartDateTime": "2026-09-15T13:37:14.506Z",
+      "ExecutionEndDateTime": "2026-09-15T13:39:13.506Z"
+    },
+    "activation_results": [
+      {
+        "meta_phone_read_access": true,
+        "external_test_messages_sent": 0
+      },
+      {
+        "prior_total": 0,
+        "durable_inbound_count": 61,
+        "retained_total": 61,
+        "expires_at_utc": "2026-09-30T16:00:00",
+        "obsolete_notices_cancelled": 1
+      },
+      {
+        "status": "ready"
+      },
+      {
+        "customer_sending_enabled": true,
+        "containers": [
+          {
+            "container": "/dudu-production-api-1",
+            "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:ffd2a765cd745b7d5f1e56ea221712623b202b0965248b312c0197d20d834fdb",
+            "health": "healthy",
+            "restarts": 0,
+            "settings": {
+              "META_SEND_ENABLED": "true",
+              "NOTIFICATION_SEND_ENABLED": "false",
+              "PUBLIC_BETA_ENABLED": "true",
+              "PUBLIC_BETA_END_DATE": "2026-09-30",
+              "LLM_ENABLED": "true",
+              "LLM_CUSTOMER_CONTEXT_ENABLED": "true"
+            }
+          },
+          {
+            "container": "/dudu-production-worker-1",
+            "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:ffd2a765cd745b7d5f1e56ea221712623b202b0965248b312c0197d20d834fdb",
+            "health": "healthy",
+            "restarts": 0,
+            "settings": {
+              "META_SEND_ENABLED": "true",
+              "NOTIFICATION_SEND_ENABLED": "false",
+              "PUBLIC_BETA_ENABLED": "true",
+              "PUBLIC_BETA_END_DATE": "2026-09-30",
+              "LLM_ENABLED": "true",
+              "LLM_CUSTOMER_CONTEXT_ENABLED": "true"
+            }
+          }
+        ]
+      }
+    ],
+    "secret_change": {
+      "secret": "dudu-support/production/runtime-env",
+      "old_version": "19d61621-f311-4e18-87fb-3beb75d1b19c",
+      "new_version": "0b04e0d5-47f8-417b-a706-0d1a300052c1",
+      "before": {
+        "META_SEND_ENABLED": "false",
+        "NOTIFICATION_SEND_ENABLED": "false",
+        "LLM_ENABLED": "true",
+        "LLM_CUSTOMER_CONTEXT_ENABLED": "true",
+        "PUBLIC_BETA_ENABLED": "true",
+        "PUBLIC_BETA_START_DATE": "2026-09-10",
+        "PUBLIC_BETA_END_DATE": "2026-09-30"
+      },
+      "changes": {
+        "PUBLIC_BETA_END_DATE": "2026-09-30",
+        "META_SEND_ENABLED": "true"
+      },
+      "LLM_ENABLED": true,
+      "LLM_CUSTOMER_CONTEXT_ENABLED": true,
+      "NOTIFICATION_SEND_ENABLED": false
+    },
+    "verification": {
+      "CommandId": "51797ae3-73ae-4130-97cc-b1c66534845a",
+      "Status": "Success",
+      "ExecutionStartDateTime": "2026-09-15T13:40:08.091Z",
+      "ExecutionEndDateTime": "2026-09-15T13:40:15.091Z"
+    },
+    "verification_results": [
+      {
+        "normal_customer_processing_admitted": true,
+        "admission_check_rolled_back": true,
+        "meta_send_enabled": true,
+        "notification_send_enabled": false,
+        "end_date": "2026-09-30",
+        "retained_total": 61,
+        "counter_expires_at_utc": "2026-09-30T16:00:00",
+        "migration": "e5c1a2b3d4f6",
+        "inbox": [
+          {
+            "status": "done",
+            "count": 61
+          }
+        ],
+        "outbox": [
+          {
+            "status": "read",
+            "count": 51
+          },
+          {
+            "status": "cancelled",
+            "count": 1
+          },
+          {
+            "status": "delivered",
+            "count": 9
+          }
+        ],
+        "notifications": [
+          {
+            "status": "cancelled",
+            "count": 12
+          },
+          {
+            "status": "pending",
+            "count": 3
+          }
+        ],
+        "inbound_queues": {
+          "processing": 0,
+          "queued": 0
+        }
+      },
+      {
+        "status": "ready"
+      }
+    ],
+    "alarms": {
+      "dudu-production-application-errors": "OK",
+      "dudu-production-cpu-high": "OK",
+      "dudu-production-https-health": "OK",
+      "dudu-production-instance-status": "OK",
+      "dudu-production-memory-high": "OK"
+    }
+  },
+  "preparation_script_sha256": "e9911748b0407bedc6f1a9cdf95595d56c583eeef269cd54c72d1fed78d02564",
+  "customer_sending_enabled": true,
+  "notification_sending_enabled": false,
+  "customer_reply_end_date": "2026-09-30",
+  "timezone": "Asia/Kuala_Lumpur",
+  "existing_message_limits_preserved": true
+}

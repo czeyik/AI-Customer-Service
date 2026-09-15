@@ -78,7 +78,7 @@ def test_dialogue_models_keep_draft_prompt_and_unassigned_evidence():
     dialogue = DialogueData(evidence_group="unassigned-media")
     dialogue.draft = new_draft(
         expiry_minutes=60,
-        now=datetime(2026, 9, 14),
+        now=datetime(2026, 9, 30),
         evidence_group=dialogue.evidence_group,
     )
     dialogue = make_prompt(dialogue, "field", "turn-1", field="name")
@@ -907,7 +907,7 @@ def test_hypothetical_or_negated_status_controls_do_not_change_a_draft(status, t
 def test_owned_case_view_rejects_another_customer():
     common = dict(
         case_id="case-1",
-        public_id="DUDU-20260914-ABCDE",
+        public_id="DUDU-20260930-ABCDE",
         status="closed",
         channel="web",
         external_user_id="owner",
@@ -919,7 +919,7 @@ def test_owned_case_view_rejects_another_customer():
     owned = owned_case_view(**common, expected_external_user_id="owner")
     assert owned and owned.model_dump() == {
         "id": "case-1",
-        "public_id": "DUDU-20260914-ABCDE",
+        "public_id": "DUDU-20260930-ABCDE",
         "status": "closed",
         "version": 1,
         "update_count": 0,
@@ -938,7 +938,7 @@ def test_greeting_cannot_become_a_case_update_reference():
 def test_case_update_requires_owned_versioned_confirmation_and_is_idempotent():
     case = owned_case_view(
         case_id="case-1",
-        public_id="DUDU-20260914-ABCDE",
+        public_id="DUDU-20260930-ABCDE",
         status="closed",
         version=3,
         channel="web",

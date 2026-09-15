@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     rate_limit_messages_per_minute: int = 20
     public_beta_enabled: bool = False
     public_beta_start_date: date = date(2026, 9, 10)
-    public_beta_end_date: date = date(2026, 9, 14)
+    public_beta_end_date: date = date(2026, 9, 30)
     public_beta_messages_per_user_day: int = 200
     public_beta_messages_per_day: int = 2_000
     public_beta_messages_total: int = 10_000

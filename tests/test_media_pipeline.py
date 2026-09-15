@@ -35,11 +35,11 @@ from app.services.media import (
     MediaProcessingError,
     MediaRejected,
     PrivateObjectStore,
-    delete_attachment,
     process_next_media,
     validate_media,
 )
 from app.services.dialogue import load_dialogue_data
+from app.services.retention import run_retention
 from app.services.ticket_drafts import ConsentEvidence, DialogueData, DraftFields, make_prompt, new_draft
 
 
@@ -557,6 +557,8 @@ def test_deletion_invalidates_review_link(db_session: Session) -> None:
     )
     ticket = Ticket(
         public_id="DUDU-TEST-DELETE",
+        status="closed",
+        closed_at=datetime.utcnow() - timedelta(days=4 * 365),
         conversation=conversation,
         urgency="normal",
         channel="whatsapp",
@@ -587,10 +589,11 @@ def test_deletion_invalidates_review_link(db_session: Session) -> None:
     storage = FakeStore()
     storage.objects[attachment.object_key] = PNG
 
-    delete_attachment(db_session, attachment, "retention-job", storage)
+    result = run_retention(db_session, storage=storage)
 
-    assert attachment.status == "deleted" and attachment.object_key is None
-    assert ticket.attachment_count == 0 and storage.deleted == ["approved/aa/delete.png"]
+    assert (result.tickets, result.attachments, result.failures) == (1, 1, 0)
+    assert db_session.get(MediaAttachment, attachment.id) is None
+    assert storage.deleted == ["approved/aa/delete.png"]
     with pytest.raises(HTTPException) as exc:
         admin_router.review_media(attachment.id, Request({"type": "http"}), db_session, AdminUser())
     assert exc.value.status_code == 404

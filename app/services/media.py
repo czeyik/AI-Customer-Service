@@ -223,7 +223,7 @@ def reconcile_orphaned_media(
     }
     removed = 0
     failures = 0
-    # ponytail: scan the prefix directly for the pilot; use S3 Inventory above 10,000 objects.
+    # ponytail: scan the prefix directly; use S3 Inventory above 10,000 objects.
     for item in storage.list("approved/"):
         modified = item["LastModified"]
         if modified.tzinfo is None:
@@ -373,40 +373,6 @@ def process_next_media(
                 pass
         raise
     return True
-
-
-def delete_attachment(
-    db: Session,
-    attachment: MediaAttachment,
-    actor: str,
-    storage: PrivateObjectStore | None = None,
-) -> None:
-    if attachment.status == "deleted":
-        return
-    if attachment.object_key:
-        (storage or PrivateObjectStore()).delete(attachment.object_key)
-    ticket = attachment.ticket
-    attachment.status = "deleted"
-    attachment.deleted_at = datetime.utcnow()
-    attachment.object_key = None
-    if ticket:
-        ticket.attachment_count = len(
-            [
-                item
-                for item in ticket.attachments
-                if item.status == "approved" and item != attachment
-            ]
-        )
-    db.add(
-        AuditLog(
-            actor=actor,
-            event_type="media_deleted",
-            subject_type="attachment",
-            subject_id=attachment.id,
-            details={"attachment_id": attachment.id, "ticket_id": attachment.ticket_id},
-        )
-    )
-    db.commit()
 
 
 def validate_media(content: bytes) -> str:

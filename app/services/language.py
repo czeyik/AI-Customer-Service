@@ -52,12 +52,6 @@ def selected_language(text: str) -> str | None:
     )
 
 
-def language_name(language: str) -> str:
-    return {"en": "English", "ms": "Bahasa Malaysia", "zh": "Simplified Chinese"}.get(
-        language, "English"
-    )
-
-
 def is_language_selection(text: str) -> bool:
     return bool(re.fullmatch(
         r"(?i)\s*(?:please |sila )?(?:use english|speak (?:english|malay|chinese)|switch to (?:english|malay|chinese)|guna bahasa (?:malaysia|melayu)|cakap bahasa melayu|请用中文|说中文|用简体中文|请用英语)\s*[.!。]*\s*", text
