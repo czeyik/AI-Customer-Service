@@ -371,3 +371,25 @@ def test_restore_requires_empty_target_and_keeps_password_out_of_arguments(tmp_p
             runner=restore,
             table_names=lambda: ["tickets"],
         )
+
+
+def test_release_inventory_runs_directly_outside_repository(tmp_path):
+    import json
+    import os
+    import subprocess
+    import sys
+
+    url = f'sqlite:///{tmp_path / "inventory.db"}'
+    database = create_engine(url)
+    Base.metadata.create_all(database)
+    database.dispose()
+    environment = {key: value for key, value in os.environ.items() if key != 'PYTHONPATH'}
+    environment.update(ENVIRONMENT='development', DATABASE_URL=url)
+    result = subprocess.run(
+        [sys.executable, str(Path(__file__).resolve().parents[1] / 'scripts/release_inventory.py'),
+         '--validate-dialogue'], cwd=tmp_path, env=environment, capture_output=True,
+        text=True, timeout=15,
+    )
+    assert result.returncode == 0, result.stderr
+    counts = json.loads(result.stdout)
+    assert counts['conversations'] == counts['tickets'] == counts['media_attachments'] == 0
