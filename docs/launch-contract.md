@@ -3,6 +3,14 @@
 Status: **APPROVED — 10 September 2026**
 Owner: Cze Yik
 
+## Customer reply extension — 15 September 2026
+
+Cze Yik authorized reactivating customer replies through **30 September 2026,
+Asia/Kuala_Lumpur** after the LangChain deployment. The existing message, budget,
+data and availability limits below continue to apply. The authorized
+`PUBLIC_BETA_END_DATE` is `2026-09-30`; the original 10–14 September window below is historical.
+Support notification sending remains disabled under the current session instruction.
+
 ## Scope and limits
 
 - Public WhatsApp beta for Kuala Lumpur and Selangor, 10–14 September 2026.
