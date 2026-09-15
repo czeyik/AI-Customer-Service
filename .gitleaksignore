@@ -1,2 +1,5 @@
 # Synthetic Base32 TOTP test fixture; not a production credential.
 aaebd40bd2ece93bf693d954ce7c7eb9f20b3aba:tests/test_admin_ticket_operations.py:generic-api-key:28
+
+# SHA-256 rate-limit bucket identifier; not a credential.
+72af0fa20c4e073f40675d37d860303ba4584aff:migrations/versions/f7b2c3d4e5a6_rename_beta_total_bucket.py:generic-api-key:14
