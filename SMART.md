@@ -3,7 +3,7 @@
 Prepared: 13 September 2026.
 Repository: /home/czeyik/Documents/AI-Customer-Service.
 Reference revision: 6d2ce8d (Record SMART activation state).
-Status: **Waves 1–8 complete. The LangChain candidate is deployed dark in production; integrity, smoke and the full 60-minute observation pass. Customer and notification sending remain disabled.**
+Status: **Waves 1–8 complete. Customer chatbot replies are enabled through 30 September 2026, Malaysia time. Production runs the verified activation update; notification sending remains disabled.**
 
 ## 1. Objective and scope
 
@@ -703,9 +703,18 @@ the owner. Do not invent working provider behavior or migrate unsafe data.
 | 5. Handler cutover | Complete | Staged execution, atomic commit, transport recovery and typed fallback pass |
 | 6. Evaluation | Complete | Automatic acceptance passes; corrected user review passes all 300 FAQ and nine focused answers, including 60 held-out paraphrases. Reviewed report has `rollout_ready=true`. |
 | 7. Release preparation | Complete | One dialogue owner; tested cutover, recovery and staging-success gates; 554 PostgreSQL tests pass. [Local evidence](docs/evaluation/langchain-wave7-local-20260915.json). |
-| 8. Production deployment | Complete | Candidate `2227b650` is deployed dark on the staging-tested pair. Migration, media integrity, smoke and the 18:14–19:14 MY observation pass. [Release evidence](docs/evaluation/langchain-production-wave8-20260915.json). |
+| 8. Production deployment | Complete | Candidate `2227b650` passed dark deployment, migration, smoke and the full observation. Follow-up `5122f81a` enables customer replies through 30 September. [Wave 8 evidence](docs/evaluation/langchain-production-wave8-20260915.json); [activation](docs/evaluation/customer-sending-activation-20260915.json). |
 
 ### Latest checkpoint
+
+- Customer replies were activated at **21:39 MY on 15 September 2026**, through **30 September 2026, Asia/Kuala_Lumpur**, under Cze Yik's explicit instruction. Notifications remain disabled.
+- Production runs `5122f81a9b9d1ee234fd05581196c0b94d118baf`, fixed ref `customer-replies-20260915`, published in merged PR #12. CI/Security, staging and production Release `34975560923` pass; the staging-tested immutable pair was promoted without rebuilding.
+- Activation SSM `bbb80a14-67ac-4147-ab95-760a6fbd02e1` verifies healthy API/worker with Meta on, beta enabled through 30 September, LLM/context on and notifications off. Meta phone access passes.
+- The expired cumulative counter was restored to 61 durable inbound messages, preserving the 10,000-message cap. One never-sent obsolete beta-ended notice was cancelled. Existing daily/minute limits remain enforced.
+- Production verification `51797ae3-73ae-4130-97cc-b1c66534845a` admits normal customer processing, rolls back its probe, confirms migration `e5c1a2b3d4f6` and empty inbound queues. All five production alarms are OK.
+- [Activation evidence](docs/evaluation/customer-sending-activation-20260915.json) records the exact images, source, approvals, secret versions and checks. The Wave 8 checkpoint below records the earlier dark deployment.
+
+### Wave 8 deployment checkpoint — before customer activation
 
 - Waves 1–8 are complete. Production runs candidate `2227b650101384d35ac8d713851d584cae46e4f9`, fixed ref `langchain-20260915-r3`; customer and notification sending remain disabled.
 - Original workspace branch `smart-release-20260911`, starting revision `52c6247571d460c5f8d0a3b3d5eb47ce1fed33ed`; inherited changes and the AGENTS.md deletion remain preserved. Evidence publication uses the isolated `/tmp/dudu-langchain-release-20260915` worktree.
@@ -728,6 +737,6 @@ the owner. Do not invent working provider behavior or migrate unsafe data.
 
 ### Remaining work
 
-None within the authorized LangChain deployment scope. Production remains dark. Customer activation
-or a beta extension requires its own authorization; compatible-runtime recovery keeps the tested
-image pair and can disable the LLM without restoring an old database over new records.
+None within the authorized deployment and customer activation scope. Customer replies are enabled
+through 30 September 2026, Malaysia time; notifications remain disabled. Compatible-runtime recovery
+keeps the tested image pair and can disable the LLM without restoring an old database over new records.

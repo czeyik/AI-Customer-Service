@@ -1,6 +1,27 @@
 # Release Validation and Public-Beta Activation
 
-Status: **LangChain Waves 1–8 complete. Production is deployed dark; migration, smoke and the full observation pass. Customer and notification sending remain disabled — see [SMART.md](../SMART.md)**
+Status: **LangChain Waves 1–8 complete. Customer replies are enabled through 30 September 2026, Malaysia time. Notification sending remains disabled — see [SMART.md](../SMART.md).**
+
+## Customer sending activation — 15 September 2026
+
+Cze Yik explicitly authorized customer sending and selected **30 September 2026,
+Asia/Kuala_Lumpur** as the end date. Activation completed at **21:39 MY**. The runtime now
+accepts the configured end date instead of pinning it to 14 September; existing message limits
+and the separate notification switch remain in place.
+
+| Gate | Evidence |
+| --- | --- |
+| Published source | `5122f81a9b9d1ee234fd05581196c0b94d118baf`, fixed ref `customer-replies-20260915`; PR #12 merged into `dev` as `48e6c40bce2328ba3ba5f443086fe9261e6ae98c` |
+| CI and Security | Runs `34973791316` / `34973791326` pass; 562 PostgreSQL tests and 556 ARM64 tests pass, with two/eight expected skips; 65 focused tests pass locally |
+| Staging | Release `34974446260`, deployment `6459784323`, SSM `575cc6dc-a8c8-4b37-8c8c-2a3f486d92e1` pass. Check `2b87cc50-4d67-4edb-a340-bfa7c3ec84a6` verifies the expired-counter restoration/cap in a rolled-back transaction, signed webhook processing/deduplication and a hosted agent answer |
+| Production promotion | Release `34975560923`, SSM `4b804448-ebeb-44f1-828a-0655c195f49d` pass; identical staging-tested app and ClamAV digests promoted without rebuilding |
+| Activation | SSM `bbb80a14-67ac-4147-ab95-760a6fbd02e1` succeeds. API and worker are healthy with `META_SEND_ENABLED=true`, `PUBLIC_BETA_ENABLED=true`, `PUBLIC_BETA_END_DATE=2026-09-30`, LLM/context on and notifications off. Meta phone access verifies |
+| Limit continuity | Restored the expired cumulative counter to 61 durable inbound messages, expiring at 1 October midnight MY. Cancelled one never-attempted obsolete capacity notice from the closed window |
+| Production verification | SSM `51797ae3-73ae-4130-97cc-b1c66534845a` confirms normal processing admission, unchanged migration, empty inbound queues and preserved counter after rolling back the probe. Public readiness passes; all five production alarms are OK |
+
+The [activation record](evaluation/customer-sending-activation-20260915.json) contains exact image
+digests, timestamps, secret-version changes and aggregate checks. The dark deployment evidence below
+records the earlier Wave 8 state before this separately authorized activation.
 Go/no-go owner: Cze Yik
 Support lead and CCO: Jane
 Beta: 10–14 September 2026
