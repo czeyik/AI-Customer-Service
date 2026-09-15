@@ -1,6 +1,6 @@
 # Release Validation and Public-Beta Activation
 
-Status: **LangChain Waves 1–6 complete; Wave 7 complete; Wave 8 publication/staging preparation in progress — see [SMART.md](../SMART.md)**
+Status: **LangChain Waves 1–8 complete. Production is deployed dark; migration, smoke and the full observation pass. Customer and notification sending remain disabled — see [SMART.md](../SMART.md)**
 Go/no-go owner: Cze Yik
 Support lead and CCO: Jane
 Beta: 10–14 September 2026
@@ -14,8 +14,7 @@ All twelve audit fixes are implemented. Cze Yik's corrected
 [human submission](evaluation/langchain-wave6-human-review-submitted-20260915.json) matches the
 exact final 300 FAQ and nine focused answers and passes both semantic scores for every answer.
 The [reviewed report](evaluation/langchain-live-wave6-reviewed-20260915.json) passes all Wave 6
-acceptance gates. The user resumed Wave 7 on 15 September 2026; the candidate has not yet been
-published, staged or deployed.
+acceptance gates. The user resumed Wave 7 on 15 September 2026; source publication and deployment progress is recorded below.
 
 | Gate | Current evidence |
 | --- | --- |
@@ -47,14 +46,14 @@ usage, cost and latency.
 Cze Yik renewed the existing AWS-0104 exceptions for outbound TCP 443/465 and AWS-0136 for
 AWS-managed SNS encryption through **17 September 2026**, exclusively for staging and dark
 deployment with customer sending disabled. This does not extend the public beta or notification
-waiver. Trivy uses `exp:2026-09-17`, a conservative date-only cutoff; recheck the gate before release.
+waiver. Trivy uses `exp:2026-09-17`, a conservative date-only cutoff; the candidate Security workflow passed with this expiry.
 
 Read-only AWS discovery used the `dudu-production` profile in account `173454940059`, region
-`ap-southeast-5`. Foundation and production stacks exist; staging must be recreated for this
-candidate. The current production secret reports `META_SEND_ENABLED=true`,
+`ap-southeast-5`. Foundation and production stacks exist; isolated staging was recreated successfully.
+Before cutover, read-only SSM verified that production containers reported `META_SEND_ENABLED=true`,
 `NOTIFICATION_SEND_ENABLED=false`, `LLM_ENABLED=true`, and `LLM_CUSTOMER_CONTEXT_ENABLED=true`.
-The runtime container values still require verification. Preparation preserves those settings;
-staging and the authorized dark deployment use disabled sending.
+Production input/timeout were 8,000/8s before cutover; the authorized dark deployment applied the
+approved 15,000/30s limits and disabled sending.
 
 Local release checks pass: **554 PostgreSQL tests, two skipped**; fresh migration to
 `e5c1a2b3d4f6`, schema drift and dependency integrity pass. AMD64/ARM64 Docker test targets each
@@ -67,12 +66,131 @@ the local runtime image. Cutover now validates configuration before downtime, pr
 references on failed retries, checks durable row counts and typed state, and waits for a complete
 worker cycle. Production promotion requires successful staging for the exact SHA and an immutable
 ECR repository. The [runbook](production-platform.md) covers deployment and compatible-runtime recovery.
-Source is published in [PR #7](https://github.com/czeyik/AI-Customer-Service/pull/7). A follow-up
-removes the production validator’s obsolete requirement that the LLM stay enabled, making the
-documented `LLM_ENABLED=false` recovery operable; 73 config/handler/platform tests pass with two
-skips. Candidate CI/Security is refreshing for that change. Staging, production and observation
-remain pending. GitHub’s default `main` still lacks Release, so the validated source must also pass
-its protected PR flow before manual staging dispatch is available.
+### Published candidate and staging
+
+Protected PRs [#7](https://github.com/czeyik/AI-Customer-Service/pull/7) and
+[#8](https://github.com/czeyik/AI-Customer-Service/pull/8) published the refactor into `dev` and
+registered Release on default `main`. Production configuration now accepts `LLM_ENABLED=false`
+for compatible-runtime recovery. Two staging failures exposed operational defects:
+
+- Run `34946722828` failed before deployment because ECR manifest publication required
+  repository-scoped `ecr:BatchGetImage`. Foundation now grants that and `ecr:DescribeRepositories`.
+  [PR #9](https://github.com/czeyik/AI-Customer-Service/pull/9) also extends the SSM waiter through
+  nonterminal states, with a 20-minute host bound and 25-minute workflow bound. Twelve shell
+  workflow checks pass, including delayed success, paced cancellation and terminal failure.
+- Run `34949944201` / SSM `6b2d5929-9dd5-4398-a699-d7e7b0b24150` published the r2 images, backed
+  up and stopped before migration because the direct inventory script could not import the app.
+  [PR #10](https://github.com/czeyik/AI-Customer-Service/pull/10) applies the existing repository-root
+  bootstrap; its regression removes `PYTHONPATH` and invokes the packaged entry point from outside
+  the repository. All 25 platform checks pass; independent review found no other entry-point issue.
+
+The final candidate is **`2227b650101384d35ac8d713851d584cae46e4f9`**, fixed by tag
+**`langchain-20260915-r3`**. PR #10 CI/Security pass (558 PostgreSQL tests, two skips;
+552 ARM64 tests, eight skips). Exact merged-SHA Security `34952053066` and CI `34952053006` both pass with the same test totals.
+
+| Final staging artifact | Result |
+| --- | --- |
+| Release | [34952070500](https://github.com/czeyik/AI-Customer-Service/actions/runs/34952070500), success on the exact candidate |
+| Host deployment | SSM `94a3ef1d-5038-494e-9fd5-31af1f717c1d`, success |
+| Application | `sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0` |
+| ClamAV | `sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42` |
+| Migration | `e5c1a2b3d4f6`; all 14 application-table counts preserved |
+| Fresh backup | `backups/postgresql/2026/09/15/092756.dump` in `dudu-support-staging-173454940059` |
+| Runtime | Public readiness, API/worker matching app digest, database/ClamAV health pass; zero API/worker restarts |
+| Configuration | Meta/notification sending off, beta off, LLM/context on, input 15,000/output 300, timeout 30 seconds |
+| Deployed-artifact checks | SSM `6486f6fb-1c2e-4f01-877e-65cb382f3699`: 25 pass; paused/pending/review and owned evidence, private S3, clean/EICAR, provider-failure discard |
+
+Staging is isolated at `staging-support.duducaradmin.com`, instance `i-0abae1e4a9f94df81`.
+Its legacy baseline contained two synthetic admin accounts, 24 existing seed knowledge records,
+three paused/pending/review conversations, six messages, one media row and one completed inbox row.
+The earlier baseline backup `backups/postgresql/2026/09/15/090326.dump` restored into an isolated
+empty database and migrated in **14 seconds**, with exact counts (SSM
+`6f91c7c2-78b2-4969-b00c-49ef2290d91a`). Fixture checks use the separate database
+`wave8_checks_20260915`; no production customer data was copied.
+
+Cze Yik authorized the existing Meta configuration in Secrets Manager and waived the dedicated
+test app/phone, recipient and window. Read-only phone-ID access succeeds with zero sends (SSM
+`6015ffb0-3670-464c-b1d5-6da91597cc41`). Live WhatsApp delivery is omitted; sending remains off.
+The bounded hosted/signed-webhook smoke succeeds (SSM `ea58e628-8f49-4d35-be6e-c9631cd6ceb6`):
+one measured agent execution, three provider calls, one tool, 4,518 input and 329 completion tokens,
+24 reported reasoning tokens, **21.250 seconds**, no timeout/fallback. The public signed webhook
+rejects an invalid signature, deduplicates the event exactly once, and the actual worker completes
+it with one unsent outbox row. External messages sent: **zero**.
+
+Same-image recovery with `LLM_ENABLED=false` succeeds: Release `34953325146` / SSM
+`904c3ec2-812c-4037-97fa-3aae76606fe5`. Fallback SSM `e51576c4-ad39-4a65-8c2d-498f50969f07`
+confirms both actual containers use the same digest with LLM off and sending off. FAQ, consent-first
+ticket creation and replay pass with zero model calls and exactly one ticket. Signed public webhook
+processing and deduplication pass through the actual fallback worker, with zero sends. Recovery
+backup: `backups/postgresql/2026/09/15/093751.dump`. LLM-on roll-forward succeeds on the same tag: Release `34953739867` / SSM
+`0ae1f794-883f-49fd-85a3-387d0013eb54`. Final verification SSM
+`3fe2e842-8081-4d62-a814-8b428fc488af` confirms the identical app/ClamAV pair, health, zero restarts,
+LLM/context on, input 15,000/timeout 30, sending off, and preserved table counts. Final backup:
+`backups/postgresql/2026/09/15/094203.dump`. Nine additional isolated DB/worker/Meta/SMTP failure
+checks pass (SSM `057b9e18-2be0-467a-bc61-619d0b35d422`), covering unavailable DB, retry bounds,
+uncertain delivery and signed reconciliation. No network sends are used by these failure checks.
+
+**Pre-cutover baseline:** production read-only conversion preflight passed all five conversations (four without drafts,
+one active draft), with zero writes or restarts (SSM `8ed02633-346a-4504-84de-c3ca42d9e307`).
+The quiesced deployment repeated preflight against the final cutover state. All five production
+alarms were OK at 17:36 MY. The project-tagged AWS budget reports USD 0.096 against USD 30, last
+updated 14:40 MY; this is delayed tagged spend, not a whole-account total. Production, its secret
+and sending state remained unchanged during preparation. Both reviewed images were downloaded without a
+restart (SSM `6526d6b3-079a-41c1-b630-18524793b208`); pre-pull free disk was 11.06GB and the latest
+hourly S3 backup was `backups/postgresql/2026/09/15/093602.dump`. The authorized cutover and post-cutover observation are recorded below.
+The production monitor was uploaded and validated read-only (SSM
+`591e1082-7534-4eba-8354-491e0fc76b21`): no errors, restarts, duplicate rows or new inbound traffic;
+host memory 51.72%. The existing two pending notifications were left unsent. These results are predeployment baseline evidence; the post-cutover observation is recorded below.
+
+### Production cutover — 15 September 2026
+
+Cze Yik instructed “deploy now and start wave 8” at approximately 18:06 MY, authorizing the
+exception to the usual 02:00–04:00 window. Current candidate/staging gates remain successful.
+The production runtime secret moved with a compare-and-swap from
+`7d4ec156-5a17-4562-8d04-f5c10fa9897f` to `19d61621-f311-4e18-87fb-3beb75d1b19c`.
+Only `META_SEND_ENABLED=false`, `LLM_MAX_INPUT_CHARS=15000`, and `LLM_TIMEOUT_SECONDS=30`
+changed; notifications remain off, LLM/context remain on, and beta dates were not extended.
+Production Release [34956214933](https://github.com/czeyik/AI-Customer-Service/actions/runs/34956214933)
+and SSM `daafc6f1-566f-44d1-bd84-caab4cd60915` succeed on the staging-tested
+`langchain-20260915-r3` ref and exact candidate SHA. The identical app and ClamAV digest pair is
+running; API and worker are healthy with zero restarts. Verification SSM
+`e8f30db9-b66e-4643-9efc-57a4faaecea6` confirms migration `e5c1a2b3d4f6`, all 14 table counts
+preserved at cutover (five conversations, two tickets, six media), valid typed dialogue, no media
+ownership mismatch, and all six approved private S3 objects present with matching byte lengths.
+Fresh backup: `backups/postgresql/2026/09/15/100905.dump` in the production bucket.
+Retention removed zero records. Actual API/worker settings: Meta/notification sending
+off, LLM/context on, input 15,000 and timeout 30 seconds.
+
+Production smoke SSM `6562da07-cfd7-4632-a201-a4d33dbbd732` passes: the actual running API invokes
+LangChain for a sourced FAQ answer in **11.725 seconds**, using two provider calls, one tool,
+3,691 input and 117 completion tokens. A separate deterministic control check creates exactly one
+consented synthetic ticket and returns the same receipt on replay, with zero provider calls and
+zero sends. One notification remains queued. The first smoke harness (`97cedc65-38e9-4fea-b02f-d64df9a93637`)
+passed its hosted assertions but used an unrecognized synthetic fallback phrase; the correction
+reused the staging-tested phrase and changed no application code. Both smoke attempts are synthetic;
+post-smoke totals are nine conversations, three tickets, six media, 126 messages, and 15 notifications.
+
+The full observation began **18:14:03 MY / 10:14:03 UTC**, after the final configuration and smoke.
+The observation ended **19:14:11 MY / 11:14:11 UTC**, after **3,607.906 seconds**, and passed.
+The [aggregate evidence](evaluation/langchain-production-wave8-20260915.json) contains timestamps,
+all samples, source and deployment provenance, smoke results and minimized table counts.
+
+| Production observation gate | Result |
+| --- | --- |
+| Public readiness | 118/118 pass; longest sample gap 37.899 seconds |
+| Existing alarms | All five OK in all 60 samples |
+| Host, queues and logs | 13/13 checks pass; zero restarts, OOM events, processing errors, failed/uncertain audit events or duplicate rows |
+| Traffic and sending | Zero new customer inbound rows; existing inbox/outbox complete; three notifications remain pending and unsent, including the synthetic smoke notification |
+| Resources | CloudWatch memory peak 78.109% (85% threshold), CPU peak 8.313% |
+| Backup | New-runtime hourly backup `backups/postgresql/2026/09/15/110940.dump`, 173,917 bytes |
+| Budget | Project-tagged USD 0.096 against USD 30 at both checks; reporting timestamp 14:40 MY |
+| Final integrity | SSM `ca27f2c2-b084-42d9-b60f-fdfd2d22ea14` passes exact images/flags, health, typed dialogue, media ownership and all six private media objects |
+
+The separate host snapshot calculates memory from `MemAvailable` and peaks at 87.39%; the alarm
+uses CloudWatch `mem_used_percent`, whose peak is 78.109%. The alarm metric remained below its
+threshold. With no new customer traffic, this observation establishes dark deployment health.
+No configuration recovery or new application build was required. Customer and notification sending
+remain disabled, with LLM/context enabled and the evaluated model limits applied.
 
 ## Historical SMART release — production state recorded 12 September 2026
 

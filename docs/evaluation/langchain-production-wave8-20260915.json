@@ -1,0 +1,4688 @@
+{
+  "candidate_sha": "2227b650101384d35ac8d713851d584cae46e4f9",
+  "release_ref": "langchain-20260915-r3",
+  "repository": "czeyik/AI-Customer-Service",
+  "aws_account": "173454940059",
+  "region": "ap-southeast-5",
+  "images": {
+    "application": "sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+    "clamav": "sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42"
+  },
+  "candidate_checks": {
+    "ci_run": 34952053006,
+    "security_run": 34952053066,
+    "both_succeeded": true,
+    "postgres_tests": 558,
+    "postgres_skipped": 2,
+    "arm64_tests": 552,
+    "arm64_skipped": 8
+  },
+  "authorization": {
+    "immediate_cutover": "2026-09-15 approximately 18:06 Asia/Kuala_Lumpur",
+    "exceptions": [
+      "AWS-0104",
+      "AWS-0136"
+    ],
+    "exceptions_renewed_through": "2026-09-17",
+    "scope": "staging and dark deployment, sending disabled",
+    "beta_extended": false
+  },
+  "staging": {
+    "release_runs": [
+      34952070500,
+      34953325146,
+      34953739867
+    ],
+    "commands": {
+      "cutover": {
+        "CommandId": "94a3ef1d-5038-494e-9fd5-31af1f717c1d",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T09:27:37.000Z",
+        "ExecutionEndDateTime": "2026-09-15T09:28:50Z"
+      },
+      "deployed_checks": {
+        "CommandId": "6486f6fb-1c2e-4f01-877e-65cb382f3699",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T09:30:08.424Z",
+        "ExecutionEndDateTime": "2026-09-15T09:30:29.424Z"
+      },
+      "hosted_smoke": {
+        "CommandId": "ea58e628-8f49-4d35-be6e-c9631cd6ceb6",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T09:31:00.524Z",
+        "ExecutionEndDateTime": "2026-09-15T09:31:53.524Z"
+      },
+      "llm_off_deploy": {
+        "CommandId": "904c3ec2-812c-4037-97fa-3aae76606fe5",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T09:36:09.506Z",
+        "ExecutionEndDateTime": "2026-09-15T09:38:26.506Z"
+      },
+      "fallback_smoke": {
+        "CommandId": "e51576c4-ad39-4a65-8c2d-498f50969f07",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T09:38:57.184Z",
+        "ExecutionEndDateTime": "2026-09-15T09:39:06.184Z"
+      },
+      "llm_on_deploy": {
+        "CommandId": "0ae1f794-883f-49fd-85a3-387d0013eb54",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T09:40:22.438Z",
+        "ExecutionEndDateTime": "2026-09-15T09:42:39.438Z"
+      },
+      "final_verification": {
+        "CommandId": "3fe2e842-8081-4d62-a814-8b428fc488af",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T09:43:01.694Z",
+        "ExecutionEndDateTime": "2026-09-15T09:43:01.694Z"
+      },
+      "failure_checks": {
+        "CommandId": "057b9e18-2be0-467a-bc61-619d0b35d422",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T09:42:13.565Z",
+        "ExecutionEndDateTime": "2026-09-15T09:42:24.565Z"
+      }
+    },
+    "hosted_smoke": {
+      "mode": "hosted",
+      "run_id": "wave8-hosted-ac82e61c95",
+      "metrics": [
+        {
+          "inbound_turns": 1,
+          "model_attempts": 3,
+          "model_successes": 3,
+          "model_timeouts": 0,
+          "tool_calls": 1,
+          "prompt_tokens": 4518,
+          "completion_tokens": 329,
+          "reasoning_tokens": 24,
+          "reasoning_usage_missing": 0,
+          "fallbacks": 0,
+          "local_control": null,
+          "agent_executions": 1,
+          "agent_failure_fallback": 0,
+          "agent_error": null,
+          "agent_error_code": null,
+          "tool_schema_chars": 3294,
+          "tool_schema_calls": 3,
+          "latency_ms": 21250,
+          "outcome": "answered"
+        }
+      ],
+      "signed_webhook": true,
+      "invalid_signature_rejected": true,
+      "duplicate_events": 1,
+      "outbox_rows": 1,
+      "external_messages_sent": 0
+    },
+    "fallback_smoke": {
+      "mode": "fallback",
+      "run_id": "wave8-fallback-e0697a1fc3",
+      "metrics": [
+        {
+          "inbound_turns": 1,
+          "model_attempts": 0,
+          "model_successes": 0,
+          "model_timeouts": 0,
+          "tool_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "reasoning_tokens": 0,
+          "reasoning_usage_missing": 0,
+          "fallbacks": 1,
+          "local_control": null,
+          "agent_executions": 0,
+          "agent_failure_fallback": 0,
+          "agent_error": null,
+          "agent_error_code": null,
+          "tool_schema_chars": 0,
+          "tool_schema_calls": 0,
+          "latency_ms": 148,
+          "outcome": "answered"
+        },
+        {
+          "inbound_turns": 1,
+          "model_attempts": 0,
+          "model_successes": 0,
+          "model_timeouts": 0,
+          "tool_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "reasoning_tokens": 0,
+          "reasoning_usage_missing": 0,
+          "fallbacks": 1,
+          "local_control": "mandatory_handoff",
+          "agent_executions": 0,
+          "agent_failure_fallback": 0,
+          "agent_error": null,
+          "agent_error_code": null,
+          "tool_schema_chars": 0,
+          "tool_schema_calls": 0,
+          "latency_ms": 33,
+          "outcome": "ticket_started"
+        },
+        {
+          "inbound_turns": 1,
+          "model_attempts": 0,
+          "model_successes": 0,
+          "model_timeouts": 0,
+          "tool_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "reasoning_tokens": 0,
+          "reasoning_usage_missing": 0,
+          "fallbacks": 1,
+          "local_control": "api_control",
+          "agent_executions": 0,
+          "agent_failure_fallback": 0,
+          "agent_error": null,
+          "agent_error_code": null,
+          "tool_schema_chars": 0,
+          "tool_schema_calls": 0,
+          "latency_ms": 52,
+          "outcome": "ticket_created"
+        },
+        {
+          "inbound_turns": 1,
+          "model_attempts": 0,
+          "model_successes": 0,
+          "model_timeouts": 0,
+          "tool_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "reasoning_tokens": 0,
+          "reasoning_usage_missing": 0,
+          "fallbacks": 1,
+          "local_control": "api_control",
+          "agent_executions": 0,
+          "agent_failure_fallback": 0,
+          "agent_error": null,
+          "agent_error_code": null,
+          "tool_schema_chars": 0,
+          "tool_schema_calls": 0,
+          "latency_ms": 28,
+          "outcome": "deterministic_fallback"
+        }
+      ],
+      "signed_webhook": true,
+      "invalid_signature_rejected": true,
+      "duplicate_events": 1,
+      "outbox_rows": 1,
+      "external_messages_sent": 0
+    },
+    "final_verification": {
+      "containers": [
+        {
+          "name": "/dudu-staging-api-1",
+          "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+          "health": "healthy",
+          "restarts": 0,
+          "settings": {
+            "META_SEND_ENABLED": "false",
+            "NOTIFICATION_SEND_ENABLED": "false",
+            "LLM_ENABLED": "true",
+            "LLM_CUSTOMER_CONTEXT_ENABLED": "true",
+            "LLM_MAX_INPUT_CHARS": "15000",
+            "LLM_TIMEOUT_SECONDS": "30"
+          }
+        },
+        {
+          "name": "/dudu-staging-worker-1",
+          "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+          "health": "healthy",
+          "restarts": 0,
+          "settings": {
+            "META_SEND_ENABLED": "false",
+            "NOTIFICATION_SEND_ENABLED": "false",
+            "LLM_ENABLED": "true",
+            "LLM_CUSTOMER_CONTEXT_ENABLED": "true",
+            "LLM_MAX_INPUT_CHARS": "15000",
+            "LLM_TIMEOUT_SECONDS": "30"
+          }
+        },
+        {
+          "name": "/dudu-staging-clamav-1",
+          "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+          "health": "healthy",
+          "restarts": 0
+        }
+      ],
+      "migration": "e5c1a2b3d4f6",
+      "preserved_counts": {
+        "admin_users": 2,
+        "audit_logs": 57,
+        "conversations": 7,
+        "knowledge_chunks": 24,
+        "knowledge_documents": 24,
+        "legal_holds": 0,
+        "media_attachments": 1,
+        "messages": 20,
+        "rate_limit_buckets": 2,
+        "support_notifications": 0,
+        "ticket_notes": 0,
+        "tickets": 1,
+        "whatsapp_inbound_messages": 3,
+        "whatsapp_outbound_messages": 2
+      },
+      "backup": "backups/postgresql/2026/09/15/094203.dump"
+    },
+    "github_deployment_id": 6455972311
+  },
+  "production": {
+    "release_run": 34956214933,
+    "commands": {
+      "cutover": {
+        "CommandId": "daafc6f1-566f-44d1-bd84-caab4cd60915",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T10:07:23.243Z",
+        "ExecutionEndDateTime": "2026-09-15T10:10:02.243Z"
+      },
+      "integrity": {
+        "CommandId": "e8f30db9-b66e-4643-9efc-57a4faaecea6",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T10:11:01.114Z",
+        "ExecutionEndDateTime": "2026-09-15T10:11:05.114Z"
+      },
+      "initial_smoke_harness_failure": {
+        "CommandId": "97cedc65-38e9-4fea-b02f-d64df9a93637",
+        "Status": "Failed",
+        "ExecutionStartDateTime": "2026-09-15T10:11:30.715Z",
+        "ExecutionEndDateTime": "2026-09-15T10:11:52.715Z"
+      },
+      "smoke": {
+        "CommandId": "6562da07-cfd7-4632-a201-a4d33dbbd732",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T10:13:17.246Z",
+        "ExecutionEndDateTime": "2026-09-15T10:13:36.246Z"
+      },
+      "post_observation": {
+        "CommandId": "ca27f2c2-b084-42d9-b60f-fdfd2d22ea14",
+        "Status": "Success",
+        "ExecutionStartDateTime": "2026-09-15T11:15:29.575Z",
+        "ExecutionEndDateTime": "2026-09-15T11:15:32.575Z"
+      }
+    },
+    "integrity": [
+      {
+        "containers": [
+          {
+            "name": "/dudu-production-api-1",
+            "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+            "health": "healthy",
+            "restarts": 0,
+            "settings": {
+              "META_SEND_ENABLED": "false",
+              "NOTIFICATION_SEND_ENABLED": "false",
+              "LLM_ENABLED": "true",
+              "LLM_CUSTOMER_CONTEXT_ENABLED": "true",
+              "LLM_MAX_INPUT_CHARS": "15000",
+              "LLM_TIMEOUT_SECONDS": "30"
+            }
+          },
+          {
+            "name": "/dudu-production-worker-1",
+            "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+            "health": "healthy",
+            "restarts": 0,
+            "settings": {
+              "META_SEND_ENABLED": "false",
+              "NOTIFICATION_SEND_ENABLED": "false",
+              "LLM_ENABLED": "true",
+              "LLM_CUSTOMER_CONTEXT_ENABLED": "true",
+              "LLM_MAX_INPUT_CHARS": "15000",
+              "LLM_TIMEOUT_SECONDS": "30"
+            }
+          },
+          {
+            "name": "/dudu-production-clamav-1",
+            "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+            "health": "healthy",
+            "restarts": 0
+          }
+        ],
+        "migration": "e5c1a2b3d4f6",
+        "preserved_counts": {
+          "admin_users": 2,
+          "audit_logs": 441,
+          "conversations": 5,
+          "knowledge_chunks": 134,
+          "knowledge_documents": 42,
+          "legal_holds": 0,
+          "media_attachments": 6,
+          "messages": 114,
+          "rate_limit_buckets": 4,
+          "support_notifications": 14,
+          "ticket_notes": 1,
+          "tickets": 2,
+          "whatsapp_inbound_messages": 60,
+          "whatsapp_outbound_messages": 60
+        },
+        "backup": "backups/postgresql/2026/09/15/100905.dump"
+      },
+      {
+        "status": "ready"
+      },
+      {
+        "typed_dialogue_valid": true,
+        "counts": {
+          "admin_users": 2,
+          "conversations": 5,
+          "messages": 114,
+          "whatsapp_inbound_messages": 60,
+          "whatsapp_outbound_messages": 60,
+          "tickets": 2,
+          "media_attachments": 6,
+          "ticket_notes": 1,
+          "support_notifications": 14,
+          "knowledge_documents": 42,
+          "knowledge_chunks": 134,
+          "audit_logs": 442,
+          "legal_holds": 0,
+          "rate_limit_buckets": 4
+        },
+        "media_ownership_mismatches": 0,
+        "approved_objects_verified": 6
+      }
+    ],
+    "smoke": {
+      "confirmation": {
+        "external_send_attempts": 0,
+        "idempotent_replay": true,
+        "model_attempts": 0,
+        "notification_rows": 1,
+        "prompt_issued": true,
+        "ticket_count": 1
+      },
+      "hosted": {
+        "agent_executions": 1,
+        "completion_tokens": 117,
+        "latency_ms": 11725,
+        "model_attempts": 2,
+        "model_successes": 2,
+        "outcome": "answered",
+        "prompt_tokens": 3691,
+        "reasoning_tokens": 0,
+        "tool_calls": 1
+      }
+    },
+    "initial_smoke_harness_failure": "Hosted assertions passed, then the synthetic fallback phrase did not match the deterministic complaint trigger. The harness reused the staging-tested phrase; no application code changed.",
+    "secret_change": {
+      "secret": "dudu-support/production/runtime-env",
+      "old_version": "7d4ec156-5a17-4562-8d04-f5c10fa9897f",
+      "new_version": "19d61621-f311-4e18-87fb-3beb75d1b19c",
+      "before": {
+        "META_SEND_ENABLED": "true",
+        "NOTIFICATION_SEND_ENABLED": "false",
+        "LLM_ENABLED": "true",
+        "LLM_CUSTOMER_CONTEXT_ENABLED": "true",
+        "LLM_MAX_INPUT_CHARS": "8000",
+        "LLM_TIMEOUT_SECONDS": "8"
+      },
+      "changes": {
+        "META_SEND_ENABLED": "false",
+        "LLM_MAX_INPUT_CHARS": "15000",
+        "LLM_TIMEOUT_SECONDS": "30"
+      },
+      "LLM_ENABLED": true,
+      "LLM_CUSTOMER_CONTEXT_ENABLED": true,
+      "NOTIFICATION_SEND_ENABLED": false
+    },
+    "post_smoke_counts": {
+      "admin_users": 2,
+      "audit_logs": 443,
+      "conversations": 9,
+      "knowledge_chunks": 134,
+      "knowledge_documents": 42,
+      "legal_holds": 0,
+      "media_attachments": 6,
+      "messages": 126,
+      "rate_limit_buckets": 2,
+      "support_notifications": 15,
+      "ticket_notes": 1,
+      "tickets": 3,
+      "whatsapp_inbound_messages": 60,
+      "whatsapp_outbound_messages": 60
+    },
+    "observation_summary": {
+      "alarm_issues": [],
+      "alarm_samples": 60,
+      "collection_errors": [],
+      "complete": true,
+      "elapsed_seconds": 3607.906,
+      "end_utc": "2026-09-15T11:14:11.720743+00:00",
+      "host_issues": [],
+      "host_memory_peak_percent": 87.39,
+      "host_samples": 13,
+      "max_ready_gap_seconds": 37.899,
+      "ready_failures": 0,
+      "ready_samples": 118,
+      "start_utc": "2026-09-15T10:14:03.814760+00:00"
+    },
+    "observation_samples": {
+      "start_utc": "2026-09-15T10:14:03.814760+00:00",
+      "duration_seconds_required": 3600,
+      "ready": [
+        {
+          "at": "2026-09-15T10:14:03.814769+00:00",
+          "ok": true,
+          "latency_ms": 76
+        },
+        {
+          "at": "2026-09-15T10:14:41.713943+00:00",
+          "ok": true,
+          "latency_ms": 50
+        },
+        {
+          "at": "2026-09-15T10:15:11.764912+00:00",
+          "ok": true,
+          "latency_ms": 64
+        },
+        {
+          "at": "2026-09-15T10:15:42.440099+00:00",
+          "ok": true,
+          "latency_ms": 58
+        },
+        {
+          "at": "2026-09-15T10:16:12.498225+00:00",
+          "ok": true,
+          "latency_ms": 112
+        },
+        {
+          "at": "2026-09-15T10:16:43.211996+00:00",
+          "ok": true,
+          "latency_ms": 56
+        },
+        {
+          "at": "2026-09-15T10:17:13.268316+00:00",
+          "ok": true,
+          "latency_ms": 56
+        },
+        {
+          "at": "2026-09-15T10:17:43.900597+00:00",
+          "ok": true,
+          "latency_ms": 49
+        },
+        {
+          "at": "2026-09-15T10:18:13.950275+00:00",
+          "ok": true,
+          "latency_ms": 58
+        },
+        {
+          "at": "2026-09-15T10:18:44.641225+00:00",
+          "ok": true,
+          "latency_ms": 55
+        },
+        {
+          "at": "2026-09-15T10:19:14.696740+00:00",
+          "ok": true,
+          "latency_ms": 61
+        },
+        {
+          "at": "2026-09-15T10:19:51.213146+00:00",
+          "ok": true,
+          "latency_ms": 52
+        },
+        {
+          "at": "2026-09-15T10:20:21.265917+00:00",
+          "ok": true,
+          "latency_ms": 59
+        },
+        {
+          "at": "2026-09-15T10:20:51.967179+00:00",
+          "ok": true,
+          "latency_ms": 49
+        },
+        {
+          "at": "2026-09-15T10:21:22.016471+00:00",
+          "ok": true,
+          "latency_ms": 63
+        },
+        {
+          "at": "2026-09-15T10:21:52.721233+00:00",
+          "ok": true,
+          "latency_ms": 57
+        },
+        {
+          "at": "2026-09-15T10:22:22.779300+00:00",
+          "ok": true,
+          "latency_ms": 57
+        },
+        {
+          "at": "2026-09-15T10:22:53.463218+00:00",
+          "ok": true,
+          "latency_ms": 56
+        },
+        {
+          "at": "2026-09-15T10:23:23.519857+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:23:54.208107+00:00",
+          "ok": true,
+          "latency_ms": 59
+        },
+        {
+          "at": "2026-09-15T10:24:24.267657+00:00",
+          "ok": true,
+          "latency_ms": 56
+        },
+        {
+          "at": "2026-09-15T10:25:00.758653+00:00",
+          "ok": true,
+          "latency_ms": 60
+        },
+        {
+          "at": "2026-09-15T10:25:30.819163+00:00",
+          "ok": true,
+          "latency_ms": 65
+        },
+        {
+          "at": "2026-09-15T10:26:01.533390+00:00",
+          "ok": true,
+          "latency_ms": 56
+        },
+        {
+          "at": "2026-09-15T10:26:31.590041+00:00",
+          "ok": true,
+          "latency_ms": 50
+        },
+        {
+          "at": "2026-09-15T10:27:02.217789+00:00",
+          "ok": true,
+          "latency_ms": 55
+        },
+        {
+          "at": "2026-09-15T10:27:32.273449+00:00",
+          "ok": true,
+          "latency_ms": 55
+        },
+        {
+          "at": "2026-09-15T10:28:02.927422+00:00",
+          "ok": true,
+          "latency_ms": 57
+        },
+        {
+          "at": "2026-09-15T10:28:32.984891+00:00",
+          "ok": true,
+          "latency_ms": 58
+        },
+        {
+          "at": "2026-09-15T10:29:03.699255+00:00",
+          "ok": true,
+          "latency_ms": 58
+        },
+        {
+          "at": "2026-09-15T10:29:33.758410+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T10:30:10.234873+00:00",
+          "ok": true,
+          "latency_ms": 49
+        },
+        {
+          "at": "2026-09-15T10:30:40.284964+00:00",
+          "ok": true,
+          "latency_ms": 72
+        },
+        {
+          "at": "2026-09-15T10:31:10.937057+00:00",
+          "ok": true,
+          "latency_ms": 56
+        },
+        {
+          "at": "2026-09-15T10:31:40.993783+00:00",
+          "ok": true,
+          "latency_ms": 60
+        },
+        {
+          "at": "2026-09-15T10:32:11.651433+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:32:41.705200+00:00",
+          "ok": true,
+          "latency_ms": 50
+        },
+        {
+          "at": "2026-09-15T10:33:12.429284+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:33:42.482856+00:00",
+          "ok": true,
+          "latency_ms": 49
+        },
+        {
+          "at": "2026-09-15T10:34:13.121623+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:34:43.176082+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:35:19.639657+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T10:35:49.695069+00:00",
+          "ok": true,
+          "latency_ms": 51
+        },
+        {
+          "at": "2026-09-15T10:36:20.391018+00:00",
+          "ok": true,
+          "latency_ms": 52
+        },
+        {
+          "at": "2026-09-15T10:36:50.444150+00:00",
+          "ok": true,
+          "latency_ms": 60
+        },
+        {
+          "at": "2026-09-15T10:37:21.099237+00:00",
+          "ok": true,
+          "latency_ms": 52
+        },
+        {
+          "at": "2026-09-15T10:37:51.151969+00:00",
+          "ok": true,
+          "latency_ms": 57
+        },
+        {
+          "at": "2026-09-15T10:38:21.799136+00:00",
+          "ok": true,
+          "latency_ms": 60
+        },
+        {
+          "at": "2026-09-15T10:38:51.860187+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T10:39:22.498440+00:00",
+          "ok": true,
+          "latency_ms": 48
+        },
+        {
+          "at": "2026-09-15T10:39:52.547514+00:00",
+          "ok": true,
+          "latency_ms": 52
+        },
+        {
+          "at": "2026-09-15T10:40:29.015488+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:40:59.070303+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:41:29.733623+00:00",
+          "ok": true,
+          "latency_ms": 50
+        },
+        {
+          "at": "2026-09-15T10:41:59.785113+00:00",
+          "ok": true,
+          "latency_ms": 50
+        },
+        {
+          "at": "2026-09-15T10:42:30.453516+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:43:00.507353+00:00",
+          "ok": true,
+          "latency_ms": 62
+        },
+        {
+          "at": "2026-09-15T10:43:31.219991+00:00",
+          "ok": true,
+          "latency_ms": 68
+        },
+        {
+          "at": "2026-09-15T10:44:01.289705+00:00",
+          "ok": true,
+          "latency_ms": 60
+        },
+        {
+          "at": "2026-09-15T10:44:31.975792+00:00",
+          "ok": true,
+          "latency_ms": 59
+        },
+        {
+          "at": "2026-09-15T10:45:02.036484+00:00",
+          "ok": true,
+          "latency_ms": 51
+        },
+        {
+          "at": "2026-09-15T10:45:38.524167+00:00",
+          "ok": true,
+          "latency_ms": 55
+        },
+        {
+          "at": "2026-09-15T10:46:08.580247+00:00",
+          "ok": true,
+          "latency_ms": 57
+        },
+        {
+          "at": "2026-09-15T10:46:39.221101+00:00",
+          "ok": true,
+          "latency_ms": 58
+        },
+        {
+          "at": "2026-09-15T10:47:09.280489+00:00",
+          "ok": true,
+          "latency_ms": 55
+        },
+        {
+          "at": "2026-09-15T10:47:39.941744+00:00",
+          "ok": true,
+          "latency_ms": 58
+        },
+        {
+          "at": "2026-09-15T10:48:10.001128+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:48:40.670325+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:49:10.725168+00:00",
+          "ok": true,
+          "latency_ms": 59
+        },
+        {
+          "at": "2026-09-15T10:49:41.399141+00:00",
+          "ok": true,
+          "latency_ms": 57
+        },
+        {
+          "at": "2026-09-15T10:50:11.457298+00:00",
+          "ok": true,
+          "latency_ms": 57
+        },
+        {
+          "at": "2026-09-15T10:50:48.009330+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T10:51:18.064774+00:00",
+          "ok": true,
+          "latency_ms": 60
+        },
+        {
+          "at": "2026-09-15T10:51:48.741437+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T10:52:18.797279+00:00",
+          "ok": true,
+          "latency_ms": 55
+        },
+        {
+          "at": "2026-09-15T10:52:49.451006+00:00",
+          "ok": true,
+          "latency_ms": 51
+        },
+        {
+          "at": "2026-09-15T10:53:19.503471+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T10:53:50.160677+00:00",
+          "ok": true,
+          "latency_ms": 59
+        },
+        {
+          "at": "2026-09-15T10:54:20.221218+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T10:54:50.885163+00:00",
+          "ok": true,
+          "latency_ms": 52
+        },
+        {
+          "at": "2026-09-15T10:55:20.938978+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T10:55:57.423985+00:00",
+          "ok": true,
+          "latency_ms": 50
+        },
+        {
+          "at": "2026-09-15T10:56:27.475644+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T10:56:58.165778+00:00",
+          "ok": true,
+          "latency_ms": 56
+        },
+        {
+          "at": "2026-09-15T10:57:28.224054+00:00",
+          "ok": true,
+          "latency_ms": 55
+        },
+        {
+          "at": "2026-09-15T10:57:58.943140+00:00",
+          "ok": true,
+          "latency_ms": 55
+        },
+        {
+          "at": "2026-09-15T10:58:28.999868+00:00",
+          "ok": true,
+          "latency_ms": 52
+        },
+        {
+          "at": "2026-09-15T10:58:59.645399+00:00",
+          "ok": true,
+          "latency_ms": 56
+        },
+        {
+          "at": "2026-09-15T10:59:29.703050+00:00",
+          "ok": true,
+          "latency_ms": 65
+        },
+        {
+          "at": "2026-09-15T11:00:00.359409+00:00",
+          "ok": true,
+          "latency_ms": 72
+        },
+        {
+          "at": "2026-09-15T11:00:30.433091+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T11:01:06.965929+00:00",
+          "ok": true,
+          "latency_ms": 52
+        },
+        {
+          "at": "2026-09-15T11:01:37.019979+00:00",
+          "ok": true,
+          "latency_ms": 60
+        },
+        {
+          "at": "2026-09-15T11:02:07.712307+00:00",
+          "ok": true,
+          "latency_ms": 56
+        },
+        {
+          "at": "2026-09-15T11:02:37.770357+00:00",
+          "ok": true,
+          "latency_ms": 63
+        },
+        {
+          "at": "2026-09-15T11:03:08.563928+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T11:03:38.619816+00:00",
+          "ok": true,
+          "latency_ms": 62
+        },
+        {
+          "at": "2026-09-15T11:04:09.276014+00:00",
+          "ok": true,
+          "latency_ms": 56
+        },
+        {
+          "at": "2026-09-15T11:04:39.334117+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T11:05:10.024166+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T11:05:40.078972+00:00",
+          "ok": true,
+          "latency_ms": 61
+        },
+        {
+          "at": "2026-09-15T11:06:16.536554+00:00",
+          "ok": true,
+          "latency_ms": 59
+        },
+        {
+          "at": "2026-09-15T11:06:46.597126+00:00",
+          "ok": true,
+          "latency_ms": 50
+        },
+        {
+          "at": "2026-09-15T11:07:17.266139+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T11:07:47.322480+00:00",
+          "ok": true,
+          "latency_ms": 55
+        },
+        {
+          "at": "2026-09-15T11:08:17.980608+00:00",
+          "ok": true,
+          "latency_ms": 57
+        },
+        {
+          "at": "2026-09-15T11:08:48.040095+00:00",
+          "ok": true,
+          "latency_ms": 54
+        },
+        {
+          "at": "2026-09-15T11:09:18.713093+00:00",
+          "ok": true,
+          "latency_ms": 60
+        },
+        {
+          "at": "2026-09-15T11:09:48.775432+00:00",
+          "ok": true,
+          "latency_ms": 77
+        },
+        {
+          "at": "2026-09-15T11:10:19.425592+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T11:10:49.481217+00:00",
+          "ok": true,
+          "latency_ms": 52
+        },
+        {
+          "at": "2026-09-15T11:11:25.933869+00:00",
+          "ok": true,
+          "latency_ms": 50
+        },
+        {
+          "at": "2026-09-15T11:11:55.986759+00:00",
+          "ok": true,
+          "latency_ms": 53
+        },
+        {
+          "at": "2026-09-15T11:12:26.640817+00:00",
+          "ok": true,
+          "latency_ms": 91
+        },
+        {
+          "at": "2026-09-15T11:12:56.733906+00:00",
+          "ok": true,
+          "latency_ms": 52
+        },
+        {
+          "at": "2026-09-15T11:13:27.396179+00:00",
+          "ok": true,
+          "latency_ms": 65
+        },
+        {
+          "at": "2026-09-15T11:13:57.463768+00:00",
+          "ok": true,
+          "latency_ms": 59
+        },
+        {
+          "at": "2026-09-15T11:14:03.814841+00:00",
+          "ok": true,
+          "latency_ms": 53
+        }
+      ],
+      "alarms": [
+        {
+          "at": "2026-09-15T10:14:04.511360+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:15:12.439552+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:16:13.210319+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:17:13.900016+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:18:14.640687+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:19:15.376454+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:20:21.966529+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:21:22.720551+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:22:23.462473+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:23:24.207329+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:24:24.921558+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:25:31.532429+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:26:32.217018+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:27:32.926498+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:28:33.698419+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:29:34.418156+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:30:40.935963+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:31:41.650243+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:32:42.428139+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:33:43.120395+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:34:43.822960+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:35:50.389843+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:36:51.098190+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:37:51.797874+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:38:52.497215+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:39:53.183457+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:40:59.732371+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:42:00.452160+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:43:01.218788+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:44:01.974261+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:45:02.714132+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:46:09.219655+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:47:09.940152+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:48:10.668842+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:49:11.397687+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:50:12.155084+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:51:18.739876+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:52:19.449469+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:53:20.159017+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:54:20.883533+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:55:21.580607+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:56:28.164101+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:57:28.941467+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:58:29.643620+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T10:59:30.357709+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:00:31.132166+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:01:37.710421+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:02:38.561953+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:03:39.274125+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:04:40.022187+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:05:40.720825+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:06:47.264148+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:07:47.978603+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:08:48.711048+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:09:49.423555+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:10:50.123433+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:11:56.638670+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:12:57.393904+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:13:58.155822+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        },
+        {
+          "at": "2026-09-15T11:14:04.455015+00:00",
+          "states": {
+            "dudu-production-application-errors": "OK",
+            "dudu-production-cpu-high": "OK",
+            "dudu-production-https-health": "OK",
+            "dudu-production-instance-status": "OK",
+            "dudu-production-memory-high": "OK"
+          }
+        }
+      ],
+      "host": [
+        {
+          "command_id": "84a8fc28-f034-4878-8f95-3aaa2256943c",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 423868.15022,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 82.72,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "33.09%",
+                "MemUsage": "21.18MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "78.47%",
+                "MemUsage": "902.4MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.14%",
+                "MemPerc": "28.81%",
+                "MemUsage": "55.31MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "1.59%",
+                "MemPerc": "29.07%",
+                "MemUsage": "74.43MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "0.15%",
+                "MemPerc": "12.88%",
+                "MemUsage": "32.96MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T10:14:08.252116+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "213f4d72-515e-4103-896a-426ccea18c77",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 424178.957965,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 82.89,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "34.46%",
+                "MemUsage": "22.05MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "78.47%",
+                "MemUsage": "902.4MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "28.93%",
+                "MemUsage": "55.55MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.36%",
+                "MemPerc": "29.00%",
+                "MemUsage": "74.25MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "0.12%",
+                "MemPerc": "12.92%",
+                "MemUsage": "33.07MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T10:19:18.941831+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "6267ea32-707e-40e2-bced-cbbdb164861a",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 424488.438525,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 83.34,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "35.79%",
+                "MemUsage": "22.91MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "78.50%",
+                "MemUsage": "902.7MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "28.96%",
+                "MemUsage": "55.59MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.40%",
+                "MemPerc": "28.99%",
+                "MemUsage": "74.22MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "0.65%",
+                "MemPerc": "12.92%",
+                "MemUsage": "33.07MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T10:24:28.419067+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "d6239be3-6cc0-403a-af05-f11edb16ce6e",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 424797.988253,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 82.71,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.01%",
+                "MemPerc": "36.13%",
+                "MemUsage": "23.12MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "78.50%",
+                "MemUsage": "902.8MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "28.99%",
+                "MemUsage": "55.66MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.38%",
+                "MemPerc": "29.02%",
+                "MemUsage": "74.3MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "4.95%",
+                "MemPerc": "12.97%",
+                "MemUsage": "33.2MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T10:29:37.965114+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "5befcad6-1292-46ab-a13e-25caddc14703",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 425107.329895,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 82.3,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "36.21%",
+                "MemUsage": "23.18MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "78.50%",
+                "MemUsage": "902.7MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "29.14%",
+                "MemUsage": "55.95MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.39%",
+                "MemPerc": "29.13%",
+                "MemUsage": "74.57MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "13.03%",
+                "MemUsage": "33.35MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T10:34:47.305304+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "a527ea55-cbb6-44cd-be32-6badf5bf3656",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 425416.719369,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 82.57,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.02%",
+                "MemPerc": "39.59%",
+                "MemUsage": "25.34MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "78.50%",
+                "MemUsage": "902.7MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "29.17%",
+                "MemUsage": "56MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.40%",
+                "MemPerc": "29.14%",
+                "MemUsage": "74.59MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "0.12%",
+                "MemPerc": "13.06%",
+                "MemUsage": "33.44MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T10:39:56.698619+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "8307159f-f783-442a-bc30-c85994193616",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 425726.258915,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 81.83,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.01%",
+                "MemPerc": "40.38%",
+                "MemUsage": "25.84MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "78.50%",
+                "MemUsage": "902.7MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.14%",
+                "MemPerc": "29.18%",
+                "MemUsage": "56.02MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.42%",
+                "MemPerc": "29.14%",
+                "MemUsage": "74.6MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "5.11%",
+                "MemPerc": "13.04%",
+                "MemUsage": "33.39MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T10:45:06.237067+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "460e00d6-6904-4143-bcc0-695e92e7ac7d",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 426035.738606,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 82.67,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "40.19%",
+                "MemUsage": "25.72MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "78.50%",
+                "MemUsage": "902.7MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "29.18%",
+                "MemUsage": "56.02MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "1.65%",
+                "MemPerc": "29.12%",
+                "MemUsage": "74.55MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "0.12%",
+                "MemPerc": "13.12%",
+                "MemUsage": "33.58MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T10:50:15.715844+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "84ff75d9-ef35-4ab3-b0bb-0e0aa27de921",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 426345.150162,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 82.02,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "40.59%",
+                "MemUsage": "25.98MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "78.50%",
+                "MemUsage": "902.7MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "29.19%",
+                "MemUsage": "56.05MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.36%",
+                "MemPerc": "29.23%",
+                "MemUsage": "74.82MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "0.12%",
+                "MemPerc": "13.10%",
+                "MemUsage": "33.54MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T10:55:25.126369+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "48293b34-7859-449f-a659-233c1a04d299",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 426654.701982,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 87.39,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "39.07%",
+                "MemUsage": "25.01MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "77.90%",
+                "MemUsage": "895.9MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "75.82%",
+                "MemUsage": "145.6MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.38%",
+                "MemPerc": "27.55%",
+                "MemUsage": "70.52MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "5.12%",
+                "MemPerc": "12.65%",
+                "MemUsage": "32.38MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T11:00:34.678965+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "5ecba256-14b3-49f2-a945-f8e05fbcda69",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 426964.263953,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 87.34,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "39.00%",
+                "MemUsage": "24.96MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "77.95%",
+                "MemUsage": "896.5MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "78.09%",
+                "MemUsage": "149.9MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.39%",
+                "MemPerc": "27.59%",
+                "MemUsage": "70.62MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "12.66%",
+                "MemUsage": "32.42MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T11:05:44.243970+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "d64a689e-7a25-4e21-aaf4-69e53e034e0a",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 427273.900489,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 86.66,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 2,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "32.27%",
+                "MemUsage": "20.65MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "72.61%",
+                "MemUsage": "835MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.12%",
+                "MemPerc": "72.46%",
+                "MemUsage": "139.1MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.38%",
+                "MemPerc": "54.37%",
+                "MemUsage": "139.2MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "0.15%",
+                "MemPerc": "12.60%",
+                "MemUsage": "32.27MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T11:10:53.893670+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        },
+        {
+          "command_id": "0f59d27b-b79f-4645-9035-c60e301c3232",
+          "sample": {
+            "containers": [
+              {
+                "health": null,
+                "image": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "caddy"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "clamav"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "api"
+              },
+              {
+                "health": "healthy",
+                "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "worker"
+              },
+              {
+                "health": "healthy",
+                "image": "postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94",
+                "oom_killed": false,
+                "restarts": 0,
+                "running": true,
+                "service": "db"
+              }
+            ],
+            "database": {
+              "audit": {
+                "duplicate_events": 0,
+                "duplicate_outbox_rows": 0,
+                "failed_or_uncertain_events": 0
+              },
+              "counts": {
+                "admin_users": 2,
+                "audit_logs": 443,
+                "conversations": 9,
+                "knowledge_chunks": 134,
+                "knowledge_documents": 42,
+                "legal_holds": 0,
+                "media_attachments": 6,
+                "messages": 126,
+                "rate_limit_buckets": 2,
+                "support_notifications": 15,
+                "ticket_notes": 1,
+                "tickets": 3,
+                "whatsapp_inbound_messages": 60,
+                "whatsapp_outbound_messages": 60
+              },
+              "migration": "e5c1a2b3d4f6",
+              "queues": {
+                "media_attachments": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "approved": 6
+                  }
+                },
+                "support_notifications": {
+                  "new_rows": 0,
+                  "pending_age_seconds": 427468.087561,
+                  "statuses": {
+                    "cancelled": 12,
+                    "pending": 3
+                  }
+                },
+                "whatsapp_inbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "done": 60
+                  }
+                },
+                "whatsapp_outbound_messages": {
+                  "new_rows": 0,
+                  "pending_age_seconds": null,
+                  "statuses": {
+                    "delivered": 9,
+                    "read": 51
+                  }
+                }
+              }
+            },
+            "host_memory_used_percent": 85.73,
+            "logs": {
+              "api": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 0,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              },
+              "worker": {
+                "agent_preparation_p95_ms": null,
+                "agent_prepared_events": 0,
+                "error_or_traceback_lines": 0,
+                "known_failure_markers": {
+                  "database_backup_failed": 0,
+                  "dialogue_agent_failed": 0,
+                  "dialogue_agent_schema_validation": 0,
+                  "inbound_processing_failed": 0,
+                  "media_processing_failed": 0,
+                  "retention_or_reconciliation_failed": 0
+                },
+                "lines": 2,
+                "malformed_metrics": 0,
+                "truncated": false,
+                "usage": {
+                  "completion_tokens": 0,
+                  "model_attempts": 0,
+                  "model_successes": 0,
+                  "prompt_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "tool_calls": 0
+                }
+              }
+            },
+            "resources": [
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "32.22%",
+                "MemUsage": "20.62MiB / 64MiB",
+                "Name": "dudu-production-caddy-1"
+              },
+              {
+                "CPUPerc": "0.00%",
+                "MemPerc": "70.74%",
+                "MemUsage": "813.5MiB / 1.123GiB",
+                "Name": "dudu-production-clamav-1"
+              },
+              {
+                "CPUPerc": "0.13%",
+                "MemPerc": "72.46%",
+                "MemUsage": "139.1MiB / 192MiB",
+                "Name": "dudu-production-api-1"
+              },
+              {
+                "CPUPerc": "0.36%",
+                "MemPerc": "54.20%",
+                "MemUsage": "138.8MiB / 256MiB",
+                "Name": "dudu-production-worker-1"
+              },
+              {
+                "CPUPerc": "0.11%",
+                "MemPerc": "12.72%",
+                "MemUsage": "32.57MiB / 256MiB",
+                "Name": "dudu-production-db-1"
+              }
+            ],
+            "sample_utc": "2026-09-15T11:14:08.065693+00:00",
+            "start_utc": "2026-09-15T10:14:03.814760+00:00"
+          }
+        }
+      ],
+      "budget": [
+        {
+          "at": "2026-09-15T10:14:11.713304+00:00",
+          "limit": {
+            "Amount": "30.0",
+            "Unit": "USD"
+          },
+          "spend": {
+            "ActualSpend": {
+              "Amount": "0.096",
+              "Unit": "USD"
+            }
+          },
+          "cost_filters": {
+            "TagKeyValue": [
+              "user:Project$dudu-support"
+            ]
+          },
+          "last_updated": "2026-09-15T14:40:03.746000+08:00"
+        },
+        {
+          "at": "2026-09-15T11:14:11.720724+00:00",
+          "limit": {
+            "Amount": "30.0",
+            "Unit": "USD"
+          },
+          "spend": {
+            "ActualSpend": {
+              "Amount": "0.096",
+              "Unit": "USD"
+            }
+          },
+          "cost_filters": {
+            "TagKeyValue": [
+              "user:Project$dudu-support"
+            ]
+          },
+          "last_updated": "2026-09-15T14:40:03.746000+08:00"
+        }
+      ],
+      "errors": [],
+      "complete": true,
+      "elapsed_seconds": 3607.906,
+      "last_sample_utc": "2026-09-15T11:14:11.720740+00:00",
+      "end_utc": "2026-09-15T11:14:11.720743+00:00"
+    },
+    "cloudwatch_resources": {
+      "memory": {
+        "Label": "mem_used_percent",
+        "Datapoints": [
+          {
+            "Timestamp": "2026-09-15T18:14:00+08:00",
+            "Average": 73.75289881670992,
+            "Maximum": 73.75289881670992,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:15:00+08:00",
+            "Average": 72.88659553205619,
+            "Maximum": 72.88659553205619,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:16:00+08:00",
+            "Average": 72.89784071307179,
+            "Maximum": 72.89784071307179,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:17:00+08:00",
+            "Average": 72.58000521946138,
+            "Maximum": 72.58000521946138,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:18:00+08:00",
+            "Average": 72.32709473322399,
+            "Maximum": 72.32709473322399,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:19:00+08:00",
+            "Average": 72.81891227273596,
+            "Maximum": 72.81891227273596,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:20:00+08:00",
+            "Average": 73.26108127719796,
+            "Maximum": 73.26108127719796,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:21:00+08:00",
+            "Average": 72.28996441854989,
+            "Maximum": 72.28996441854989,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:22:00+08:00",
+            "Average": 72.6428084945673,
+            "Maximum": 72.6428084945673,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:23:00+08:00",
+            "Average": 72.56642613295199,
+            "Maximum": 72.56642613295199,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:24:00+08:00",
+            "Average": 72.58997736111671,
+            "Maximum": 72.58997736111671,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:25:00+08:00",
+            "Average": 73.06057757795774,
+            "Maximum": 73.06057757795774,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:26:00+08:00",
+            "Average": 73.21949532476295,
+            "Maximum": 73.21949532476295,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:27:00+08:00",
+            "Average": 72.9629778936715,
+            "Maximum": 72.9629778936715,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:28:00+08:00",
+            "Average": 73.16157203387134,
+            "Maximum": 73.16157203387134,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:29:00+08:00",
+            "Average": 73.26108127719796,
+            "Maximum": 73.26108127719796,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:30:00+08:00",
+            "Average": 72.72279780103668,
+            "Maximum": 72.72279780103668,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:31:00+08:00",
+            "Average": 72.4722212202931,
+            "Maximum": 72.4722212202931,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:32:00+08:00",
+            "Average": 72.61034599088079,
+            "Maximum": 72.61034599088079,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:33:00+08:00",
+            "Average": 72.7049752499931,
+            "Maximum": 72.7049752499931,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:34:00+08:00",
+            "Average": 72.74995597405545,
+            "Maximum": 72.74995597405545,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:35:00+08:00",
+            "Average": 72.97252568887342,
+            "Maximum": 72.97252568887342,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:36:00+08:00",
+            "Average": 72.77287068254006,
+            "Maximum": 72.77287068254006,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:37:00+08:00",
+            "Average": 72.93030321675829,
+            "Maximum": 72.93030321675829,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:38:00+08:00",
+            "Average": 72.63453373872565,
+            "Maximum": 72.63453373872565,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:39:00+08:00",
+            "Average": 72.95491531105655,
+            "Maximum": 72.95491531105655,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:40:00+08:00",
+            "Average": 73.07649056996094,
+            "Maximum": 73.07649056996094,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:41:00+08:00",
+            "Average": 72.76883939123258,
+            "Maximum": 72.76883939123258,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:42:00+08:00",
+            "Average": 72.8454339260746,
+            "Maximum": 72.8454339260746,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:43:00+08:00",
+            "Average": 73.51802305474281,
+            "Maximum": 73.51802305474281,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:44:00+08:00",
+            "Average": 73.55769944813744,
+            "Maximum": 73.55769944813744,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:45:00+08:00",
+            "Average": 72.79090540681034,
+            "Maximum": 72.79090540681034,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:46:00+08:00",
+            "Average": 72.59040170757012,
+            "Maximum": 72.59040170757012,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:47:00+08:00",
+            "Average": 72.70179265159247,
+            "Maximum": 72.70179265159247,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:48:00+08:00",
+            "Average": 72.7115526200211,
+            "Maximum": 72.7115526200211,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:49:00+08:00",
+            "Average": 72.95831008268391,
+            "Maximum": 72.95831008268391,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:50:00+08:00",
+            "Average": 73.12550258533076,
+            "Maximum": 73.12550258533076,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:51:00+08:00",
+            "Average": 72.90314504373951,
+            "Maximum": 72.90314504373951,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:52:00+08:00",
+            "Average": 72.93794145291982,
+            "Maximum": 72.93794145291982,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:53:00+08:00",
+            "Average": 72.99204562573067,
+            "Maximum": 72.99204562573067,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:54:00+08:00",
+            "Average": 73.10619482170023,
+            "Maximum": 73.10619482170023,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:55:00+08:00",
+            "Average": 72.9443066497211,
+            "Maximum": 72.9443066497211,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:56:00+08:00",
+            "Average": 73.3357662529996,
+            "Maximum": 73.3357662529996,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:57:00+08:00",
+            "Average": 73.409178189441,
+            "Maximum": 73.409178189441,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:58:00+08:00",
+            "Average": 73.46582844097234,
+            "Maximum": 73.46582844097234,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:59:00+08:00",
+            "Average": 77.9316505167479,
+            "Maximum": 77.9316505167479,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:00:00+08:00",
+            "Average": 77.88730631236567,
+            "Maximum": 77.88730631236567,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:01:00+08:00",
+            "Average": 77.0823210902309,
+            "Maximum": 77.0823210902309,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:02:00+08:00",
+            "Average": 77.08147239732408,
+            "Maximum": 77.08147239732408,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:03:00+08:00",
+            "Average": 77.77846144706385,
+            "Maximum": 77.77846144706385,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:04:00+08:00",
+            "Average": 77.4988171342611,
+            "Maximum": 77.4988171342611,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:05:00+08:00",
+            "Average": 76.9874796578919,
+            "Maximum": 76.9874796578919,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:06:00+08:00",
+            "Average": 77.01591087027093,
+            "Maximum": 77.01591087027093,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:07:00+08:00",
+            "Average": 77.21514153015087,
+            "Maximum": 77.21514153015087,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:08:00+08:00",
+            "Average": 77.66982875498873,
+            "Maximum": 77.66982875498873,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:09:00+08:00",
+            "Average": 77.33947504100247,
+            "Maximum": 77.33947504100247,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:10:00+08:00",
+            "Average": 78.10945168073022,
+            "Maximum": 78.10945168073022,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:11:00+08:00",
+            "Average": 77.15552085344558,
+            "Maximum": 77.15552085344558,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:12:00+08:00",
+            "Average": 77.09908277514094,
+            "Maximum": 77.09908277514094,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:13:00+08:00",
+            "Average": 76.86908699738815,
+            "Maximum": 76.86908699738815,
+            "Unit": "Percent"
+          }
+        ]
+      },
+      "cpu": {
+        "Label": "CPUUtilization",
+        "Datapoints": [
+          {
+            "Timestamp": "2026-09-15T18:15:00+08:00",
+            "Average": 5.224633886972675,
+            "Maximum": 5.558333333333333,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:20:00+08:00",
+            "Average": 5.058699905274502,
+            "Maximum": 5.5166666666666675,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:25:00+08:00",
+            "Average": 5.271617577019361,
+            "Maximum": 5.872161788468907,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:30:00+08:00",
+            "Average": 5.046586230738038,
+            "Maximum": 5.630705670687012,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:35:00+08:00",
+            "Average": 5.229477093493584,
+            "Maximum": 5.888820403471655,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:40:00+08:00",
+            "Average": 5.140409430418705,
+            "Maximum": 5.630611870929051,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:45:00+08:00",
+            "Average": 5.168475095195416,
+            "Maximum": 5.875,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:50:00+08:00",
+            "Average": 5.129377705101515,
+            "Maximum": 5.86393016592257,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T18:55:00+08:00",
+            "Average": 5.3899406044744556,
+            "Maximum": 6.01376001599227,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:00:00+08:00",
+            "Average": 5.055104397540592,
+            "Maximum": 5.68608160610962,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:05:00+08:00",
+            "Average": 5.262276403462812,
+            "Maximum": 5.54434643410982,
+            "Unit": "Percent"
+          },
+          {
+            "Timestamp": "2026-09-15T19:10:00+08:00",
+            "Average": 6.15752827791228,
+            "Maximum": 8.312648886371587,
+            "Unit": "Percent"
+          }
+        ]
+      }
+    },
+    "host_memory_calculation": "100 * (1 - MemAvailable / MemTotal); distinct from the configured CloudWatch mem_used_percent alarm metric",
+    "post_observation_verification": [
+      {
+        "containers": [
+          {
+            "name": "/dudu-production-api-1",
+            "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+            "health": "healthy",
+            "restarts": 0,
+            "settings": {
+              "META_SEND_ENABLED": "false",
+              "NOTIFICATION_SEND_ENABLED": "false",
+              "LLM_ENABLED": "true",
+              "LLM_CUSTOMER_CONTEXT_ENABLED": "true",
+              "LLM_MAX_INPUT_CHARS": "15000",
+              "LLM_TIMEOUT_SECONDS": "30"
+            }
+          },
+          {
+            "name": "/dudu-production-worker-1",
+            "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0",
+            "health": "healthy",
+            "restarts": 0,
+            "settings": {
+              "META_SEND_ENABLED": "false",
+              "NOTIFICATION_SEND_ENABLED": "false",
+              "LLM_ENABLED": "true",
+              "LLM_CUSTOMER_CONTEXT_ENABLED": "true",
+              "LLM_MAX_INPUT_CHARS": "15000",
+              "LLM_TIMEOUT_SECONDS": "30"
+            }
+          },
+          {
+            "name": "/dudu-production-clamav-1",
+            "image": "173454940059.dkr.ecr.ap-southeast-5.amazonaws.com/dudu-support@sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42",
+            "health": "healthy",
+            "restarts": 0
+          }
+        ],
+        "migration": "e5c1a2b3d4f6",
+        "preserved_counts": {
+          "admin_users": 2,
+          "audit_logs": 441,
+          "conversations": 5,
+          "knowledge_chunks": 134,
+          "knowledge_documents": 42,
+          "legal_holds": 0,
+          "media_attachments": 6,
+          "messages": 114,
+          "rate_limit_buckets": 4,
+          "support_notifications": 14,
+          "ticket_notes": 1,
+          "tickets": 2,
+          "whatsapp_inbound_messages": 60,
+          "whatsapp_outbound_messages": 60
+        },
+        "backup": "backups/postgresql/2026/09/15/100905.dump"
+      },
+      {
+        "status": "ready"
+      },
+      {
+        "typed_dialogue_valid": true,
+        "counts": {
+          "admin_users": 2,
+          "conversations": 9,
+          "messages": 126,
+          "whatsapp_inbound_messages": 60,
+          "whatsapp_outbound_messages": 60,
+          "tickets": 3,
+          "media_attachments": 6,
+          "ticket_notes": 1,
+          "support_notifications": 15,
+          "knowledge_documents": 42,
+          "knowledge_chunks": 134,
+          "audit_logs": 443,
+          "legal_holds": 0,
+          "rate_limit_buckets": 2
+        },
+        "media_ownership_mismatches": 0,
+        "approved_objects_verified": 6
+      }
+    ],
+    "new_runtime_hourly_backup": {
+      "key": "backups/postgresql/2026/09/15/110940.dump",
+      "bytes": 173917,
+      "last_modified_utc": "2026-09-15T11:09:43+00:00"
+    },
+    "customer_sending_enabled": false,
+    "notification_sending_enabled": false,
+    "new_inbound_rows": 0,
+    "observation_scope": "Dark deployment health with customer and notification sending disabled."
+  },
+  "production_gates_passed": true
+}
