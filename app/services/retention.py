@@ -271,14 +271,26 @@ def _expire_chats(
         .limit(limit)
     ).scalars().all()
     old_outbound_ids = db.execute(
-        select(WhatsAppOutboundMessage.id)
+        select(WhatsAppOutboundMessage.id).join(
+            WhatsAppInboundMessage,
+            WhatsAppInboundMessage.id == WhatsAppOutboundMessage.inbound_message_id,
+        )
         .where(
             or_(
                 WhatsAppOutboundMessage.created_at < cutoff,
                 WhatsAppOutboundMessage.inbound_message_id.in_(inbound_ids),
-            )
+            ),
+            ~exists().where(
+                Conversation.channel == "whatsapp",
+                Conversation.external_user_id == WhatsAppInboundMessage.sender,
+                _active_hold("conversation", Conversation.id, now),
+            ),
         )
-        .order_by(WhatsAppOutboundMessage.created_at)
+        # Each inbound has at most one reply; include its dependency before aging other rows.
+        .order_by(
+            WhatsAppOutboundMessage.inbound_message_id.in_(inbound_ids).desc(),
+            WhatsAppOutboundMessage.created_at,
+        )
         .limit(limit)
     ).scalars().all()
     result.transport_messages += len(inbound_ids) + len(old_outbound_ids)

@@ -3,11 +3,9 @@ from html.parser import HTMLParser
 from app.config import get_settings
 from urllib.parse import urljoin, urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
-from xml.etree import ElementTree
 
 
 MAX_PAGE_BYTES = 2_000_000
-MAX_SITEMAP_URLS = 100
 ALLOWED_HOST = "duducar.co"
 IGNORED_TAGS = {"script", "style", "nav", "footer", "form", "noscript", "svg"}
 VOID_TAGS = {
@@ -121,23 +119,6 @@ def _read_url(url: str) -> bytes:
     if len(data) > MAX_PAGE_BYTES:
         raise ValueError("website page exceeds the 2 MB extraction limit")
     return data
-
-
-def sitemap_urls(sitemap_url: str = "https://duducar.co/sitemap.xml") -> list[str]:
-    data = _read_url(sitemap_url)
-    if b"<!DOCTYPE" in data.upper() or b"<!ENTITY" in data.upper():
-        raise ValueError("website sitemap cannot contain DTD or entity declarations")
-    root = ElementTree.fromstring(data)
-    urls = []
-    for element in root.iter("{http://www.sitemaps.org/schemas/sitemap/0.9}loc"):
-        url = (element.text or "").strip()
-        if url and url not in urls:
-            parsed = urlparse(url)
-            if parsed.scheme == "https" and parsed.hostname == ALLOWED_HOST:
-                urls.append(url)
-        if len(urls) >= MAX_SITEMAP_URLS:
-            break
-    return urls
 
 
 def extract_page(url: str, chunk_chars: int = 1600) -> dict[str, str | list[str]]:

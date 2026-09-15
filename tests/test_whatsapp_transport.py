@@ -273,7 +273,7 @@ def test_webhook_preserves_durable_inbox_when_chat_processing_fails(
     def fail(*args, **kwargs):
         raise RuntimeError("chat failed")
 
-    monkeypatch.setattr("app.routers.webhooks_meta.chatbot_service.handle", fail)
+    monkeypatch.setattr("app.services.inbound.chatbot_service.handle", fail)
 
     call_webhook(db_session, payload("wamid.rollback", "Hello"))
 

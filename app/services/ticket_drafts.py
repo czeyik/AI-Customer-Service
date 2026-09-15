@@ -674,10 +674,6 @@ def build_field_references(
     return FieldReferences(values, extraction.ambiguous_fields)
 
 
-def new_dialogue(*, evidence_group: str | None = None) -> DialogueData:
-    return DialogueData(evidence_group=evidence_group)
-
-
 def new_draft(
     *,
     expiry_minutes: int,

@@ -2,7 +2,6 @@
 
 Revision ID: e5c1a2b3d4f6
 Revises: d9010a1b2c3d
-Create Date: 2026-09-14
 """
 
 import json

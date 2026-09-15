@@ -16,5 +16,6 @@ Complete before enabling real-customer traffic.
 | Secret, dependency, static, image, configuration, and dynamic scans | `.github/workflows/security.yml`, `docs/application-security.md` |
 | TLS, alarms, backup/restore, rollback, and capacity | `docs/production-platform.md` |
 
-All controls are `PASS` for the approved beta subject to the expiring exceptions in
-`docs/release-validation.md`.
+Current release-specific evidence and the recorded production state are in
+[release-validation.md](release-validation.md). AWS-0104 and AWS-0136 exceptions expire
+17 September 2026 and apply only to staging/dark deployment; they do not waive customer sending.

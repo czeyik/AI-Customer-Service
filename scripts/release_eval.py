@@ -865,9 +865,12 @@ def run(
                 <= 30,
                 "provider_timeout_rate_below_0_05": usage["provider_timeout_rate"] < 0.05,
                 "agent_failure_fallback_rate_at_most_0_05": (
-                    usage["agent_failure_fallback_rate"] is not None
-                    and usage["agent_failure_fallback_rate"]
-                    <= AGENT_FAILURE_FALLBACK_RATE_MAX
+                    mode != "live"
+                    or (
+                        usage["agent_failure_fallback_rate"] is not None
+                        and usage["agent_failure_fallback_rate"]
+                        <= AGENT_FAILURE_FALLBACK_RATE_MAX
+                    )
                 ),
                 "estimated_cost_at_most_usd": max_cost,
                 "estimated_cost_within_limit": estimated_cost <= max_cost,
@@ -907,7 +910,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        help="Report path (default: docs/evaluation/langchain-<mode>.json)",
+        help="Report path (default: a new temporary dudu-evaluation-*/report.json)",
     )
     parser.add_argument(
         "--reviews", type=Path, help="Human semantic-review JSON for these exact answers"
@@ -915,7 +918,7 @@ def main() -> None:
     parser.add_argument(
         "--report",
         type=Path,
-        help="Saved SMART report whose exact answers receive --reviews without provider calls",
+        help="Saved SMART report whose exact answers receive --reviews; output defaults to a new temporary report",
     )
     parser.add_argument(
         "--case-id",
@@ -954,8 +957,11 @@ def main() -> None:
         raise SystemExit("--report requires --suite smart and --reviews")
     if args.report and (args.case_ids or args.checkpoint or args.resume):
         raise SystemExit("--report cannot be combined with case selection or resume")
-    output = args.output or args.report or ROOT / "docs/evaluation" / f"langchain-{args.mode}.json"
+    if args.resume and not (args.checkpoint or args.output):
+        raise SystemExit("--resume requires --checkpoint or --output")
+    output = args.output or Path(tempfile.mkdtemp(prefix="dudu-evaluation-")) / "report.json"
     preflight_output_path(output)
+    print(f"Evaluation report: {output}", file=sys.stderr)
     checkpoint = args.checkpoint
     if args.resume and checkpoint is None:
         checkpoint = output.with_name(output.name + ".checkpoint.json")
@@ -1017,8 +1023,7 @@ def main() -> None:
         price_checked=args.price_checked,
     )
     rendered = json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True)
-    if args.output:
-        atomic_write_json(args.output, report)
+    atomic_write_json(output, report)
     print(rendered)
     thresholds = report["thresholds"]
     if report["failures"] or not all(

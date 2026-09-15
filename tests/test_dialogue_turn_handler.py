@@ -192,15 +192,19 @@ def complete_review() -> DialogueData:
 
 def test_outage_intake_commits_one_ticket_and_typed_receipt(db):
     bot = service()
-    for text in (
-        "I need a human",
-        "Yes",
-        "Alex Tan",
-        "alex@example.com",
-        "My ride receipt is missing",
-        "Done",
-    ):
-        response = send(bot, db, text)
+    send(bot, db, "I need a human")
+    conversation = db.query(Conversation).one()
+    dialogue = load_dialogue_data(conversation)
+    dialogue.draft.evidence_group = "submission-evidence"
+    conversation.dialogue_data = dialogue.model_dump(mode="json")
+    db.commit()
+
+    for text in ("Yes", "Alex Tan", "alex@example.com", "My ride receipt is missing"):
+        send(bot, db, text)
+
+    conversation = db.query(Conversation).one()
+    revision_before_submission = conversation.dialogue_revision
+    response = send(bot, db, "Done")
 
     assert response.ticket is not None
     assert db.query(Ticket).count() == 1
@@ -208,6 +212,9 @@ def test_outage_intake_commits_one_ticket_and_typed_receipt(db):
     conversation = db.query(Conversation).one()
     dialogue = load_dialogue_data(conversation)
     assert dialogue.draft.status == "submitted"
+    assert dialogue.draft.evidence_group is None
+    assert dialogue.evidence_group is None
+    assert conversation.dialogue_revision > revision_before_submission
     assert dialogue.last_receipt.case_reference == response.ticket.public_id
     assert conversation.intake_state == "idle" and conversation.intake_data == {}
 
@@ -553,7 +560,7 @@ def test_expired_inbound_lease_cannot_write_a_reply(db):
 
 def test_outage_case_update_requires_owned_case_and_confirmation(db):
     owned = Ticket(
-        public_id="DUDU-20260914-ABCDE",
+        public_id="DUDU-20260930-ABCDE",
         status="closed",
         closed_at=datetime.utcnow(),
         urgency="normal",
@@ -574,7 +581,7 @@ def test_outage_case_update_requires_owned_case_and_confirmation(db):
     prompt = send(
         bot,
         db,
-        "Please add to DUDU-20260914-ABCDE that the receipt is still missing",
+        "Please add to DUDU-20260930-ABCDE that the receipt is still missing",
         channel="web",
         user="case-user",
     )
@@ -595,7 +602,7 @@ def test_outage_case_update_requires_owned_case_and_confirmation(db):
     missing = send(
         bot,
         db,
-        "Please add to DUDU-20260914-ZZZZZ that this is not mine",
+        "Please add to DUDU-20260930-ZZZZZ that this is not mine",
         channel="web",
         user="case-user",
     )

@@ -195,6 +195,61 @@ def test_worker_readiness_requires_a_complete_cycle(tmp_path, monkeypatch, failu
     assert marker.exists() == (not failure)
 
 
+@pytest.mark.parametrize(
+    ("argv", "retention_failures", "reconciliation_failure"),
+    [
+        (["retention", "--once"], 0, False),
+        (["retention", "--dry-run"], 0, False),
+        (["retention", "--once"], 1, False),
+        (["retention", "--once"], 0, True),
+    ],
+    ids=["success", "dry-run", "retention-failure", "reconciliation-failure"],
+)
+def test_standalone_retention_lifecycle(
+    monkeypatch, argv, retention_failures, reconciliation_failure
+) -> None:
+    import sys
+    from contextlib import nullcontext
+    from types import SimpleNamespace
+
+    from app.workers import retention as worker
+
+    calls = []
+    monkeypatch.setattr(worker, "SessionLocal", lambda: nullcontext(None))
+    monkeypatch.setattr(
+        worker,
+        "run_retention",
+        lambda db, dry_run=False: (
+            calls.append(("retention", dry_run))
+            or SimpleNamespace(failures=retention_failures)
+        ),
+    )
+
+    def reconcile(_db):
+        calls.append(("reconcile",))
+        if reconciliation_failure:
+            raise RuntimeError("reconciliation failed")
+        return 2
+
+    monkeypatch.setattr(worker, "reconcile_orphaned_media", reconcile, raising=False)
+    monkeypatch.setattr(sys, "argv", argv)
+
+    if retention_failures:
+        with pytest.raises(SystemExit) as error:
+            worker.main()
+        assert error.value.code == 1
+    elif reconciliation_failure:
+        with pytest.raises(RuntimeError, match="reconciliation failed"):
+            worker.main()
+    else:
+        worker.main()
+
+    expected = [("retention", argv[1] == "--dry-run")]
+    if not retention_failures and not argv[1] == "--dry-run":
+        expected.append(("reconcile",))
+    assert calls == expected
+
+
 def test_readiness_fails_closed_without_database() -> None:
     class Database:
         def execute(self, statement):

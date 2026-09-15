@@ -1,6 +1,6 @@
 # DUDU Car AI Support Chatbot Requirements
 
-Last updated: 15 September 2026
+Last updated: 16 September 2026
 
 This is the authoritative product baseline.
 
@@ -31,8 +31,9 @@ This is the authoritative product baseline.
 
 - Only the named CCO may publish, replace, remove, or roll back knowledge. Every change is
   authenticated, versioned, attributable, and audited.
-- The LangChain release candidate uses hosted `glm-5.3-flash` through one bounded `create_agent`.
-  Current deployment status is recorded in [SMART.md](../SMART.md). It receives approved
+- The support dialogue uses hosted `glm-5.3-flash` through one bounded `create_agent`. The durable
+  design is documented in [architecture](architecture.md), and current deployment evidence is in
+  [release validation](release-validation.md). It receives approved
   knowledge, the minimized current question, and bounded sanitized conversation context after the
   privacy activation gate is approved. Raw identifiers, ticket bodies, attachments and full history
   remain excluded. Seven scoped tools stage knowledge/draft/case operations; local code validates

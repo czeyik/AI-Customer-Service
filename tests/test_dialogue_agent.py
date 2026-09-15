@@ -1393,7 +1393,7 @@ def test_persisted_case_confirmation_without_current_operation_repairs_to_null(s
             "pending_case_update": {
                 "operation_id": "operation-1",
                 "case_id": "case-1",
-                "case_reference": "DUDU-20260914-ABCDE",
+                "case_reference": "DUDU-20260930-ABCDE",
                 "case_version": 1,
                 "update": "Synthetic update",
                 "originating_turn": "prior-turn",
@@ -2066,7 +2066,7 @@ def test_case_tools_reject_unknown_reference_and_conflicting_update(sessions):
         db.add(
             Ticket(
                 id="case-1",
-                public_id="DUDU-20260914-ABCDE",
+                public_id="DUDU-20260930-ABCDE",
                 status="closed",
                 urgency="normal",
                 channel="web",
@@ -2101,7 +2101,7 @@ def test_case_tools_reject_unknown_reference_and_conflicting_update(sessions):
             return httpx.Response(
                 200,
                 json=completion(
-                    "get_owned_case", {"public_id": "DUDU-20260914-ABCDE"}
+                    "get_owned_case", {"public_id": "DUDU-20260930-ABCDE"}
                 ),
             )
         if len(requests) == 2:
@@ -2148,7 +2148,7 @@ def test_case_tools_reject_unknown_reference_and_conflicting_update(sessions):
     assert case_reference
     assert result.case_update.update == "Please add that my receipt is missing"
     assert result.dialogue.pending_case_update.operation_id == result.case_update.operation_id
-    assert "DUDU-20260914-ABCDE" in result.answer
+    assert "DUDU-20260930-ABCDE" in result.answer
 
 
 def test_invented_case_reference_cannot_stage_an_update(sessions):

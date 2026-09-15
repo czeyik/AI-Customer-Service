@@ -19,9 +19,8 @@ from app.models import (
     WhatsAppInboundMessage,
     WhatsAppOutboundMessage,
 )
-from app.schemas import AttachmentPayload, ChatRequest, MetaWebhookResult
+from app.schemas import AttachmentPayload, MetaWebhookResult
 from app.security import verify_meta_signature
-from app.services.chatbot import chatbot_service
 from app.services.dialogue import ensure_evidence_group, store_dialogue_data
 from app.services.guardrails import assess_message
 from app.services.pii import redact_sensitive
@@ -151,7 +150,7 @@ def _consume_public_beta_limits(
                 day_seconds,
             ),
             (
-                "beta-total:2026-09-10:2026-09-14",
+                "beta-total:2026-09-10:2026-09-30",
                 settings.public_beta_messages_total,
                 beta_seconds,
             ),
