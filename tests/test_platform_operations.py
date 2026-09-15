@@ -59,6 +59,142 @@ def test_readiness_checks_database() -> None:
     assert ready(Database()) == {"status": "ready"}
 
 
+@pytest.mark.parametrize("failure", [
+    "", "pull", "config", "writer", "drain", "backup", "migration", "schema",
+    "inventory", "invalid_state", "retention", "health",
+])
+def test_deploy_drains_and_backs_up_before_migration(tmp_path, failure):
+    import json
+    import os
+    import subprocess
+
+    source = tmp_path / "source"
+    source.mkdir()
+    script = source / "deploy.sh"
+    script.write_text(Path("infra/production/deploy.sh").read_text().replace(
+        "/run/dudu", str(tmp_path / "run")
+    ).replace("/opt/dudu", str(tmp_path / "opt")))
+    commands = tmp_path / "commands.jsonl"
+    backup_file = tmp_path / "opt/releases/abc-def/pre-migration-backup.s3"
+    backup_file.parent.mkdir(parents=True)
+    backup_file.write_text("backups/postgresql/previous.dump\n")
+    binary = tmp_path / "bin"
+    binary.mkdir()
+    stub = '''#!/usr/bin/env python3
+import json, os, pathlib, sys
+name = pathlib.Path(sys.argv[0]).name
+args = sys.argv[1:]
+with open(os.environ["COMMAND_LOG"], "a") as log:
+    log.write(json.dumps([name, *args]) + "\\n")
+if name == "curl":
+    print("staging" if args[-1].endswith("/Environment") else "support.example.invalid")
+elif name == "aws":
+    print("META_SEND_ENABLED=false" if "get-secret-value" in args else "123456789012")
+elif name == "docker":
+    failure = os.environ["DEPLOY_FAILURE"]
+    if args[0] == "ps" and failure == "writer":
+        print("old-writer")
+    if (failure == "pull" and "pull" in args or
+        failure == "config" and any("get_settings()" in arg for arg in args) or
+        failure == "drain" and args[-2:] == ["python", "-"] or
+        failure == "backup" and any("run_backup" in arg for arg in args) or
+        failure == "migration" and "upgrade" in args or
+        failure == "schema" and "check" in args or
+        failure == "invalid_state" and "--validate-dialogue" in args or
+        failure == "retention" and "app.workers.retention" in args or
+        failure == "health" and "--remove-orphans" in args):
+        sys.exit(9)
+    if any("run_backup" in arg for arg in args):
+        print("backups/postgresql/synthetic.dump")
+    if "scripts/release_inventory.py" in args:
+        print(json.dumps({"tickets": 0 if failure == "inventory" and "--validate-dialogue" in args else 1}))
+'''
+    for name in ("docker", "curl", "aws"):
+        command = binary / name
+        command.write_text(stub)
+        command.chmod(0o755)
+    result = subprocess.run(
+        ["bash", str(script), "app@sha256:abc", "clamav@sha256:def"],
+        env={**os.environ, "PATH": f"{binary}:{os.environ['PATH']}",
+             "COMMAND_LOG": str(commands), "DEPLOY_FAILURE": failure},
+        capture_output=True, text=True,
+    )
+    calls = [json.loads(line) for line in commands.read_text().splitlines()]
+    docker = [call for call in calls if call[0] == "docker"]
+    index = lambda word: next(i for i, call in enumerate(docker) if word in call)
+    backup = [i for i, call in enumerate(docker) if any("run_backup" in arg for arg in call)]
+    start = [i for i, call in enumerate(docker) if "--remove-orphans" in call]
+    assert result.returncode == {"": 0, "writer": 4, "inventory": 5}.get(failure, 9)
+    if failure in {"pull", "config"}:
+        assert not any("stop" in call for call in docker)
+    else:
+        assert index("pull") < index("stop")
+    if failure in {"pull", "config", "writer", "drain", "backup"}:
+        assert not any("upgrade" in call for call in docker)
+        assert backup_file.read_text() == "backups/postgresql/previous.dump\n"
+    else:
+        assert backup_file.read_text() == "backups/postgresql/synthetic.dump\n"
+    if failure and failure != "health":
+        assert not start
+    if not failure:
+        assert index("stop") < backup[0] < index("upgrade") < index("check") < start[0]
+        assert "--wait" in docker[start[0]]
+    assert (tmp_path / "opt/last-good-images").exists() == (not failure)
+
+
+def test_release_inventory_preserves_counts_and_rejects_invalid_private_state():
+    from app.models import Conversation
+    from scripts.release_inventory import migration_inventory
+
+    engine = create_engine("sqlite://")
+    with engine.begin() as connection:
+        empty = migration_inventory(connection)
+        Base.metadata.create_all(connection)
+        assert migration_inventory(connection, validate_dialogue=True) == empty
+        connection.execute(Conversation.__table__.insert().values(
+            channel="web", external_user_id="inventory-check",
+            dialogue_data={"schema_version": 1},
+        ))
+        before = migration_inventory(connection)
+        assert before["conversations"] == 1
+        assert migration_inventory(connection, validate_dialogue=True) == before
+        connection.execute(Conversation.__table__.update().values(
+            dialogue_data={"schema_version": 999, "private": "customer-secret"},
+        ))
+        with pytest.raises(SystemExit, match="Invalid migrated dialogue") as error:
+            migration_inventory(connection, validate_dialogue=True)
+        assert "customer-secret" not in str(error.value)
+
+
+@pytest.mark.parametrize("failure", [True, False])
+def test_worker_readiness_requires_a_complete_cycle(tmp_path, monkeypatch, failure):
+    from contextlib import nullcontext
+    from app.workers import all as worker
+
+    marker = tmp_path / "worker-ready"
+    marker.touch()  # A restart must discard any previous readiness marker.
+    monkeypatch.setattr(worker, "READY_FILE", marker)
+    monkeypatch.setattr(worker, "get_settings", lambda: Settings(_env_file=None))
+    monkeypatch.setattr(worker, "SessionLocal", nullcontext)
+
+    def inbox(_):
+        assert not marker.exists()
+        if failure:
+            raise RuntimeError("worker failed")
+        return False
+
+    def end_cycle(_):
+        raise RuntimeError("cycle complete")
+
+    monkeypatch.setattr(worker, "process_inbox", inbox)
+    for name in ("process_outbox", "process_next_media", "process_notifications"):
+        monkeypatch.setattr(worker, name, lambda _: False)
+    monkeypatch.setattr(worker.time, "sleep", end_cycle)
+    with pytest.raises(RuntimeError, match="worker failed" if failure else "cycle complete"):
+        worker.main()
+    assert marker.exists() == (not failure)
+
+
 def test_readiness_fails_closed_without_database() -> None:
     class Database:
         def execute(self, statement):

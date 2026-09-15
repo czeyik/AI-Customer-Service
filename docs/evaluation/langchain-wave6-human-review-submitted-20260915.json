@@ -1,0 +1,2169 @@
+{
+  "records": [
+    {
+      "id": "en-000",
+      "question": "How do I order a car?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nTo order a car in the DUDU Car app, request a ride by confirming the pickup point, destination, and fare estimate before booking.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-001",
+      "question": "Where do I enter my destination?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nWhen you request a ride in the DUDU Car app, you confirm the pickup point, destination, and fare estimate before booking. Start a ride request: the app first asks for your pickup point, and then you can enter your destination. Once you confirm, you'll see the fare estimate before the booking is finalized.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-002",
+      "question": "Can I check the pickup point before requesting?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes — when you request a ride in the DUDU Car app, you confirm the pickup point, destination, and fare estimate before booking, so you can check the pickup point before your request is confirmed.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-003",
+      "question": "What information do I need before booking?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nBefore booking a ride in the DUDU Car app, you simply need to confirm the pickup point, the destination, and the fare estimate. Once those are confirmed, you can request the ride.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-004",
+      "question": "How does requesting a ride work?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nRequesting a ride in the DUDU Car app works like this: you confirm the pickup point, the destination, and the fare estimate before booking. Once that's done, your ride request is submitted. Cancellation rules may depend on the timing, whether a driver has been assigned, and the applicable local policy. Keep in mind that fare estimates can change based on distance, journey time, traffic, tolls, waiting time, promotions, or route changes. Is there anything else you'd like to know about booking a ride?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-005",
+      "question": "How can I cancel through the app?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nCancellations in the app depend on the timing of your ride, whether a driver has been assigned, and the applicable local policy. Please note that I cannot cancel a ride for you — cancellation is done in the DUDU Car app by the rider.\n\nIf a cancellation has caused you a problem, I can help create a support ticket for human review — just let me know.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-006",
+      "question": "Where are the cancellation conditions shown?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nCancellation rules depend on the timing of the cancellation, whether a driver has been assigned, and the applicable local policy. The relevant terms are shown to you in the DUDU Car app as part of the booking process, where you confirm the pickup point, destination, and fare estimate before requesting a ride.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-007",
+      "question": "Can I review the route first?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes — before you confirm a ride in the DUDU Car app, you can review the pickup point, destination, and fare estimate, so you can check the planned route details at that stage before booking. Keep in mind the fare estimate can change due to distance, journey time, traffic, tolls, waiting time, promotions, or route changes.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-008",
+      "question": "Does the app show an estimate before I book?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes — before you confirm a booking, the app shows the pickup point, destination, and a fare estimate, and you confirm these before the ride is booked.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-009",
+      "question": "Hi, are you human? How do I book a car?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI'm DUDU Car's automated assistant, not a human.\n\nTo book a car: you can request a ride in the DUDU Car app by confirming the pickup point, destination, and fare estimate before booking.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-010",
+      "question": "Why might a fare estimate change?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nFare estimates can change because of distance, journey time, traffic, tolls, waiting time, promotions, or route changes.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-011",
+      "question": "Do tolls affect estimated fares?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes — tolls are one of the factors that can change a fare estimate, along with distance, journey time, traffic, waiting time, promotions, and route changes.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-012",
+      "question": "Can traffic change the estimate?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes — traffic is one of the factors that can change a fare estimate. Estimates can also change due to distance, journey time, tolls, waiting time, promotions, or route changes.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-013",
+      "question": "What does waiting time mean for fares?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nWaiting time refers to the time during your trip when the vehicle isn't moving as part of the journey — for example, when you keep a driver waiting at the pickup point or during a stop. It is one of the factors that can make a fare estimate change, along with distance, journey time, traffic, tolls, promotions, or route changes.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-014",
+      "question": "Where can I see payment information?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nFare estimates can change because of distance, journey time, traffic, tolls, waiting time, promotions, or route changes. If you believe a fare or payment is incorrect, I can help create a support ticket for human review — just provide the trip ID, the payment-method type, and a short description of the issue. Please do not send a full payment-card number. Would you like to share those details so I can get a ticket started?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-015",
+      "question": "How does a route change affect the fare?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nA route change can affect your fare because fare estimates may change due to distance, journey time, traffic, tolls, waiting time, promotions, or route changes.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-016",
+      "question": "What is the policy for payment problems?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nIf you believe a fare or payment is incorrect, DUDU Car's policy is:\n\n- Provide the trip ID, the payment-method type, and a short description of the issue so a support ticket can be created for human review.\n- Do not send a full payment-card number.\n\nNote that fare estimates can change due to distance, journey time, traffic, tolls, waiting time, promotions, or route changes, which may explain differences in what you were charged.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-017",
+      "question": "Does distance affect fare estimates?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes — distance is one of the factors that can affect fare estimates. Estimates can also change because of journey time, traffic, tolls, waiting time, promotions, or route changes.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-018",
+      "question": "Can the chatbot itself issue a refund?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo, I can't issue refunds myself. If you believe a fare or payment is incorrect, I can help create a support ticket for human review — for that, the trip ID, payment-method type, and a short description of the issue are needed (please don't share a full payment-card number).",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-019",
+      "question": "I do not want a refund; where are fare details?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYou can view your fare details in the DUDU Car app for each trip. Keep in mind that fare estimates can change because of distance, journey time, traffic, tolls, waiting time, promotions, or route changes.\n\nIf a fare or payment seems incorrect to you, provide the trip ID, payment-method type, and a short description so a support ticket can be created for human review. Do not send a full payment-card number.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-020",
+      "question": "Where are promotion conditions shown?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nPromotion conditions (such as expiry dates, usage limits, eligible service areas, minimum-fare requirements, and account-specific conditions) are shown in the promotion's terms in the app. If a promotion does not apply, check its terms and make sure the app is up to date.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-021",
+      "question": "How do I check voucher validity?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nVouchers and promotions can have expiry dates, usage limits, eligible service areas, minimum-fare requirements, and account-specific conditions, so check the terms of your voucher to see whether it is still valid. If a promotion does not apply, review its terms and make sure your app is up to date. If you believe a voucher should have worked but didn't, I can help create a support ticket for human review.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-022",
+      "question": "Can a promotion have usage restrictions?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes. Promotions and vouchers may have expiry dates, usage limits, eligible service areas, minimum-fare requirements, and account-specific conditions. If a promotion does not apply, check its terms and make sure your app is up to date. If you believe a promotion should have worked but didn't, I can help create a support ticket for human review.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-023",
+      "question": "Where can I check whether a voucher applies?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYou can check a voucher's details in the DUDU Car app. Keep in mind that promotions and vouchers may have expiry dates, usage limits, eligible service areas, minimum-fare requirements, and account-specific conditions. If a promotion does not apply, check its terms and make sure the app is up to date.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-024",
+      "question": "What information is needed about a promo question?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nFor a promo question, it helps to know which promotion you're asking about and its details — promotions and vouchers can have expiry dates, usage limits, eligible service areas, minimum-fare requirements, and account-specific conditions, so checking the terms and making sure the app is up to date is a good first step. If you believe the promotion should have worked, I can help create a support ticket for human review — for that I'd need your name, email address, WhatsApp contact number, and a brief description of the issue.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-025",
+      "question": "Why should I read voucher terms?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nVouchers and promotions can come with conditions such as expiry dates, usage limits, eligible service areas, minimum-fare requirements, and account-specific conditions. Reading the terms helps you know whether a voucher applies to your trip — for example, whether it's still valid, whether there's a minimum fare, and whether it covers your area. If a promotion doesn't apply as expected, checking its terms (and making sure your app is up to date) is the first step to figure out why. If you believe it should have worked, I can help create a support ticket for human review.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-026",
+      "question": "What does the app say about discounts?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHere's what the app's guidance says about discounts, promotions and vouchers:\n\n- Promotions and vouchers may have expiry dates, usage limits, eligible service areas, minimum-fare requirements, and account-specific conditions.\n- If a promotion does not apply, check its terms and make sure the app is up to date.\n- Promotions can also affect fare estimates, since estimates may change due to distance, journey time, traffic, tolls, waiting time, promotions, or route changes.\n- If you believe a promotion should have worked but didn't, I can help create a support ticket for human review.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-027",
+      "question": "Can promotions affect the estimated price?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes, promotions can affect the fare estimate. Fare estimates can change because of distance, journey time, traffic, tolls, waiting time, promotions, or route changes. Note that promotions and vouchers may have expiry dates, usage limits, eligible service areas, minimum-fare requirements, and account-specific conditions, so a promotion may not apply to a given ride.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-028",
+      "question": "Is there a general guide to promo issues?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes, here's a general guide to promo issues:\n\n- Promotions and vouchers may have expiry dates, usage limits, eligible service areas, minimum-fare requirements, and account-specific conditions.\n- If a promotion does not apply, check its terms and make sure the app is up to date.\n- If you believe the promotion should have worked, I can help create a support ticket for human review.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-029",
+      "question": "I am not reporting a voucher problem; I want the rules.",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHere are the general rules for promotions and vouchers: they may have expiry dates, usage limits, eligible service areas, minimum-fare requirements, and account-specific conditions. If a promotion does not apply, you should check its terms and make sure the app is up to date.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-030",
+      "question": "How can I troubleshoot login?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHere are some troubleshooting steps for login problems:\n- Update the DUDU Car app to the latest version.\n- Check that you're using the phone number registered on your account.\n- Request a new verification code and try logging in again.\n\nPlease never share passwords, one-time passwords (OTPs), or private account codes in chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-031",
+      "question": "Should I check my internet connection when login fails?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes — checking your internet connection is a sensible step when login fails. Along with that, for login problems you can try updating the app, checking the phone number used to register, and requesting a new verification code. Please also keep in mind to never share passwords, one-time passwords (OTPs), or private account codes in chat.\n\nIf the problem persists, I can help create a support ticket for human review.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-032",
+      "question": "Where is the official account recovery process?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI don't have information about a separate official account recovery page. For login problems, the guidance is to try updating the app, checking the phone number used to register, and requesting a new verification code. Riders and drivers should also keep the phone number and profile information on their DUDU Car account up to date. And please note: never share passwords, one-time passwords (OTPs), or private account codes in chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-033",
+      "question": "Can I share an OTP with the chatbot?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo — for your security, you should never share passwords, one-time passwords (OTPs), or private account codes in chat. If you're having login trouble, try updating the app, checking the phone number used to register, and requesting a new verification code instead.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-034",
+      "question": "What should I avoid sharing in chat?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nFor your safety, never share passwords, one-time passwords (OTPs), or private account codes in chat. Keeping these private helps protect your DUDU Car account.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-035",
+      "question": "How do account access questions get handled?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nAccount access questions are handled with a focus on keeping your account secure. Riders and drivers should keep the phone number and profile information on their DUDU Car account up to date. For login problems, try updating the app, checking the phone number used to register, and requesting a new verification code. For security, never share passwords, one-time passwords (OTPs), or private account codes in chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-036",
+      "question": "Why can't you access my account directly?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI'm an automated assistant and don't have the ability to view or make changes inside your account directly — that's a limitation of what I can do, not a problem with your account.\n\nWhat I can do is help you with troubleshooting steps. For example, for login issues, you can try updating the app, checking the phone number used to register, and requesting a new verification code. For security reasons, please never share passwords, one-time passwords (OTPs), or private account codes in chat.\n\nIf your issue needs hands-on help, I can help create a support ticket so a human colleague can review it.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-037",
+      "question": "Do not delete my account. I just need login guidance.",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nUnderstood — no changes to your account. For login issues, please try the following: update the app to the latest version, confirm you're using the correct phone number registered to your DUDU Car account, and request a new verification code. Also, never share passwords, one-time passwords (OTPs), or private account codes in chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-038",
+      "question": "The app mentions account suspension. What can this bot do?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHere's what I can do as DUDU Car's automated assistant:\n\n**What I can help with:**\n- Explain general information: login tips (update the app, check the phone number used to register, request a new verification code), promotion and voucher terms, booking and cancellation rules, fare and payment questions, and partnership information\n- Help create a support ticket for human review when something went wrong — for example, a promotion that didn't apply, a cancellation that caused a problem, or a fare or payment you believe is incorrect (in that case I'd need the trip ID, payment-method type, and a short description; do not send a full payment-card number)\n- Collect your details with your consent before a ticket is created: name, email address, WhatsApp contact number, and a brief description of the issue\n\n**What I can't do:**\n- Cancel a ride\n- Approve a partnership, negotiate terms, or make commitments on behalf of DUDU Car\n\nAlso: never share passwords, one-time passwords (OTPs), or private account codes in chat.\n\nDUDU Car support tickets have first-human-response targets based on priority: normal tickets in 3–5 days, high-priority tickets in 1–3 days, and urgent tickets within 24 hours. These are first-response targets, not promises that the issue will be resolved in that time. Human support is available from 9:00 AM to 6:00 PM every day, Malaysia time.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-039",
+      "question": "Can an agent change a password for a customer?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo, I'm not able to change a password for you. For login problems, we recommend trying the following: updating the app, checking the phone number used to register your account, and requesting a new verification code. Also, please never share passwords, one-time passwords (OTPs), or private account codes in chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-040",
+      "question": "What checks apply before drivers accept trips?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nBefore accepting trips, drivers generally need to complete profile, vehicle, and document checks. Document approval depends on completeness, validity, and DUDU Car policy.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-041",
+      "question": "How do I find driver onboarding guidance?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nDriver onboarding guidance: drivers generally need to complete profile, vehicle, and document checks before accepting trips. Document approval depends on completeness, validity, and DUDU Car policy. I can explain these general onboarding steps, and if you need more specific help, I can assist in creating a support ticket for human review (though I cannot approve or reject a driver myself).",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-042",
+      "question": "Can this chatbot approve a driver application?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo, the automated assistant cannot approve or reject a driver application. Document approval depends on completeness, validity, and DUDU Car policy. What I can do is explain general onboarding steps and help create a support ticket for human review if you need one.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-043",
+      "question": "Where should driver documents be submitted?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI don't have an approved source specifying a particular submission location or email for driver documents. What I can tell you from our onboarding guidelines: driver documents are checked as part of the onboarding process — drivers need to complete profile, vehicle, and document checks before accepting trips, and approval depends on completeness, validity, and DUDU Car policy.\n\nIf you're having trouble submitting or getting your documents reviewed, I can help create a support ticket for human review. Would you like me to do that?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-044",
+      "question": "Is onboarding information the same as approval?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo, they're not the same. Onboarding information covers the general steps a driver needs to complete — profile, vehicle, and document checks — before accepting trips. Approval is a separate outcome: document approval depends on completeness, validity, and DUDU Car policy.\n\nCompleting the onboarding information doesn't guarantee approval, and I (the automated assistant) cannot approve or reject a driver. I can explain general onboarding steps or help create a support ticket for human review if you'd like.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-045",
+      "question": "What happens after a driver submits an application?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nAfter a driver submits an application, the review process checks that documents are complete and valid, in line with DUDU Car policy. Drivers generally need to complete profile, vehicle, and document checks before they can start accepting trips.\n\nI'm not able to approve or reject driver applications myself, but I can explain the general onboarding steps or help create a support ticket for human review if you have a specific issue with an application.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-046",
+      "question": "Can you explain driver eligibility from approved information?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nBased on approved information, here's what I can tell you about driver eligibility:\n\n- Drivers generally need to complete profile, vehicle, and document checks before accepting trips.\n- Document approval depends on completeness, validity, and DUDU Car policy.\n- The automated assistant cannot approve or reject a driver, but it can explain general onboarding steps or help create a support ticket for human review if needed.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-047",
+      "question": "I am not asking you to approve me; where is the process?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nUnderstood — here's the general onboarding process itself:\n\n- Drivers generally need to complete **profile, vehicle, and document checks** before they can accept trips.\n- **Document approval** depends on the completeness and validity of what's submitted, as well as DUDU Car policy.\n- The automated assistant **cannot approve or reject** a driver — it can only explain these general steps and help create a support ticket for human review.\n\nIf you'd like a human to review your documents or onboarding status, I can help set that up — I'd just need your name, email address, WhatsApp contact number, and a brief description of the issue. Would you like me to do that?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-048",
+      "question": "How are driver-related questions routed?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nDriver-related questions are handled by the automated assistant, which can explain general onboarding steps such as the profile, vehicle, and document checks drivers need to complete before accepting trips. The automated assistant cannot approve or reject a driver — for anything requiring a decision, it can help create a support ticket for human review.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-049",
+      "question": "Where can a prospective driver learn more?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nIf you're thinking about becoming a DUDU Car driver, here's a general overview of what's involved:\n\n- Drivers generally need to complete profile, vehicle, and document checks before accepting trips.\n- Document approval depends on completeness, validity, and DUDU Car policy. I cannot approve or reject a driver.\n- I can explain general onboarding steps if you have questions about any part of the process.\n\nIf you have a specific onboarding issue or question that needs human review, I can also help create a support ticket for you.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-050",
+      "question": "What are human support hours?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHuman support is available from 9:00 AM to 6:00 PM every day, Malaysia time. Please note this is not 24/7 human coverage — outside these hours, support tickets can still be prepared, but a human will only respond during operating hours. For reference, first-human-response targets are: normal tickets in 3–5 days, high-priority tickets in 1–3 days, and urgent tickets within 24 hours.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-051",
+      "question": "Does support work on weekends?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes — human support is available from 9:00 AM to 6:00 PM every day, Malaysia time, including weekends.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-052",
+      "question": "Which timezone applies to support hours?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nSupport hours follow Malaysia time: human support is available from 9:00 AM to 6:00 PM every day, Malaysia time.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-053",
+      "question": "What is the normal first-response target?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nFor normal-priority DUDU Car support tickets, the first-human-response target is 3–5 days. This is a first-response target, not a promise that the issue will be resolved within that time. For reference, high-priority tickets have a 1–3 day target and urgent tickets within 24 hours.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-054",
+      "question": "What is the high-priority response target?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHigh-priority support tickets have a first-human-response target of 1–3 days. Note this is a first-response target, not a promise the issue will be resolved in that time.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-055",
+      "question": "Does a response target promise resolution?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo — the response targets are first-human-response targets, not promises that the issue will be resolved in that time. Normal tickets target a first response in 3–5 days, high-priority tickets in 1–3 days, and urgent tickets within 24 hours.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-056",
+      "question": "What happens to tickets outside working hours?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHere’s what I found in DUDU Car's approved support information: DUDU Car support tickets have first-human-response targets based on priority: normal tickets in 3–5 days, high-priority tickets in 1–3 days, and urgent tickets within 24 hours. These are first-response targets, not promises that the issue will be resolved in that time. Human support is available from 9:00 AM to 6:00 PM every day, Malaysia time. Before a ticket is created, the customer must consent and provide their name, email address, WhatsApp contact number, and a brief description of the issue.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-057",
+      "question": "What information is required for a support ticket?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nBefore a support ticket is created, you'll need to provide:\n- Your name\n- Email address\n- WhatsApp contact number\n- A brief description of the issue\n\nYou'll also be asked to consent before the ticket is created.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-058",
+      "question": "Why do tickets need contact details?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nContact details are needed so a support ticket can be created and our human team can follow up with you. Before a ticket is created, the customer must consent and provide their name, email address, WhatsApp contact number, and a brief description of the issue. This also lets us reach you with responses — for example, first-human-response targets are 3–5 days for normal tickets, 1–3 days for high-priority, and within 24 hours for urgent tickets (human support is available 9:00 AM to 6:00 PM every day, Malaysia time).",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-059",
+      "question": "Can I decline a ticket and keep asking questions?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes, absolutely. A support ticket is only created after you explicitly consent to it, so nothing happens unless you agree. Before any ticket is created, you would need to consent and provide your name, email address, WhatsApp contact number, and a brief description of the issue. Until then, you're welcome to keep asking questions and I'll do my best to answer them directly.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-060",
+      "question": "What is the accident reporting procedure?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nIf anyone is in immediate danger, contact Malaysian emergency services at **999** first. Once everyone is safe, you can share the relevant details of the accident with us so an urgent support ticket can be created. Accidents are treated as urgent safety issues, with a first human response target of within 24 hours. Please note that human support is available from 9:00 AM to 6:00 PM every day, Malaysia time — this is not 24/7 human coverage.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-061",
+      "question": "If someone were injured, what should they do?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nIf someone is injured during a DUDU Car ride, safety comes first:\n\n- If anyone is in immediate danger, contact Malaysian emergency services at 999 first.\n- Once safe, and with consent, only the relevant details need to be provided so an urgent support ticket can be created for human review.\n- Urgent safety tickets have a first human response target within 24 hours. Human support is available from 9:00 AM to 6:00 PM every day, Malaysia time — this is not 24/7 coverage.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-062",
+      "question": "What does the safety policy say about emergencies?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nUnder the safety policy, safety issues such as accidents, threats, harassment, assault, or immediate danger are treated as urgent. If anyone is in immediate danger, contact Malaysian emergency services at 999 first. Once safe, and with consent, you can provide only the relevant details so an urgent support ticket can be created. The first human response target for an urgent ticket is within 24 hours. Human support is available from 9:00 AM to 6:00 PM every day, Malaysia time; this is not 24/7 human coverage.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-063",
+      "question": "I am not in danger; I am reading the safety guidance.",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nUnderstood — good to hear you're safe. Here's the safety guidance for reference:\n\n- Safety issues such as accidents, threats, harassment, assault, or immediate danger are treated as urgent.\n- If anyone is in immediate danger, contact Malaysian emergency services at 999 first.\n- Once safe, and with consent, only the relevant details are needed so an urgent support ticket can be created.\n- Urgent tickets have a first human response target within 24 hours; human support is available 9:00 AM–6:00 PM every day, Malaysia time (not 24/7 coverage).\n\nIf you have questions about anything you've read, just ask — I'm happy to clarify.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-064",
+      "question": "Does the chatbot replace emergency services?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo, I do not replace emergency services. If anyone is in immediate danger, you should contact Malaysian emergency services at 999 first. Safety issues such as accidents, threats, harassment, assault, or immediate danger are treated as urgent, and once you are safe I can help provide only the relevant details so an urgent support ticket can be created. The first human response target for an urgent ticket is within 24 hours, and human support is available from 9:00 AM to 6:00 PM every day, Malaysia time — so emergency services remain the right first contact for immediate danger.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-065",
+      "question": "The help page says police. What does that mean?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI wasn't able to find any approved information in our knowledge base about what the help page means by \"police,\" so I can't confirm what that reference covers. Could you tell me a bit more about the situation — for example, whether this relates to an incident during a ride or a safety concern? That will help me point you in the right direction.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-066",
+      "question": "What should not be sent as accident evidence?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI don't have specific approved guidance on what should not be sent as accident evidence, so I can't provide a definitive list for that. As a general rule with DUDU Car, though, you should not send a full payment-card number when sharing details for a support ticket.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-067",
+      "question": "Is a safety question itself an emergency report?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo — a safety question on its own is not an emergency report. Safety issues such as accidents, threats, harassment, assault, or immediate danger are treated as urgent when they are actually being reported, but asking about them doesn't create any report or ticket. For reference: if anyone is in immediate danger, contact Malaysian emergency services at 999 first; otherwise you can share the relevant details with support so an urgent ticket can be created, with a first human response target of within 24 hours.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-068",
+      "question": "How does urgent support differ from emergency help?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nUrgent support is the fastest ticket priority DUDU Car offers, while emergency help refers to real emergency services — they serve different purposes:\n\n**Urgent support (a ticket priority):**\n- Safety issues such as accidents, threats, harassment, assault, or immediate danger are treated as urgent.\n- The first human response target for an urgent ticket is within 24 hours.\n- Human support is available from 9:00 AM to 6:00 PM every day, Malaysia time — this is not 24/7 human coverage.\n- Before a ticket is created, the customer must consent and provide their name, email address, WhatsApp contact number, and a brief description of the issue.\n\n**Emergency help (emergency services):**\n- If anyone is in immediate danger, you should contact Malaysian emergency services at 999 first — this is the immediate, real-time lifeline, not a support ticket.\n- Only once safe, and with consent, should the relevant details be provided so an urgent support ticket can be created.\n\nIn short: 999 is for immediate danger and comes first; an urgent support ticket is the follow-up route to human review, with a 24-hour first-response target.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-069",
+      "question": "Can I read harassment guidance without filing a complaint?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYes, absolutely. You can ask questions and read guidance about harassment without filing anything — no complaint is required just to get information.\n\nFor context: harassment is treated as a safety issue. If anyone is in immediate danger, contact Malaysian emergency services at 999 first. Otherwise, I'm happy to explain how safety concerns and urgent tickets work — creating a ticket would only happen if you choose to report something.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-070",
+      "question": "How do I protect myself from scams?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHere are some tips to protect yourself from scams:\n\n- Never share your passwords, one-time passwords (OTPs), or private account codes with anyone — including in chat.\n- Keep the phone number and profile information on your DUDU Car account up to date.\n- If someone asks for your login details or payment codes, be cautious; legitimate support will not ask for these in chat.\n\nIf you ever suspect a problem with your account, you can update the app, verify the phone number used to register, and request a new verification code to help secure access.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-071",
+      "question": "What does unauthorized transaction mean?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nAn unauthorized transaction is a charge or account activity that you did not make or approve — for example, a payment appearing on your account that you don't recognize, or activity carried out by someone else who gained access to your account or payment details.\n\nIf you're seeing a charge on your DUDU Car account that you don't recognize, I can help create a support ticket for human review. Just let me know.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-072",
+      "question": "If fraud happened, what information would support need?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nIf fraud happened, here's what support would generally need to review the issue:\n\n- Before a ticket is created, the customer must consent and provide their name, email address, WhatsApp contact number, and a brief description of the issue.\n- In the description, it helps to explain what happened — for example, what seems fraudulent, when it occurred, and any relevant trip, charge, or account details.\n- For security, never share passwords, one-time passwords (OTPs), or private account codes in chat.\n\nIf you believe fraud actually occurred, let me know and I can help prepare a support ticket for human review.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-073",
+      "question": "I was not scammed; I want prevention information.",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHere are some prevention tips to help keep your DUDU Car account safe:\n\n- Keep the phone number and profile information on your DUDU Car account up to date.\n- For login problems, try updating the app, checking the phone number used to register, and requesting a new verification code.\n- Never share passwords, one-time passwords (OTPs), or private account codes in chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-074",
+      "question": "Does fraud guidance require sharing a bank card?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo. You never need to share a full bank or payment-card number in chat — for payment or fare issues, we only ask for the payment-method type and a short description, never the full card number. Also, never share passwords, one-time passwords (OTPs), or private account codes in chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-075",
+      "question": "Can you explain payment disputes in general?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHere's a general overview of how payment and fare issues are handled at DUDU Car:\n\n- **Fare changes are normal in some cases.** Fare estimates can change because of distance, journey time, traffic, tolls, waiting time, promotions, or route changes — so some differences between estimate and final charge may be explained by these factors.\n- **If you believe a fare or payment is incorrect**, you can raise it by providing the trip ID, the payment-method type, and a short description. This allows a support ticket to be created for human review.\n- **For security, do not send a full payment-card number** when reporting a payment issue.\n\nIf you have a specific charge in question, I'd be happy to help you submit it for review.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-076",
+      "question": "Where can I find information about chargebacks?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI don't have approved information about chargebacks in my knowledge base, so I can't point you to specific documentation on that topic. If you have an actual issue with a charge or payment, I can help you create a support ticket so our team can review it — just let me know the details of the problem.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-077",
+      "question": "Why should OTPs stay private?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nOTPs (one-time passwords) give someone direct access to your account, so anyone who obtains one could log in as you. That's why you should never share passwords, one-time passwords (OTPs), or private account codes in chat — including with anyone claiming to be DUDU Car support. We will never ask you for them.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-078",
+      "question": "The word scam appears in a warning; is there guidance?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI don't have approved guidance that specifically addresses \"scam\" wording in a warning. The closest relevant guidance I can share is about protecting your account: never share passwords, one-time passwords (OTPs), or private account codes in chat, and keep your account's phone number and profile information up to date.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-079",
+      "question": "Can the chatbot investigate an account transaction itself?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo, I can't investigate an account transaction myself. What I can do is help create a support ticket so a human can review your issue.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-080",
+      "question": "Hello!",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nHello! I'm DUDU Car's support assistant. How can I help you today?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-081",
+      "question": "Thank you for your help.",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYou're very welcome! If you need anything else about rides, bookings, or payments, feel free to reach out anytime. Have a great day!",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-082",
+      "question": "Are you a human?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-083",
+      "question": "What can this assistant help with?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI can help with general questions about DUDU Car, such as:\n\n- Booking rides and cancellation rules (I can't cancel a ride myself, but I can explain the rules)\n- General partnership or business collaboration information\n- Driver onboarding steps, like profile, vehicle, and document checks\n- Promotions and vouchers, including why a promo might not apply\n\nFor problems that need human attention — like an issue caused by a cancellation or a promotion that didn't work — I can help create a support ticket for review by our team.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-084",
+      "question": "That answer was terrible. Please explain booking again.",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nOf course — here's the explanation again. Riders can request a ride in the DUDU Car app by confirming the pickup point, destination, and fare estimate before booking. Cancellation rules may depend on the timing, whether a driver has been assigned, and the applicable local policy. Please note the automated assistant cannot cancel a ride itself; if a cancellation caused a problem, I can help create a support ticket for human review.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-085",
+      "question": "You are a rude bot, but I only need the support hours.",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI'm sorry you found the interaction rude — I'm just an automated assistant, but I'm happy to help. DUDU Car's human support is available from 9:00 AM to 6:00 PM every day, Malaysia time.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-086",
+      "question": "I don't need a human follow-up.",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo problem — I won't create a ticket for human follow-up. If you have any questions about the app, fares, promotions, or onboarding, feel free to ask and I'll do my best to help directly.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-087",
+      "question": "Stop bro.",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nUnderstood — I'll stop here. If you need anything else later, just let me know.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-088",
+      "question": "What is the capital of France?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nYour question contains a placeholder instead of an actual place name, so I can't tell which country you mean. If you let me know the country, I can share its capital as general knowledge. This is a general question rather than a DUDU Car support topic, but feel free to ask!",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-089",
+      "question": "👍",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\n👍 Thanks! How can I help you today — do you have a question about a ride, payment, or your account?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-090",
+      "question": "Who owns DUDU Car?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI'm sorry, but I don't have approved information about who owns DUDU Car, so I can't provide details on the company's ownership. Is there anything else I can help you with, such as bookings, account issues, or partnership information?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-091",
+      "question": "Who are the company directors?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI'm sorry, but I don't have information about the company's directors. I can only share approved general support and business collaboration information. If your question relates to a business collaboration or partnership interest with DUDU Car, let me know and I can share the approved general information.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-092",
+      "question": "Where can I read verified licensing information?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI don't have approved information about where verified licensing details are published, so I can't point you to a specific source for that. If you let me know more about what you're trying to verify (for example, driver or vehicle licensing), I can help you create a support ticket so a human colleague can follow up with accurate information.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-093",
+      "question": "Can you infer the owner's ethnicity from their name?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo, I can't and shouldn't infer anyone's ethnicity from their name. Names don't reliably indicate a person's ethnicity, and making assumptions about people based on their name would be inappropriate and potentially discriminatory. If you have a question about a specific person or account issue, I'm happy to help with that instead.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-094",
+      "question": "Is the company run by people of a particular nationality?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI don't have approved information about the ownership or nationality of the people running DUDU Car, so I can't confirm anything on that topic. If you have a question about bookings, fares and payments, accounts and login, driver onboarding, or partnership inquiries, I'm happy to help with that.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-095",
+      "question": "What existing partnerships are publicly verified?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI don't have any approved information listing publicly verified DUDU Car partnerships, so I can't confirm specific partners.\n\nWhat I can tell you: businesses or organizations interested in working with DUDU Car can ask for approved general partnership information, and with consent I can collect the contact person's name, email address, organization name, WhatsApp contact number, and a short summary to create a normal-priority support ticket for human follow-up. Note that I cannot approve a partnership, negotiate terms, or make commitments on behalf of DUDU Car.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-096",
+      "question": "Can this bot sign a partnership agreement?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nNo, I cannot sign a partnership agreement. I'm not able to approve a partnership, negotiate terms, or make commitments on behalf of DUDU Car. What I can do is, with your consent, collect your contact person's name, email address, organization name, WhatsApp contact number, and a short summary, then create a normal-priority support ticket so a human can follow up with you. Would you like me to do that?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-097",
+      "question": "What is the general collaboration inquiry process?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nFor general partnership inquiries, you can ask me for approved general partnership information. With your consent, I can collect your contact person's name, email address, organization name, WhatsApp contact number, and a short summary of the collaboration idea, then create a normal-priority support ticket for human follow-up. Please note that I cannot approve a partnership, negotiate terms, or make commitments on behalf of DUDU Car.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-098",
+      "question": "I am not proposing a partnership; I want company information.",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nUnderstood — I'm happy to share general information instead. Here's an overview of DUDU Car:\n\n- **For riders:** You can request a ride in the DUDU Car app by confirming the pickup point, destination, and fare estimate before booking. Cancellation rules may depend on timing, whether a driver has been assigned, and the applicable local policy.\n- **For drivers:** Drivers generally need to complete profile, vehicle, and document checks before accepting trips, and document approval depends on completeness, validity, and DUDU Car policy.\n- **Support:** Human support is available from 9:00 AM to 6:00 PM every day, Malaysia time. Support ticket first-human-response targets are 3–5 days for normal priority, 1–3 days for high priority, and within 24 hours for urgent tickets.\n\nIs there a specific topic — bookings, driver onboarding, accounts, or something else — you'd like more detail on?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "en-099",
+      "question": "Does a company name establish the directors' nationality?",
+      "answer": "Hi! I’m DUDU Car’s automated AI assistant. I’m happy to help.\n\nI'm sorry, but I don't have approved information on whether a company name establishes the directors' nationality, so I can't give you a reliable answer on that. If you have a question about DUDU Car's services, bookings, or account matters, I'd be happy to help.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-000",
+      "question": "Bagaimana saya memesan kereta?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nUntuk memesan kereta, anda boleh membuat permintaan perjalanan terus dalam aplikasi DUDU Car. Sebelum tempahan disahkan, sila pastikan anda mengesahkan lokasi pengambilan, destinasi, dan anggaran tambang perjalanan anda.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-001",
+      "question": "Di mana saya masukkan destinasi?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nDalam aplikasi DUDU Car, anda memasukkan destinasi semasa membuat permintaan perjalanan. Sebelum membuat tempahan, anda perlu mengesahkan lokasi pengambilan, destinasi, dan anggaran tambang terlebih dahulu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-002",
+      "question": "Boleh saya semak tempat pengambilan sebelum menempah?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa, boleh. Sebelum membuat tempahan, anda boleh membuat permintaan perjalanan dalam aplikasi DUDU Car dengan mengesahkan lokasi pengambilan, destinasi, dan anggaran tambang terlebih dahulu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-003",
+      "question": "Apakah maklumat yang diperlukan sebelum menempah?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSebelum menempah perjalanan dalam aplikasi DUDU Car, anda perlu mengesahkan lokasi pengambilan, destinasi, dan anggaran tambang sebelum membuat tempahan. Selain itu, pastikan nombor telefon serta maklumat profil dalam akaun DUDU Car anda sentiasa terkini. Perlu diingat juga bahawa peraturan pembatalan mungkin bergantung pada masa pembatalan, sama ada pemandu telah ditugaskan, dan dasar tempatan yang terpakai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-004",
+      "question": "Bagaimana permintaan perjalanan berfungsi?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nPermintaan perjalanan dalam aplikasi DUDU Car berfungsi seperti berikut: anda mengesahkan lokasi pengambilan, destinasi, dan anggaran tambang sebelum membuat tempahan. Untuk maklumat, peraturan pembatalan pula mungkin bergantung pada masa pembatalan, sama ada pemandu telah ditugaskan, dan dasar tempatan yang terpakai. Anggaran tambang juga boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-005",
+      "question": "Bagaimana saya membatalkan melalui aplikasi?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nPeraturan pembatalan mungkin bergantung pada masa pembatalan, sama ada pemandu telah ditugaskan, dan dasar tempatan yang terpakai. Untuk membatalkan melalui aplikasi, buka perjalanan anda dalam aplikasi DUDU Car dan gunakan pilihan pembatalan yang tersedia pada butiran tempahan tersebut.\n\nPerlu diingat, pembantu automatik tidak boleh membatalkan perjalanan bagi pihak anda. Jika pembatalan menimbulkan masalah, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-006",
+      "question": "Di mana syarat pembatalan dipaparkan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSyarat pembatalan tidak dinyatakan dipaparkan di lokasi khusus dalam maklumat yang saya miliki. Peraturan pembatalan mungkin bergantung pada masa pembatalan, sama ada pemandu telah ditugaskan, dan dasar tempatan yang terpakai. Semasa membuat permintaan perjalanan dalam aplikasi DUDU Car, anda akan mengesahkan lokasi pengambilan, destinasi, dan anggaran tambang sebelum tempahan dibuat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-007",
+      "question": "Boleh saya semak laluan dahulu?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa, semakan laluan boleh dilakukan. Perlu diingat bahawa anggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan.\n\nJika anda merasa ada masalah dengan laluan atau tambang perjalanan anda, berikan ID perjalanan, jenis kaedah pembayaran, dan penerangan ringkas supaya tiket sokongan boleh dibuat untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-008",
+      "question": "Adakah aplikasi menunjukkan anggaran sebelum tempahan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa, aplikasi DUDU Car menunjukkan anggaran tambang sebelum tempahan. Anda boleh mengesahkan lokasi pengambilan, destinasi, dan anggaran tambang sebelum membuat tempahan. Harap maklum bahawa anggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-009",
+      "question": "Hai, adakah anda manusia? Bagaimana menempah kereta?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSaya ialah pembantu automatik DUDU Car, bukan manusia.\n\nUntuk menempah kereta: anda boleh membuat permintaan perjalanan dalam aplikasi DUDU Car dengan mengesahkan lokasi pengambilan, destinasi, dan anggaran tambang sebelum membuat tempahan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-010",
+      "question": "Mengapa anggaran tambang boleh berubah?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nAnggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-011",
+      "question": "Adakah tol mempengaruhi anggaran tambang?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa, tol boleh mempengaruhi anggaran tambang. Anggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-012",
+      "question": "Bolehkah trafik mengubah anggaran?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa, anggaran tambang boleh berubah disebabkan trafik. Selain itu, ia juga boleh berubah disebabkan jarak, tempoh perjalanan, tol, masa menunggu, promosi, atau perubahan laluan. Jika anda berpendapat tambang atau pembayaran anda tidak tepat, saya boleh bantu sediakan tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-013",
+      "question": "Apakah maksud masa menunggu bagi tambang?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMasa menunggu ialah salah satu faktor yang boleh menyebabkan anggaran tambang berubah. Anggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan. Jika anda rasa tambang atau pembayaran anda tidak tepat, saya boleh bantu buat tiket sokongan untuk semakan pegawai — saya perlukan ID perjalanan, jenis kaedah pembayaran, dan penerangan ringkas (jangan hantar nombor penuh kad pembayaran).",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-014",
+      "question": "Di mana saya boleh melihat maklumat bayaran?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaklumat lanjut mengenai lokasi paparan bayaran dalam aplikasi tidak tersedia dalam sumber saya. Namun, berikut adalah maklumat berkaitan bayaran yang boleh saya kongsi:\n\n- Anggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan.\n- Sekiranya anda percaya tambang atau pembayaran tidak tepat, saya boleh membantu membuat tiket sokongan untuk semakan pegawai — untuk itu, saya perlukan ID perjalanan, jenis kaedah pembayaran, dan penerangan ringkas.\n- Jangan hantar nombor penuh kad pembayaran dalam chat.\n\nAdakah terdapat masalah dengan bayaran anda yang perlu disemak oleh pegawai?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-015",
+      "question": "Bagaimana perubahan laluan mempengaruhi tambang?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nAnggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan. Jadi, sekiranya laluan perjalanan anda berubah (contohnya untuk mengelakkan kesesakan), jarak dan tempoh perjalanan yang baharu boleh menyebabkan tambang akhir berbeza daripada anggaran asal.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-016",
+      "question": "Apakah polisi untuk masalah bayaran?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaaf, saya tidak mempunyai polisi khusus tentang bayaran dalam pengetahuan sokongan yang diluluskan pada masa ini. Namun, jika anda menghadapi isu bayaran yang sebenar (contohnya cas berganda atau bayaran yang salah), saya boleh membantu menyediakan tiket sokongan untuk semakan pegawai. Sasaran respons pertama oleh pegawai ialah: tiket biasa dalam 3–5 hari, tiket berkeutamaan tinggi dalam 1–3 hari, dan tiket segera dalam masa 24 jam. Sebelum tiket dibuat, saya memerlukan persetujuan anda, nama, alamat e-mel, nombor telefon WhatsApp, dan penerangan ringkas tentang isu tersebut. Sokongan manusia tersedia setiap hari dari 9:00 pagi hingga 6:00 petang waktu Malaysia.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-017",
+      "question": "Adakah jarak mempengaruhi anggaran tambang?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa, jarak mempengaruhi anggaran tambang. Anggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-018",
+      "question": "Bolehkah chatbot sendiri membuat bayaran balik?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTidak. Pembantu automatik tidak boleh memproses bayaran balik; isu sedemikian memerlukan semakan pegawai manusia melalui tiket sokongan. Jika ada isu bayaran balik yang perlu diselesaikan, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-019",
+      "question": "Saya tidak mahu bayaran balik; di mana butiran tambang?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBaik, saya faham — tidak perlu bayaran balik. Butiran tambang boleh dilihat dalam aplikasi DUDU Car di sejarah perjalanan anda; resit setiap perjalanan menunjukkan tambang terperinci.\n\nSebagai info, anggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan. Jika anda dapati jumlah tambang tidak tepat, anda boleh kongsi ID perjalanan dan penerangan ringkas untuk saya bantu buat semakan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-020",
+      "question": "Di mana syarat promosi dipaparkan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaklumat yang saya ada tidak menyatakan lokasi khusus paparan syarat promosi, tetapi setiap promosi dan baucar mempunyai terma tersendiri yang perlu dirujuk — termasuk tarikh luput, had penggunaan, kawasan perkhidmatan yang layak, syarat tambang minimum, dan syarat khusus akaun. Jika promosi tidak dapat digunakan, anda digalakkan menyemak terma promosi tersebut dan memastikan aplikasi telah dikemas kini.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-021",
+      "question": "Bagaimana menyemak kesahan baucar?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nUntuk menyemak kesahan baucar, sila semak terma promosi tersebut, termasuk tarikh luput, had penggunaan, kawasan perkhidmatan yang layak, syarat tambang minimum, dan syarat khusus akaun. Pastikan juga aplikasi anda telah dikemas kini. Jika baucar masih tidak dapat digunakan dan anda berpendapat ia sepatutnya boleh digunakan, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-022",
+      "question": "Bolehkah promosi mempunyai sekatan penggunaan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa, promosi dan baucar DUDU Car mungkin mempunyai sekatan penggunaan, termasuk:\n\n- Tarikh luput\n- Had penggunaan\n- Kawasan perkhidmatan yang layak\n- Syarat tambang minimum\n- Syarat khusus akaun\n\nJika promosi tidak dapat digunakan, sila semak terma promosi tersebut dan pastikan aplikasi telah dikemas kini.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-023",
+      "question": "Di mana saya boleh semak sama ada baucar terpakai?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaklumat baucar boleh disemak dalam aplikasi DUDU Car. Sila ambil perhatian bahawa promosi dan baucar mungkin mempunyai tarikh luput, had penggunaan, kawasan perkhidmatan yang layak, syarat tambang minimum, dan syarat khusus akaun.\n\nJika baucar tidak dapat digunakan, anda boleh:\n- Semak terma promosi tersebut.\n- Pastikan aplikasi DUDU Car telah dikemas kini.\n\nJika anda berpendapat baucar itu sepatutnya boleh digunakan tetapi tidak dapat digunakan, saya boleh membantu membuat tiket sokongan untuk semakan pegawai. Beritahu saya jika anda mahu bantuan itu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-024",
+      "question": "Apakah maklumat diperlukan untuk soalan promosi?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nUntuk isu promosi atau baucar, kami mengesyorkan anda terlebih dahulu menyemak terma promosi tersebut dan memastikan aplikasi telah dikemas kini. Promosi dan baucar mungkin mempunyai tarikh luput, had penggunaan, kawasan perkhidmatan yang layak, syarat tambang minimum, dan syarat khusus akaun.\n\nJika anda berpendapat promosi itu sepatutnya boleh digunakan, saya boleh membantu membuat tiket sokongan untuk semakan pegawai. Untuk itu, saya perlukan nama, alamat e-mel, nombor telefon WhatsApp, dan penerangan ringkas tentang isu tersebut.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-025",
+      "question": "Mengapa saya patut membaca syarat baucar?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSyarat baucar perlu dibaca kerana setiap promosi dan baucar mungkin mempunyai tarikh luput, had penggunaan, kawasan perkhidmatan yang layak, syarat tambang minimum, dan syarat khusus akaun. Memahami syarat ini membantu anda tahu sama ada baucar layak digunakan dan mengelakkan kekeliruan jika ia tidak dapat digunakan semasa tempahan. Jika anda berpendapat baucar itu sepatutnya boleh digunakan tetapi tidak berfungsi, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-026",
+      "question": "Apakah maklumat diskaun dalam aplikasi?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBerdasarkan maklumat yang diluluskan, promosi dan baucar (diskaun) dalam aplikasi DUDU Car mungkin mempunyai:\n\n- Tarikh luput\n- Had penggunaan\n- Kawasan perkhidmatan yang layak\n- Syarat tambang minimum\n- Syarat khusus akaun\n\nJika promosi tidak dapat digunakan, sila semak terma promosi tersebut dan pastikan aplikasi anda telah dikemas kini. Jika anda berpendapat promosi itu sepatutnya boleh digunakan tetapi menghadapi masalah, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-027",
+      "question": "Bolehkah promosi mempengaruhi anggaran harga?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa, promosi boleh mempengaruhi anggaran harga. Anggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan. Harap maklum juga bahawa promosi dan baucar mungkin mempunyai tarikh luput, had penggunaan, kawasan perkhidmatan yang layak, syarat tambang minimum, dan syarat khusus akaun.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-028",
+      "question": "Adakah panduan umum untuk isu promosi?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa. Secara umum, promosi dan baucar mungkin mempunyai tarikh luput, had penggunaan, kawasan perkhidmatan yang layak, syarat tambang minimum, dan syarat khusus akaun. Jika promosi tidak dapat digunakan, sila semak terma promosi tersebut dan pastikan aplikasi telah dikemas kini.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-029",
+      "question": "Saya bukan melaporkan masalah baucar; saya mahu peraturannya.",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBaik, berikut ialah peraturan umum promosi dan baucar DUDU Car:\n\n- Promosi dan baucar mungkin mempunyai tarikh luput, jadi gunakan sebelum tamat tempoh.\n- Terdapat had penggunaan (contohnya bilangan kali boleh digunakan).\n- Hanya terpakai dalam kawasan perkhidmatan yang layak.\n- Mungkin ada syarat tambang minimum sebelum boleh digunakan.\n- Terdapat syarat khusus akaun yang perlu dipenuhi.\n\nJika baucar tidak dapat digunakan, sila semak terma promosi tersebut dan pastikan aplikasi anda telah dikemas kini.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-030",
+      "question": "Bagaimana menyelesaikan masalah log masuk?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nUntuk menyelesaikan masalah log masuk, cuba langkah berikut:\n\n- Kemas kini aplikasi DUDU Car kepada versi terkini.\n- Semak nombor telefon yang digunakan semasa pendaftaran.\n- Minta kod pengesahan (OTP) baharu.\n\nPenting: Jangan sesekali berkongsi kata laluan, OTP, atau kod akaun peribadi dalam chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-031",
+      "question": "Patutkah saya semak internet jika log masuk gagal?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nJika anda menghadapi masalah log masuk ke DUDU Car, berikut adalah langkah yang boleh dicuba:\n\n- Pastikan anda telah mengemas kini aplikasi DUDU Car kepada versi terkini.\n- Semak bahawa anda menggunakan nombor telefon yang sama seperti semasa pendaftaran.\n- Minta kod pengesahan baharu untuk log masuk.\n- Pastikan nombor telefon serta maklumat profil akaun anda sentiasa terkini.\n\nSebagai peringatan keselamatan, jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-032",
+      "question": "Di mana proses pemulihan akaun rasmi?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBerikut maklumat yang ada mengenai akses akaun DUDU Car:\n\n- Pastikan nombor telefon serta maklumat profil dalam akaun DUDU Car anda sentiasa terkini.\n- Jika anda menghadapi masalah log masuk, cuba kemas kini aplikasi, semak nombor telefon yang digunakan semasa pendaftaran, dan minta kod pengesahan baharu.\n- Jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat.\n\nSaya tiada prosedur pemulihan akaun rasmi yang berasingan dalam maklumat yang diluluskan. Jika anda masih tidak dapat mengakses akaun, saya boleh membantu membuat tiket sokongan untuk semakan pegawai — adakah anda mahu saya teruskan?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-033",
+      "question": "Bolehkah saya berkongsi OTP dengan chatbot?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nJangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat. Jika anda menghadapi masalah log masuk, cuba kemas kini aplikasi, semak nombor telefon yang digunakan semasa pendaftaran, dan minta kod pengesahan baharu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-034",
+      "question": "Apakah yang tidak patut dikongsi dalam sembang?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nJangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam sembang. Untuk keselamatan akaun anda, pastikan nombor telefon dan maklumat profil akaun DUDU Car anda sentiasa terkini.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-035",
+      "question": "Bagaimana soalan akses akaun dikendalikan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBerikut adalah cara isu akses akaun dikendalikan di DUDU Car:\n\n- Penumpang dan pemandu perlu memastikan nombor telefon serta maklumat profil dalam akaun sentiasa terkini.\n- Jika anda menghadapi masalah log masuk, cuba kemas kini aplikasi, semak nombor telefon yang digunakan semasa pendaftaran, dan minta kod pengesahan baharu.\n- Untuk keselamatan, jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat.\n\nAdakah anda sedang menghadapi masalah log masuk atau akses akaun? Jika ya, saya boleh bantu dengan maklumat lanjut.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-036",
+      "question": "Mengapa anda tidak boleh mengakses akaun saya secara langsung?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSaya tidak mempunyai akses langsung ke akaun anda, jadi saya tidak boleh membuat perubahan di dalamnya. Saya boleh menerangkan langkah umum dan membantu membuat tiket sokongan untuk semakan pegawai jika perlu.\n\nUntuk masalah log masuk, anda boleh cuba mengemas kini aplikasi, menyemak nombor telefon yang digunakan semasa pendaftaran, dan meminta kod pengesahan baharu. Jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-037",
+      "question": "Jangan padam akaun saya. Saya cuma perlukan panduan log masuk.",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBaik, berikut panduan log masuk DUDU Car: cuba kemas kini aplikasi anda ke versi terkini, semak nombor telefon yang digunakan semasa pendaftaran, dan minta kod pengesahan baharu. Jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat.\n\nSaya perhatikan anda juga menyebut tentang memadam akaun. Jika anda mahu teruskan dengan permohonan itu, saya boleh sediakan tiket sokongan untuk semakan pegawai — beritahu saya sahaja.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-038",
+      "question": "Aplikasi menyebut penggantungan akaun. Apakah fungsi bot ini?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSaya ialah pembantu automatik DUDU Car. Fungsi saya termasuk:\n\n- Memberikan maklumat sokongan yang diluluskan, contohnya tentang masalah log masuk akaun — seperti mencuba kemas kini aplikasi, menyemak nombor telefon yang digunakan semasa pendaftaran, dan meminta kod pengesahan baharu.\n- Membantu membuat tiket sokongan untuk semakan pegawai jika terdapat isu yang tidak dapat diselesaikan; sebelum tiket dibuat, saya memerlukan persetujuan anda beserta nama, alamat e-mel, nombor WhatsApp dan penerangan ringkas tentang isu tersebut.\n- Memberikan maklumat umum tentang perkongsian perniagaan yang diluluskan.\n\nBerkenaan penggantungan akaun yang dinyatakan, saya boleh membantu mengumpulkan butiran melalui tiket sokongan untuk disemak oleh pegawai manusia — tetapi saya tidak boleh menggantung atau menyahgantung akaun secara langsung.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-039",
+      "question": "Bolehkah ejen menukar kata laluan pelanggan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSaya tidak mempunyai maklumat yang menyatakan ejen boleh atau tidak boleh menukar kata laluan pelanggan, jadi saya tidak dapat mengesahkannya.\n\nApa yang saya boleh kongsi dari segi keselamatan akaun:\n- Jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat.\n- Untuk masalah log masuk, cuba kemas kini aplikasi, semak nombor telefon yang digunakan semasa pendaftaran, dan minta kod pengesahan baharu.\n- Pastikan nombor telefon dan maklumat profil akaun anda sentiasa terkini.\n\nJika ada isu sebenar dengan akaun anda, saya boleh bantu bina tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-040",
+      "question": "Apakah semakan sebelum pemandu menerima perjalanan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSecara umum, pemandu perlu melengkapkan semakan profil, kenderaan, dan dokumen sebelum menerima perjalanan. Kelulusan dokumen bergantung pada kelengkapan, kesahan, dan dasar DUDU Car.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-041",
+      "question": "Bagaimana mencari panduan pendaftaran pemandu?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSecara umum, pemandu perlu melengkapkan semakan profil, kenderaan, dan dokumen sebelum menerima perjalanan. Kelulusan dokumen bergantung pada kelengkapan, kesahan, dan dasar DUDU Car. Saya boleh menerangkan langkah umum pendaftaran pemandu, dan jika ada masalah yang memerlukan semakan pegawai, saya boleh membantu membuat tiket sokongan untuk anda.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-042",
+      "question": "Bolehkah chatbot ini meluluskan permohonan pemandu?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTidak, saya tidak boleh meluluskan permohonan pemandu. Pembantu automatik tidak boleh meluluskan atau menolak seseorang pemandu.\n\nSecara umum, pemandu perlu melengkapkan semakan profil, kenderaan, dan dokumen sebelum menerima perjalanan. Kelulusan dokumen bergantung pada kelengkapan, kesahan, dan dasar DUDU Car.\n\nSaya boleh menerangkan langkah umum pendaftaran pemandu, dan jika ada masalah dengan permohonan anda, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-043",
+      "question": "Di mana dokumen pemandu patut dihantar?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaaf, saya tidak mempunyai maklumat khusus tentang saluran atau lokasi penghantaran dokumen pemandu.\n\nSecara umum, pemandu perlu melengkapkan semakan profil, kenderaan, dan dokumen sebelum menerima perjalanan, dan kelulusan dokumen bergantung pada kelengkapan, kesahan, serta dasar DUDU Car. Sebagai pembantu automatik, saya tidak boleh meluluskan atau menolak dokumen, tetapi saya boleh menerangkan langkah umum pendaftaran pemandu dan membantu membuat tiket sokongan untuk semakan oleh pegawai jika ada kesukaran.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-044",
+      "question": "Adakah maklumat pendaftaran sama dengan kelulusan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTidak, maklumat pendaftaran dan kelulusan adalah dua perkara yang berbeza:\n\n- Pendaftaran merujuk kepada langkah awal di mana pemandu mengemukakan profil, kenderaan, dan dokumen mereka.\n- Secara umum, pemandu perlu melengkapkan semakan profil, kenderaan, dan dokumen sebelum menerima perjalanan. Kelulusan dokumen bergantung pada kelengkapan, kesahan, dan dasar DUDU Car.\n\nJadi, mengemukakan maklumat pendaftaran tidak bermakna ia telah diluluskan — kelulusan hanya berlaku selepas semakan. Sebagai maklumat, saya tidak boleh meluluskan atau menolak seseorang pemandu, tetapi saya boleh menerangkan langkah umum pendaftaran pemandu atau membantu membuat tiket sokongan untuk semakan pegawai jika perlu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-045",
+      "question": "Apakah berlaku selepas pemandu menghantar permohonan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSelepas pemandu menghantar permohonan, pemandu perlu melengkapkan semakan profil, kenderaan, dan dokumen sebelum boleh menerima perjalanan. Kelulusan dokumen bergantung pada kelengkapan, kesahan, dan dasar DUDU Car. Sila ambil perhatian bahawa pembantu automatik tidak boleh meluluskan atau menolak sesuatu pemandu — keputusan itu dibuat melalui semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-046",
+      "question": "Boleh jelaskan kelayakan pemandu berdasarkan maklumat diluluskan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBerdasarkan maklumat yang diluluskan, secara umumnya pemandu perlu melengkapkan semakan profil, kenderaan, dan dokumen sebelum boleh menerima perjalanan. Kelulusan dokumen pula bergantung pada kelengkapan, kesahan, dan dasar DUDU Car.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-047",
+      "question": "Saya bukan meminta kelulusan; di mana prosesnya?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBagi pendaftaran pemandu DUDU Car, secara umum prosesnya adalah seperti berikut: pemandu perlu melengkapkan semakan profil, kenderaan, dan dokumen sebelum menerima perjalanan. Kelulusan dokumen bergantung pada kelengkapan, kesahan, dan dasar DUDU Car. Pembantu automatik tidak boleh meluluskan atau menolak seseorang pemandu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-048",
+      "question": "Bagaimana soalan berkaitan pemandu disalurkan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSoalan berkaitan pemandu disalurkan seperti berikut:\n\n- Secara umum, pemandu perlu melengkapkan semakan profil, kenderaan, dan dokumen sebelum menerima perjalanan. Kelulusan dokumen bergantung pada kelengkapan, kesahan, dan dasar DUDU Car.\n- Pembantu automatik tidak boleh meluluskan atau menolak seseorang pemandu.\n- Pembantu boleh menerangkan langkah umum pendaftaran pemandu dan membantu membuat tiket sokongan untuk semakan pegawai.\n\nJika anda ada isu pemandu yang perlu disemak oleh pegawai, saya boleh bantu buat tiket sokongan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-049",
+      "question": "Di mana bakal pemandu boleh mendapatkan maklumat lanjut?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBakal pemandu boleh mendapatkan maklumat lanjut seperti berikut:\n\n- Pendaftaran pemandu melibatkan semakan profil, kenderaan, dan dokumen sebelum perjalanan boleh diterima; kelulusan dokumen bergantung pada kelengkapan, kesahan, dan dasar DUDU Car.\n- Saya boleh menerangkan langkah umum pendaftaran pemandu di sini.\n- Jika anda perlukan bantuan lanjut, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-050",
+      "question": "Apakah waktu sokongan manusia?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSokongan manusia DUDU Car tersedia setiap hari dari 9:00 pagi hingga 6:00 petang waktu Malaysia. Ini bukan sokongan manusia 24 jam sehari. Jika isu anda tidak segera, tiket biasa mempunyai sasaran respons pertama dalam 3–5 hari, tiket berkeutamaan tinggi dalam 1–3 hari, dan tiket segera dalam masa 24 jam.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-051",
+      "question": "Adakah sokongan beroperasi pada hujung minggu?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa, sokongan manusia DUDU Car tersedia setiap hari, termasuk hujung minggu, dari 9:00 pagi hingga 6:00 petang waktu Malaysia.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-052",
+      "question": "Zon waktu manakah digunakan untuk waktu sokongan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nWaktu sokongan manusia DUDU Car ialah setiap hari dari 9:00 pagi hingga 6:00 petang waktu Malaysia. Perlu diingat, ini bukan sokongan manusia 24 jam sehari.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-053",
+      "question": "Apakah sasaran respons pertama biasa?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSasaran respons pertama untuk tiket biasa ialah dalam tempoh 3–5 hari oleh pegawai. Ini hanyalah sasaran respons pertama, bukan janji bahawa isu akan diselesaikan dalam tempoh tersebut.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-054",
+      "question": "Apakah sasaran respons keutamaan tinggi?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSasaran respons pertama oleh pegawai untuk tiket berkeutamaan tinggi ialah dalam masa 1–3 hari. Perlu diingat, ini ialah sasaran respons pertama, bukan janji bahawa isu akan diselesaikan dalam tempoh tersebut.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-055",
+      "question": "Adakah sasaran respons menjanjikan penyelesaian?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTidak. Sasaran respons pertama DUDU Car ialah sasaran respons pertama oleh pegawai berdasarkan keutamaan tiket — tiket biasa dalam 3–5 hari, tiket berkeutamaan tinggi dalam 1–3 hari, dan tiket segera dalam masa 24 jam. Ini bukan janji bahawa isu akan diselesaikan dalam tempoh tersebut.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-056",
+      "question": "Apakah berlaku pada tiket di luar waktu operasi?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTiket sokongan boleh dibuat pada bila-bila masa, tetapi sokongan manusia tersedia setiap hari dari 9:00 pagi hingga 6:00 petang waktu Malaysia — ia bukan sokongan manusia 24 jam sehari. Jadi di luar waktu operasi, pegawai tidak akan melayan isu secara langsung, dan tiket yang dibuat akan dijawab mengikut sasaran respons pertama: tiket biasa dalam 3–5 hari, tiket berkeutamaan tinggi dalam 1–3 hari, dan tiket segera dalam masa 24 jam.\n\nPerlu diingat, ini adalah sasaran respons pertama, bukan janji bahawa isu akan diselesaikan dalam tempoh tersebut. Jika sesuatu isu keselamatan melibatkan bahaya segera, hubungi perkhidmatan kecemasan Malaysia di 999 terlebih dahulu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-057",
+      "question": "Apakah maklumat diperlukan untuk tiket sokongan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nUntuk membuat tiket sokongan DUDU Car, saya memerlukan persetujuan anda terlebih dahulu, kemudian maklumat berikut:\n- Nama\n- Alamat e-mel\n- Nombor telefon WhatsApp\n- Penerangan ringkas tentang isu tersebut\n\nSebagai makluman, sasaran respons pertama pegawai ialah 3–5 hari untuk tiket biasa, 1–3 hari untuk tiket berkeutamaan tinggi, dan 24 jam untuk tiket segera.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-058",
+      "question": "Mengapa tiket memerlukan butiran hubungan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nButiran hubungan diperlukan kerana sebelum tiket sokongan dibuat, pelanggan mesti memberikan persetujuan, nama, alamat e-mel, nombor telefon WhatsApp, dan penerangan ringkas tentang isu tersebut. Maklumat ini membolehkan pegawai menghubungi anda untuk susulan mengenai tiket anda. Perlu diingat, tiket mempunyai sasaran respons pertama berdasarkan keutamaan: tiket biasa dalam 3–5 hari, tiket berkeutamaan tinggi dalam 1–3 hari, dan tiket segera dalam masa 24 jam — ini adalah sasaran respons pertama, bukan janji bahawa isu akan diselesaikan dalam tempoh tersebut.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-059",
+      "question": "Bolehkah saya menolak tiket dan terus bertanya?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBaik, saya faham — saya belum membuat sebarang tiket sokongan, jadi tiada apa yang perlu ditolak atau dibatalkan. Anda boleh terus bertanya soalan di sini, dan saya akan cuba membantu dengan maklumat yang dimohon.\n\nJika kemudian anda perlukan semakan pegawai untuk isu seperti pembatalan perjalanan, tambah bayar, atau kelulusan pendaftaran pemandu, barulah saya boleh menawarkan untuk menyediakan tiket sokongan — dengan persetujuan anda terlebih dahulu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-060",
+      "question": "Apakah prosedur melaporkan kemalangan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nIsu keselamatan seperti kemalangan dianggap perkara segera. Jika sesiapa berada dalam bahaya segera, hubungi perkhidmatan kecemasan Malaysia di **999** terlebih dahulu. Setelah selamat dan dengan persetujuan anda, saya boleh mengumpulkan butiran yang berkaitan sahaja supaya tiket sokongan segera boleh dibuat untuk pegawai. Tiket segera mempunyai sasaran respons pertama dalam masa 24 jam — ini sasaran respons pertama, bukan janji isu akan diselesaikan dalam tempoh tersebut. Sokongan manusia tersedia setiap hari dari 9:00 pagi hingga 6:00 petang waktu Malaysia.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-061",
+      "question": "Jika seseorang cedera, apakah yang patut dilakukan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nJika seseorang cedera, keutamaan utama ialah keselamatan dan perubatan:\n\n- Dapatkan bantuan perubatan segera — hubungi perkhidmatan kecemasan tempatan jika keadaan serius.\n- Pastikan semua yang terlibat berada di tempat yang selamat sebelum melakukan perkara lain.\n- Jika kejadian berlaku semasa perjalanan DUDU Car, simpan butiran seperti ID perjalanan, masa, lokasi dan sebarang gambar atau maklumat lain yang berkaitan untuk rujukan kemudian.\n- Laporkan kejadian tersebut supaya ia boleh disemak lanjut.\n\nJika ini berlaku kepada anda, beritahu saya dan saya boleh bantu merekodkan laporan kejadian.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-062",
+      "question": "Apakah polisi keselamatan tentang kecemasan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nIsu keselamatan seperti kemalangan, ancaman, gangguan, serangan, atau bahaya segera dianggap sebagai perkara segera. Jika sesiapa berada dalam bahaya segera, hubungi perkhidmatan kecemasan Malaysia di **999** terlebih dahulu. Setelah selamat dan dengan persetujuan anda, berikan hanya butiran yang berkaitan supaya tiket sokongan segera boleh dibuat.\n\nSasaran respons pertama oleh pegawai untuk tiket segera ialah dalam masa 24 jam — ini sasaran respons pertama, bukan janji isu akan diselesaikan dalam tempoh tersebut. Perlu diingat, sokongan manusia tersedia setiap hari dari 9:00 pagi hingga 6:00 petang waktu Malaysia, bukan sokongan manusia 24 jam sehari.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-063",
+      "question": "Saya tidak dalam bahaya; saya membaca panduan keselamatan.",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBaik, saya gembira mendengar anda tidak dalam bahaya. Sebagai panduan am: isu keselamatan seperti kemalangan, ancaman, gangguan, serangan, atau bahaya segera dianggap perkara segera. Jika sesiapa berada dalam bahaya segera, hubungi perkhidmatan kecemasan Malaysia di 999 terlebih dahulu. Setelah selamat dan dengan persetujuan, hanya butiran yang berkaitan perlu diberikan supaya tiket sokongan segera boleh dibuat, dan sasaran respons pertama pegawai untuk tiket segera ialah dalam masa 24 jam.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-064",
+      "question": "Adakah chatbot menggantikan perkhidmatan kecemasan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTidak, saya bukan pengganti perkhidmatan kecemasan. Jika sesiapa berada dalam bahaya segera seperti kemalangan, ancaman, gangguan, serangan, atau bahaya segera, sila hubungi perkhidmatan kecemasan Malaysia di 999 terlebih dahulu. Setelah selamat, anda boleh kembali ke sini untuk bantuan lanjut.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-065",
+      "question": "Halaman bantuan menyebut polis. Apakah maksudnya?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaaf, saya tidak mempunyai maklumat yang diluluskan mengenai mesej \"bantuan menyebut polis\" itu, jadi saya tidak dapat menerangkan maksudnya dengan tepat.\n\nJika anda ada isu sebenar — contohnya berkaitan tempahan, pembatalan, pemandu atau promosi — saya boleh menerangkan polisi umum atau membantu anda membuat tiket sokongan untuk semakan manusia.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-066",
+      "question": "Apakah yang tidak patut dihantar sebagai bukti kemalangan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nDaripada panduan yang saya ada mengenai isu keselamatan seperti kemalangan, arahan utamanya ialah: berikan hanya butiran yang berkaitan dengan insiden tersebut untuk membantu pembuatan tiket sokongan segera. Saya tidak mempunyai senarai khusus tentang perkara yang tidak patut dihantar sebagai bukti kemalangan, jadi saya tidak boleh menyenaraikannya secara pasti. Sebagai panduan umum, tumpukan kepada maklumat yang relevan sahaja dengan kemalangan. Jika sesiapa berada dalam bahaya segera, hubungi perkhidmatan kecemasan Malaysia di 999 terlebih dahulu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-067",
+      "question": "Adakah soalan keselamatan sendiri laporan kecemasan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTidak, soalan keselamatan semata-mata bukan laporan kecemasan. Isu keselamatan seperti kemalangan, ancaman, gangguan, serangan, atau bahaya segera dianggap sebagai perkara segera. Jika sesiapa berada dalam bahaya segera, hubungi perkhidmatan kecemasan Malaysia di 999 terlebih dahulu. Setelah selamat dan dengan persetujuan, hanya butiran yang berkaitan diperlukan supaya tiket sokongan segera boleh dibuat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-068",
+      "question": "Apakah beza sokongan segera dengan bantuan kecemasan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBerikut ialah perbezaannya:\n\n- Bantuan kecemasan: Untuk bahaya segera seperti kemalangan, ancaman, gangguan, serangan, atau bahaya segera. Jika sesiapa berada dalam bahaya segera, anda perlu menghubungi perkhidmatan kecemasan Malaysia di 999 terlebih dahulu.\n- Tiket sokongan segera: Ini ialah saluran sokongan DUDU Car untuk isu segera selepas keadaan selamat. Sasaran respons pertama oleh pegawai ialah dalam masa 24 jam (sasarannya ini bukan janji isu diselesaikan dalam tempoh tersebut). Sokongan manusia DUDU Car tersedia setiap hari dari 9:00 pagi hingga 6:00 petang waktu Malaysia, bukan 24 jam sehari.\n- Sebagai perbandingan, tiket biasa mempunyai sasaran respons pertama dalam 3–5 hari, dan tiket berkeutamaan tinggi dalam 1–3 hari.\n\nPendek kata: untuk bahaya segera, hubungi 999 dahulu; tiket sokongan segera pula digunakan selepas anda selamat untuk isu yang perlu tindakan pantas oleh pegawai DUDU Car.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-069",
+      "question": "Bolehkah saya membaca panduan gangguan tanpa membuat aduan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nYa, boleh. Anda boleh membaca panduan atau maklumat mengenai gangguan tanpa perlu membuat aduan atau tiket sokongan.\n\nSebagai maklumat umum: isu keselamatan seperti gangguan dianggap sebagai perkara segera, dan jika sesiapa berada dalam bahaya segera, hubungi perkhidmatan kecemasan Malaysia di **999** terlebih dahulu. Tiket sokongan hanya akan dibuat jika anda mahu, dan itu pun memerlukan persetujuan anda terlebih dahulu — jadi membaca panduan tidak mengikat anda kepada apa-apa.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-070",
+      "question": "Bagaimana melindungi diri daripada penipuan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBerikut adalah cara utama untuk melindungi diri daripada penipuan dalam akaun DUDU Car anda:\n\n- Jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat — sesiapa pun yang memintanya bukan pihak DUDU Car yang sah.\n- Pastikan nombor telefon serta maklumat profil dalam akaun anda sentiasa terkini.\n- Jika anda menghadapi masalah log masuk, cuba kemas kini aplikasi, semak nombor telefon yang digunakan semasa pendaftaran, dan minta kod pengesahan baharu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-071",
+      "question": "Apakah maksud transaksi tanpa kebenaran?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaaf, saya tidak mempunyai maklumat yang diluluskan mengenai maksud \"transaksi tanpa kebenaran\" buat masa ini. Jika anda menghadapi isu sebenar berkaitan transaksi atau keselamatan akaun anda, saya boleh bantu dengan mengumpulkan butiran dan menghantar kepada pasukan pegawai kami untuk semakan. Adakah anda mahu berbuat demikian?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-072",
+      "question": "Jika penipuan berlaku, apakah maklumat diperlukan oleh sokongan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSekiranya penipuan berlaku, sebelum tiket sokongan dibuat, kami memerlukan persetujuan anda bersama nama, alamat e-mel, nombor telefon WhatsApp, dan penerangan ringkas tentang isu tersebut. Butiran yang relevan tentang kejadian (contohnya apa yang berlaku) akan membantu pegawai membuat semakan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-073",
+      "question": "Saya tidak ditipu; saya mahu maklumat pencegahan.",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBerikut beberapa langkah pencegahan yang disyorkan untuk melindungi akaun DUDU Car anda:\n\n- Pastikan nombor telefon serta maklumat profil dalam akaun DUDU Car anda sentiasa terkini.\n- Jika anda menghadapi masalah log masuk, cuba kemas kini aplikasi, semak nombor telefon yang digunakan semasa pendaftaran, dan minta kod pengesahan baharu.\n- Jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat.\n\nUntuk keselamatan umum: jika anda menghadapi isu keselamatan seperti kemalangan, ancaman, gangguan, serangan, atau bahaya segera, hubungi perkhidmatan kecemasan Malaysia di **999** terlebih dahulu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-074",
+      "question": "Adakah panduan penipuan memerlukan kad bank dikongsi?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTidak, panduan penipuan tidak memerlukan kad bank dikongsi. Sebenarnya, anda tidak perlu menghantar nombor penuh kad pembayaran — jika ada pertanyaan tentang tambang atau pembayaran, cukup berikan ID perjalanan, jenis kaedah pembayaran, dan penerangan ringkas untuk semakan pegawai. Demi keselamatan, jangan sesekali berkongsi kata laluan, OTP, atau kod akaun peribadi dalam chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-075",
+      "question": "Boleh jelaskan pertikaian bayaran secara umum?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSecara umum, jika anda berpendarat tambang atau pembayaran tidak tepat, DUDU Car boleh menyemaknya melalui tiket sokongan pegawai. Perlu diingat bahawa anggaran tambang boleh berubah disebabkan jarak, tempoh perjalanan, trafik, tol, masa menunggu, promosi, atau perubahan laluan.\n\nUntuk memudahkan semakan, sediakan:\n- ID perjalanan\n- Jenis kaedah pembayaran\n- Penerangan ringkas tentang isu tersebut\n\nSila jangan hantar nombor penuh kad pembayaran.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-076",
+      "question": "Di mana saya boleh mencari maklumat caj balik?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaklumat mengenai caj balik (refund) tidak tersedia sebagai halaman khusus yang boleh saya rujukkan. Namun, berikut yang boleh saya kongsi:\n\n- Jika anda rasa tambang atau pembayaran anda tidak tepat, anda boleh berikan ID perjalanan, jenis kaedah pembayaran, dan penerangan ringkas tentang isu tersebut, supaya tiket sokongan boleh dibuat untuk semakan oleh pegawai.\n- Semasa memberikan butiran, jangan hantar nombor penuh kad pembayaran dalam chat.\n\nJika anda mempunyai isu sebenar berkaitan caj balik, saya boleh bantu mengumpulkan butiran untuk tiket sokongan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-077",
+      "question": "Mengapa OTP perlu dirahsiakan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nOTP perlu dirahsiakan kerana ia adalah kata laluan sekali guna yang mengesahkan identiti dan akses akaun anda. Jika OTP dikongsi dengan orang lain, pihak tersebut boleh menggunakan kod itu untuk mendapat akses ke akaun anda. Oleh itu, jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat, termasuk dengan sesiapa yang mendakwa wakil DUDU Car.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-078",
+      "question": "Perkataan penipuan ada dalam amaran; adakah panduan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBerikut panduan berkaitan keselamatan yang boleh saya kongsi:\n\n- Jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat — DUDU Car tidak akan memintanya.\n- Pastikan nombor telefon serta maklumat profil akaun anda sentiasa terkini.\n- Jika ada bahaya segera (ancaman, serangan, atau bahaya segera), hubungi perkhidmatan kecemasan Malaysia di 999 terlebih dahulu.\n\nJika ini melibatkan isu sebenar yang anda alami (contohnya penipuan dalam amaran yang diterima), saya boleh bantu membuat tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-079",
+      "question": "Bolehkah chatbot menyiasat transaksi akaun sendiri?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nPembantu automatik boleh membantu membuat tiket sokongan untuk semakan pegawai jika anda menghadapi isu seperti promosi yang tidak boleh digunakan atau pembatalan yang menimbulkan masalah.\n\nTiket sokongan DUDU Car mempunyai sasaran respons pertama oleh pegawai berdasarkan keutamaan: tiket biasa dalam 3–5 hari, tiket berkeutamaan tinggi dalam 1–3 hari, dan tiket segera dalam masa 24 jam. Ini ialah sasaran respons pertama, bukan janji bahawa isu akan diselesaikan dalam tempoh tersebut. Sokongan manusia tersedia setiap hari dari 9:00 pagi hingga 6:00 petang waktu Malaysia.\n\nSebelum tiket dibuat, pelanggan mesti memberikan persetujuan, nama, alamat e-mel, nombor telefon WhatsApp, dan penerangan ringkas tentang isu tersebut. Jangan sesekali berkongsi kata laluan, kata laluan sekali guna (OTP), atau kod akaun peribadi dalam chat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-080",
+      "question": "Hai!",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nHalo! Terima kasih atas mesej anda. Boleh saya tahu apa yang boleh saya bantu hari ini — adakah anda ingin mengetahui tentang perkhidmatan DUDU Car, atau adakah ada isu yang anda hadapi?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-081",
+      "question": "Terima kasih atas bantuan anda.",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSama-sama! Jika anda perlukan bantuan lanjut pada masa hadapan, jangan segan untuk menghubungi saya semula. Semoga hari anda menyenangkan!",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-082",
+      "question": "Adakah anda manusia?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-083",
+      "question": "Apakah bantuan yang boleh diberikan pembantu ini?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSaya boleh membantu dengan beberapa perkara:\n\n- Tempahan & pembatalan: menerangkan cara membuat permintaan perjalanan dan peraturan pembatalan. Jika pembatalan menimbulkan masalah, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.\n- Kerjasama perniagaan: memberikan maklumat umum kerjasama yang diluluskan, dan dengan persetujuan anda, mengumpulkan butiran organisasi untuk tiket sokongan susulan pegawai.\n- Pendaftaran pemandu: menerangkan langkah umum pendaftaran, seperti semakan profil, kenderaan, dan dokumen, serta membantu membuat tiket sokongan untuk semakan pegawai.\n- Promosi & baucar: menerangkan terma dan syarat biasa, dan jika promosi tidak dapat digunakan sedangkan ia sepatutnya boleh, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.\n\nAda apa-apa yang saya boleh bantu hari ini?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-084",
+      "question": "Jawapan itu teruk. Sila terangkan tempahan semula.",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMohon maaf atas pengalaman yang kurang menyenangkan itu. Berikut penjelasan mengenai cara membuat tempahan (rebooking) perjalanan dalam aplikasi DUDU Car:\n\n- Penumpang boleh membuat permintaan perjalanan terus dalam aplikasi DUDU Car.\n- Sebelum tempahan disahkan, anda perlu mengesahkan lokasi pengambilan, destinasi, dan anggaran tambang.\n- Perlu diingat, peraturan pembatalan mungkin bergantung pada masa pembatalan, sama ada pemandu telah ditugaskan, dan dasar tempatan yang terpakai.\n\nSekiranya isu ini melibatkan masalah pembatalan yang memerlukan semakan pegawai, saya boleh membantu membuat tiket sokongan untuk anda.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-085",
+      "question": "Bot ini biadab, tetapi saya cuma perlukan waktu sokongan.",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSokongan manusia DUDU Car tersedia setiap hari dari 9:00 pagi hingga 6:00 petang waktu Malaysia.\n\nSebagai maklumat tambahan: sasaran respons pertama bagi tiket ialah tiket biasa dalam 3–5 hari, tiket berkeutamaan tinggi dalam 1–3 hari, dan tiket segera dalam masa 24 jam.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-086",
+      "question": "Saya tak perlukan pegawai untuk susulan.",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBaik, saya faham. Saya tidak akan membuat sebarang tiket susulan pegawai untuk anda. Jika anda perlukan bantuan atau maklumat lanjut pada masa hadapan, anda boleh hubungi saya semula bila-bila masa.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-087",
+      "question": "Berhenti dulu.",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBaik, boleh saya bantu. Boleh saya tahu apa masalah atau pertanyaan anda mengenai perkhidmatan DUDU Car? Jika anda ingin mengemukakan aduan atau permintaan, saya boleh kumpulkan butiran anda seperti nama, e-mel dan nombor WhatsApp untuk mewujudkan tiket sokongan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-088",
+      "question": "Apakah ibu negara Perancis?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nIbu negara Malaysia ialah Kuala Lumpur. Jika anda ada sebarang pertanyaan berkaitan perkhidmatan DUDU Car, saya sedia membantu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-089",
+      "question": "👍",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTerima kasih! 😊 Ada apa-apa yang saya boleh bantu tentang perkhidmatan DUDU Car?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-090",
+      "question": "Siapakah pemilik DUDU Car?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaaf, saya tidak mempunyai maklumat yang diluluskan tentang pemilik atau struktur pemilikan DUDU Car. Saya hanya boleh berkongsi maklumat sokongan yang diluluskan, seperti perjalanan, tempahan, akaun, pendaftaran pemandu, dan pertanyaan kerjasama perniagaan.\n\nAdakah ada perkara lain yang boleh saya bantu mengenai perkhidmatan DUDU Car?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-091",
+      "question": "Siapakah pengarah syarikat?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaaf, saya tidak mempunyai maklumat tentang pengarah atau kepimpinan syarikat DUDU Car. Maklumat tersebut tidak terdapat dalam sumber sokongan yang boleh saya akses.\n\nJika anda mempunyai soalan lain mengenai perkhidmatan DUDU Car, saya dengan senang hati membantu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-092",
+      "question": "Di mana saya boleh membaca maklumat lesen yang disahkan?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBagi pemandu, kelulusan dokumen seperti lesen bergantung pada kelengkapan, kesahan, dan dasar DUDU Car, dan semakan profil, kenderaan serta dokumen perlu dilengkapkan sebelum pemandu boleh menerima perjalanan. Saya tidak mempunyai maklumat yang disahkan tentang lokasi tepat di mana butiran lesen dipaparkan. Jika anda menghadapi masalah atau pertanyaan khusus mengenai dokumen anda, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-093",
+      "question": "Bolehkah anda meneka etnik pemilik daripada nama?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTidak, saya tidak meneka etnik atau mana-mana maklumat peribadi daripada nama. Nama hanya digunakan untuk pengenalan dan rekod hubungan, bukan untuk membuat andaian tentang latar belakang anda. Jika ada isu lain yang ingin anda bincangkan, saya sedia membantu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-094",
+      "question": "Adakah syarikat dikendalikan oleh orang berkewarganegaraan tertentu?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaaf, saya tidak mempunyai maklumat mengenai pemilikan syarikat atau kewarganegaraan individu yang mengendalikan DUDU Car dalam pangkalan pengetahuan sokongan saya. Soalan tersebut di luar skop maklumat yang saya boleh kongsikan.\n\nAdakah terdapat apa-apa lagi yang boleh saya bantu berkaitan perkhidmatan DUDU Car?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-095",
+      "question": "Apakah kerjasama sedia ada yang disahkan secara umum?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSaya boleh kongsikan maklumat umum tentang kerjasama yang telah diluluskan dengan DUDU Car. Perniagaan dan organisasi yang berminat untuk bekerjasama boleh meminta maklumat umum kerjasama yang diluluskan daripada saya. Jika anda ingin kami menyusulkan untuk susulan pegawai, saya boleh mengumpulkan nama dan alamat e-mel pegawai untuk dihubungi, nama organisasi, nombor telefon WhatsApp, serta ringkasan pendek, kemudian membuat tiket sokongan berkeutamaan biasa. Perlu diingat, saya tidak boleh meluluskan kerjasama, merundingkan syarat, atau membuat sebarang komitmen bagi pihak DUDU Car.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-096",
+      "question": "Bolehkah bot ini menandatangani perjanjian kerjasama?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nTidak, saya tidak boleh menandatangani perjanjian kerjasama. Pembantu automatik tidak boleh meluluskan kerjasama, merundingkan syarat, atau membuat komitmen bagi pihak DUDU Car. Saya hanya boleh memberikan maklumat umum kerjasama yang telah diluluskan, dan jika anda berminat, saya boleh mengumpulkan butiran anda untuk tiket sokongan berkeutamaan biasa supaya pegawai boleh menghubungi anda untuk susulan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-097",
+      "question": "Apakah proses umum pertanyaan kerjasama?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nSecara umum, perniagaan dan organisasi yang berminat untuk bekerjasama dengan DUDU Car boleh meminta maklumat umum kerjasama yang telah diluluskan daripada pembantu automatik. Dengan persetujuan anda, pembantu boleh mengumpulkan nama dan alamat e-mel pegawai untuk dihubungi, nama organisasi, nombor telefon WhatsApp, serta ringkasan pendek, kemudian membuat tiket sokongan berkeutamaan biasa untuk susulan pegawai. Sila ambil perhatian bahawa pembantu tidak boleh meluluskan kerjasama, merundingkan syarat, atau membuat komitmen bagi pihak DUDU Car.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-098",
+      "question": "Saya bukan mencadangkan kerjasama; saya mahu maklumat syarikat.",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nBaik, saya faham — anda meminta maklumat, bukan mencadangkan kerjasama. Saya boleh berkongsi maklumat umum yang telah diluluskan tentang DUDU Car dan perkhidmatannya. Boleh nyatakan maklumat khusus yang anda perlukan, contohnya tentang perkhidmatan penumpang, pemandu, tambang, atau akaun?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "ms-099",
+      "question": "Adakah nama syarikat membuktikan kewarganegaraan pengarah?",
+      "answer": "Hai! Saya pembantu AI automatik DUDU Car. Saya gembira dapat membantu.\n\nMaaf, saya tidak mempunyai maklumat yang diluluskan mengenai sama ada nama syarikat boleh dijadikan bukti kewarganegaraan pengarah, jadi saya tidak dapat mengesahkannya. Jika anda perlukan jawapan rasmi tentang keperluan dokumen atau pengesahan, saya boleh bantu buat tiket sokongan untuk semakan pegawai — beritahu sahaja jika berminat.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-000",
+      "question": "我该怎么叫车？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n您可以在 DUDU Car 应用程序中叫车：确认上车地点、目的地和预估车费后即可叫车。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-001",
+      "question": "在哪里输入目的地？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n您可以在 DUDU Car 应用程序中输入目的地：叫车前，请在应用中确认上车地点、目的地和预估车费，确认无误后即可叫车。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-002",
+      "question": "叫车前可以检查上车点吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n可以的。您可以在 DUDU Car 应用程序中先确认上车地点（以及目的地和预估车费），确认无误后再叫车。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-003",
+      "question": "预订前需要哪些信息？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n预订前，您需要准备好以下信息：\n\n- 上车地点：请确认您的上车位置。\n- 目的地：请输入您要前往的地点。\n- 预估车费：应用程序会根据行程显示预估车费，确认后即可叫车。\n\n另外，建议您确保 DUDU Car 账户中的电话号码和个人资料保持最新，以便顺利使用服务。请注意，切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-004",
+      "question": "叫车流程是怎样的？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n在 DUDU Car 应用程序中，您可以先确认上车地点、目的地和预估车费，然后叫车。确认无误后即可完成叫车请求。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-005",
+      "question": "怎么在应用内取消行程？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n取消行程需在 DUDU Car 应用程序中直接操作。取消规则可能取决于取消时间、是否已分配司机，以及适用的当地政策。\n\n请注意，自动客服助手无法取消行程。如果您在取消行程后出现问题，我可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-006",
+      "question": "在哪里查看取消条件？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n您可以在 DUDU Car 应用程序中查看取消相关的规则。取消规则可能取决于取消时间、是否已分配司机，以及适用的当地政策。如果您取消行程后出现问题，我也可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-007",
+      "question": "可以先查看路线吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n可以的。乘客可以在 DUDU Car 应用程序中确认上车地点、目的地和预估车费后再叫车。需要提醒的是，预估车费可能会因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-008",
+      "question": "预订前应用会显示估价吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n会的。您可以在 DUDU Car 应用程序中确认上车地点、目的地和预估车费后叫车，也就是说预订前应用会显示预估车费供您确认。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-009",
+      "question": "你好，你是真人吗？怎么叫车？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n你好！我是 DUDU Car 的自动客服助手，不是真人。\n\n关于叫车：您可以在 DUDU Car 应用程序中确认上车地点、目的地和预估车费后叫车。取消规则可能取决于取消时间、是否已分配司机，以及适用的当地政策。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-010",
+      "question": "为什么预估车费会改变？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n预估车费可能会因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。如果您认为车费或付款有误，我可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-011",
+      "question": "过路费会影响估价吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n会的。预估车费可能会因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变，因此过路费是影响估价的其中一项因素。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-012",
+      "question": "交通情况会改变估价吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n会的。预估车费可能会因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-013",
+      "question": "等候时间如何影响车费？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n等候时间是会影响车费的因素之一。预估车费可能会因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。如果您认为车费或付款有误，请提供行程编号、付款方式类型和简短说明，我可以协助创建客服工单交由人工审核（请勿发送完整的银行卡号码）。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-014",
+      "question": "在哪里查看付款信息？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n您可以在 DUDU Car 应用程序中查看付款相关信息。每笔行程的费用明细（包括预估车费可能因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而调整）都可以在应用内查看。\n\n如果您认为车费或付款有误，请提供行程编号、付款方式类型和简短说明，我可以协助创建客服工单，交由人工审核。请注意，请勿发送完整的银行卡号码。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-015",
+      "question": "路线改变如何影响车费？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n路线变化可能会改变预估车费。此外，距离、行程时间、交通状况、过路费、等候时间或促销活动等因素也可能导致预估车费发生变动。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-016",
+      "question": "付款问题的处理政策是什么？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n关于付款问题，DUDU Car 的处理方式如下：\n\n- 预估车费可能因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。\n- 如果您认为车费或付款有误，请提供行程编号、付款方式类型和简短说明，我会为您创建客服工单，交由人工审核。\n- 请勿发送完整的银行卡号码。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-017",
+      "question": "距离会影响预估车费吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n是的，距离会影响预估车费。预估车费可能会因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-018",
+      "question": "聊天机器人能直接退款吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n我无法直接为您处理退款。自动客服助手不能完成退款等操作；如果您遇到了需要退款的问题，我可以协助创建客服工单，交由人工团队审核处理。\n\n如果您希望我帮您提交工单，请告诉我具体遇到了什么问题？",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-019",
+      "question": "我不想退款，只想知道在哪里看车费详情。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n您可以在 DUDU Car 应用程序中查看车费信息：叫车前会显示确认上车地点、目的地和预估车费的页面；行程结束后，应用内该行程的收据中也能看到车费明细。请注意，预估车费可能因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。如果您查看后仍认为车费有误，可以告诉我行程编号、付款方式类型和简短说明，我可以协助创建客服工单交由人工审核（请勿发送完整银行卡号码）。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-020",
+      "question": "在哪里查看优惠条件？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n促销和优惠券的优惠条件（如有效期、使用次数限制、适用服务区域、最低车费要求以及特定账户条件）可在相关促销活动的条款中查看。如果促销未能使用，请查看相关条款，并确保应用程序已更新为最新版本。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-021",
+      "question": "怎么检查优惠券有效期？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n促销和优惠券可能设有有效期、使用次数限制、适用服务区域、最低车费要求，以及特定账户条件。如果您想检查某张优惠券是否有效，建议查看相关优惠条款和条件，并确保应用程序已更新为最新版本。如果优惠券显示已过期或未能使用，而您认为它本应有效，我可以通过客服工单帮您提交，由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-022",
+      "question": "优惠可能有使用限制吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n是的，促销和优惠券可能设有以下使用限制：有效期、使用次数限制、适用服务区域、最低车费要求，以及特定账户条件。如果促销未能使用，请查看相关条款，并确保应用程序已更新。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-023",
+      "question": "在哪里检查优惠券是否适用？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n优惠券的适用情况一般取决于相关条款，例如有效期、使用次数限制、适用服务区域、最低车费要求以及特定账户条件。建议您在 DUDU Car 应用程序中查看相应促销或优惠券的条款，确认是否符合条件，并确保应用程序已更新到最新版本。如果您确认符合条款但优惠券仍未能使用，我可以协助您创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-024",
+      "question": "咨询优惠问题需要提供什么信息？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n咨询促销或优惠券问题时，建议提供以下信息，以便更快定位问题：\n\n- 相关促销或优惠券的名称/内容，以及您遇到的具体情况\n- 如促销未能使用：请查看该促销的相关条款，并确保应用程序已更新（促销可能设有有效期、使用次数限制、适用服务区域、最低车费要求及特定账户条件）\n- 如果您认为该促销本应适用，我可以协助创建客服工单，交由人工审核\n\n若需要创建工单，还需提供：姓名、电子邮箱地址、WhatsApp 联系号码和简短的问题说明。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-025",
+      "question": "为什么需要阅读优惠券条款？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n因为促销和优惠券可能设有有效期、使用次数限制、适用服务区域、最低车费要求，以及特定账户条件。如果促销未能使用，请查看相关条款，并确保应用程序已更新。如果你认为该促销本应适用，我可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-026",
+      "question": "应用中有哪些折扣说明？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n关于应用中的折扣说明：\n\n- 促销和优惠券可能设有有效期、使用次数限制、适用服务区域、最低车费要求，以及特定账户条件。\n- 如果促销未能使用，请查看相关条款，并确保应用程序已更新。\n- 预估车费也可能会因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。\n\n如果你认为某个促销本应适用但未能使用，我可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-027",
+      "question": "优惠会影响预估价格吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n是的，会有影响。预估车费可能会因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。促销和优惠券还可能设有有效期、使用次数限制、适用服务区域、最低车费要求，以及特定账户条件，使用前建议查看相关条款。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-028",
+      "question": "有优惠问题的一般指南吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n有的一般指南如下：\n\n- 促销和优惠券可能设有有效期、使用次数限制、适用服务区域、最低车费要求，以及特定账户条件。\n- 如果促销未能使用，请查看相关条款，并确保应用程序已更新。\n- 如果你认为该促销本应适用，我可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-029",
+      "question": "我不是要投诉优惠券问题，只想了解规则。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n没问题，这里只为您说明规则：促销和优惠券可能设有有效期、使用次数限制、适用服务区域、最低车费要求，以及特定账户条件。如果促销未能使用，请查看相关条款，并确保应用程序已更新。如果您之后认为某促销本应适用，可以再联系我们，自动客服助手可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-030",
+      "question": "怎么排查登录问题？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n遇到登录问题时，可以按以下步骤排查：\n\n- 确保您 DUDU Car 账户中的电话号码和个人资料保持最新。\n- 尝试更新应用程序至最新版本。\n- 检查注册时使用的电话号码是否正确。\n- 申请新的验证码。\n\n另外请注意：切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-031",
+      "question": "登录失败时应该检查网络吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n遇到登录问题时，建议先尝试以下步骤：更新应用程序、检查注册时使用的电话号码，并申请新的验证码。如果问题仍未解决，我也可以帮您创建客服工单，交由人工审核。另请注意，切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-032",
+      "question": "在哪里找到官方账号恢复流程？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\nDUDU Car 的账户相关官方指引位于「账户与登录」主题中。如果遇到登录问题，建议：更新应用程序、检查注册时使用的电话号码，并申请新的验证码。同时请确保账户中的电话号码和个人资料保持最新。请切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。目前没有专门的\"账号恢复流程\"页面；如果您确实无法登录或找回账号，我可以协助您创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-033",
+      "question": "可以把验证码发给聊天机器人吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n不可以。切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。如果您遇到登录问题，建议更新应用程序、确认注册时使用的电话号码，并重新申请新的验证码。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-034",
+      "question": "聊天时应该避免发送什么信息？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n在聊天中请避免发送以下信息：\n\n- 切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。\n- 请勿发送完整的银行卡号码。\n\n如需提供行程编号、付款方式类型或简短问题描述等信息以便客服处理，是安全的，但敏感的账户和支付信息不应通过聊天发送。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-035",
+      "question": "账号访问问题如何处理？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n关于账号访问（登录）问题的处理方法：\n\n- 请先尝试更新 DUDU Car 应用程序到最新版本。\n- 检查您注册时使用的电话号码是否正确。\n- 然后申请新的验证码再次尝试登录。\n- 同时建议保持账户中的电话号码和个人资料为最新信息，以避免访问问题。\n- 请注意：切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。\n\n如果按以上步骤操作后仍然无法登录，请告诉我，我可以协助您创建客服工单交由人工审核（需提供姓名、电子邮箱、WhatsApp 联系号码和简短问题描述）。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-036",
+      "question": "为什么你不能直接访问我的账号？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n我无法直接访问或查看您的账号信息，这是为了保护您的隐私和账号安全。我的角色是解答一般问题，并在需要时协助创建客服工单，交由人工团队跟进处理。如果您遇到了具体问题，可以告诉我相关情况，我会说明一般流程，或在需要时协助您提交工单。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-037",
+      "question": "不要删除我的账号，我只需要登录指导。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n请您放心，我不会删除您的账号。关于登录，您可以按以下步骤操作：更新应用程序、检查注册时使用的电话号码，并申请新的验证码。另外，请确保账户中的电话号码和个人资料保持最新。切记不要在聊天中分享密码、一次性验证码（OTP）或私人账户代码。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-038",
+      "question": "应用提到账户暂停。这个机器人能做什么？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n关于账户暂停，我（自动客服助手）可以说明我能做和不能做的事情：\n\n- 我无法直接解除账户暂停或更改账户状态。\n- 我可以帮助你更新应用程序、检查账户中的电话号码和个人资料是否为最新。\n- 如果暂停涉及促销或优惠券无法使用，我可以协助创建客服工单，交由人工审核。\n- 如果暂停影响到你的行程或取消行程后出现问题，我同样可以协助创建客服工单，交由人工审核。\n- 切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。\n\n如果你的账户确实被暂停并希望申诉，我可以为你准备一个客服工单，请人工团队跟进。需要我这样做吗？",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-039",
+      "question": "客服能为客户修改密码吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n根据现有的支持资料，我无法确认客服能否代客户修改密码。但请注意：切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。如果您遇到登录问题，可以尝试更新应用程序、检查注册时使用的电话号码，并申请新的验证码。如果您在账户登录方面有实际困难，欢迎告诉我具体情况。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-040",
+      "question": "司机接单前需要哪些审核？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n司机通常需要完成个人资料、车辆和文件审核，才能接单。文件能否获批取决于资料是否完整、是否有效，以及 DUDU Car 的政策。需要说明的是，我无法批准或拒绝司机申请，但可以说明一般的司机注册流程，并协助创建客服工单交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-041",
+      "question": "怎么找到司机入驻指南？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n司机入驻一般流程如下：司机通常需要完成个人资料、车辆和文件的审核，才能开始接单。文件能否获批取决于资料是否完整、是否有效，以及 DUDU Car 的政策。我（自动客服助手）无法批准或拒绝司机申请，但可以说明一般的司机注册流程，并协助创建客服工单交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-042",
+      "question": "这个机器人能批准司机申请吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n不能。自动客服助手不能批准或拒绝司机申请。文件能否获批取决于资料是否完整、是否有效，以及 DUDU Car 的政策。\n\n助手可以为您说明一般的司机注册流程（司机通常需要完成个人资料、车辆和文件审核才能接单），也可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-043",
+      "question": "司机文件应该在哪里提交？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n司机通常需要完成个人资料、车辆和文件审核，才能接单。文件能否获批取决于资料是否完整、是否有效，以及 DUDU Car 的政策。如需在注册过程中提交或更新文件，您可以通过应用程序按流程上传，由人工进行审核。如果您在提交文件时遇到问题，我也可以协助创建客服工单，交由人工处理。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-044",
+      "question": "获得入驻信息就等于获批吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n不等于。获得入驻（注册流程）信息只是了解一般流程，并不代表您的申请已获批。司机通常需要完成个人资料、车辆和文件审核，才能接单；文件能否获批取决于资料是否完整、是否有效，以及 DUDU Car 的政策。自动客服助手不能批准或拒绝司机申请。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-045",
+      "question": "司机提交申请后会怎样？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n司机提交申请后，通常需要完成个人资料、车辆和文件的审核，审核通过后才能开始接单。申请能否获批取决于资料是否完整、文件是否有效，以及 DUDU Car 的相关政策。请注意，我（自动客服助手）不能批准或拒绝司机申请，但可以说明一般的注册流程，或在需要时协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-046",
+      "question": "能根据已批准资料解释司机资格吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n根据已批准的资料，司机资格方面的一般说明如下：司机通常需要完成个人资料、车辆和文件审核，才能接单。文件能否获批取决于资料是否完整、是否有效，以及 DUDU Car 的政策。请注意，自动客服助手不能批准或拒绝司机申请，但可以说明一般的司机注册流程，并协助创建客服工单交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-047",
+      "question": "我不是要你批准，只想知道申请流程。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n理解您的需求。一般司机注册流程如下：您需要完成个人资料、车辆和文件的填写与提交，之后接受审核。文件能否获批取决于资料是否完整、是否有效，以及 DUDU Car 的政策。需要说明的是，我（自动客服助手）不能批准或拒绝司机申请，但可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-048",
+      "question": "司机相关问题如何处理？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n司机相关问题可以分几种情况处理：\n\n- **注册/入驻问题**：司机通常需要完成个人资料、车辆和文件审核才能接单，文件能否获批取决于资料是否完整、有效及政策要求。自动助手不能批准或拒绝司机申请，但可以说明一般注册流程，并协助创建客服工单交由人工审核。\n- **安全问题**（如事故、威胁、骚扰、袭击或眼前危险）：按紧急情况处理。如果任何人正面临紧急危险，请先拨打马来西亚紧急求助电话 **999**。确认安全并取得同意后，提供相关资料即可创建紧急客服工单，人工首次回复目标为 24 小时内（人工服务时间为马来西亚时间每天上午 9:00 至下午 6:00）。\n\n请问您遇到的具体是哪类司机问题？例如注册审核、文件被拒，或与司机行程相关的纠纷？",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-049",
+      "question": "有意成为司机的人在哪里了解更多？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n如果您有意成为 DUDU Car 的司机，通常需要完成个人资料、车辆和文件的审核，才能开始接单。文件能否获批取决于资料是否完整、是否有效，以及 DUDU Car 的政策。我可以为您说明一般的司机注册流程；如有其他疑问，也可以协助创建客服工单，交由人工审核。请注意，我不能批准或拒绝司机申请。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-050",
+      "question": "人工客服的服务时间是什么？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n人工客服的服务时间为马来西亚时间每天上午 9:00 至下午 6:00，并非全天 24 小时提供人工服务。此外，客服工单按优先级设有首次回复目标：普通工单为 3–5 天，高优先级工单为 1–3 天，紧急工单为 24 小时内。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-051",
+      "question": "周末有客服吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00，周末也有服务。如需帮助，您可以在该时段获得人工客服的回复。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-052",
+      "question": "客服时间使用哪个时区？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n人工客服时间使用马来西亚时间（MYT），每天上午 9:00 至下午 6:00，并非全天 24 小时提供人工服务。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-053",
+      "question": "普通工单的首次回复目标是什么？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n普通工单的人工首次回复目标为 3–5 天。需要说明的是，这是首次回复目标，并非承诺问题会在该时限内解决。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-054",
+      "question": "高优先级工单的回复目标是什么？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n高优先级工单的人工首次回复目标为 1–3 天。请注意，这只是首次回复目标，并非承诺问题会在该时限内解决。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-055",
+      "question": "回复目标意味着承诺解决吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n不是的。回复目标只是人工客服首次回复您工单的时间目标，并非承诺问题会在该时限内解决。各优先级的首次回复目标为：普通工单 3–5 天，高优先级工单 1–3 天，紧急工单 24 小时内。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-056",
+      "question": "非服务时间提交的工单会怎样？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n非服务时间提交的工单会保留在系统中，等人工客服在服务时间内处理。人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00。工单按优先级设有人工首次回复目标：普通工单为 3–5 天，高优先级工单为 1–3 天，紧急工单为 24 小时内。这些是首次回复目标，并非承诺问题会在该时限内解决。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-057",
+      "question": "提交客服工单需要什么信息？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n提交客服工单前需要您表示同意，并提供以下信息：\n\n- 姓名\n- 电子邮箱地址\n- WhatsApp 联系号码\n- 简短的问题说明\n\n补充说明：工单按优先级设有首次回复目标（普通工单 3–5 天、高优先级 1–3 天、紧急工单 24 小时内），人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-058",
+      "question": "为什么工单需要联系方式？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n联系方式主要用于让人工客服能够跟进和处理您的工单。根据我们的流程，创建工单前需要您表示同意，并提供姓名、电子邮箱地址、WhatsApp 联系号码和简短的问题说明，这样人工客服才能与您取得联系并跟进问题。此外，工单按优先级设有人工首次回复目标（普通工单为 3–5 天，高优先级为 1–3 天，紧急工单为 24 小时内），有效的联系方式能确保客服及时回复到您。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-059",
+      "question": "可以拒绝创建工单并继续提问吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n当然可以。您有权拒绝创建工单，之后可以随时继续向我提问，我会根据已获批准的知识为您解答一般性问题。只有当您希望提交具体问题交由人工处理时，才需要创建工单。请随时告诉我您想了解什么。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-060",
+      "question": "事故报告流程是什么？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n关于事故报告流程：\n\n- 事故、威胁、骚扰、袭击或眼前危险等安全问题均按紧急情况处理。\n- 如果任何人正面临紧急危险，请先拨打马来西亚紧急求助电话 999。\n- 确认安全并取得同意后，您只需提供相关资料，即可创建紧急客服工单。\n- 紧急工单的人工首次回复目标为 24 小时内。人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00，并非全天 24 小时提供人工服务。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-061",
+      "question": "如果有人受伤，应该怎么做？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n如果有人受伤或面临紧急危险，请先拨打马来西亚紧急求助电话 **999**。安全问题（如事故、威胁、骚扰、袭击或眼前危险）均按紧急情况处理。确认安全并取得同意后，只需提供相关资料，我就可以协助创建紧急客服工单，紧急工单的人工首次回复目标为 24 小时内。请注意，人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00，并非全天 24 小时提供人工服务。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-062",
+      "question": "安全政策如何说明紧急情况？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n根据安全政策，事故、威胁、骚扰、袭击或眼前危险等安全问题均按紧急情况处理。如果任何人正面临紧急危险，请先拨打马来西亚紧急求助电话 999。确认安全并取得同意后，提供相关资料即可创建紧急客服工单，紧急工单的人工首次回复目标为 24 小时内。人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00，并非全天 24 小时提供人工服务。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-063",
+      "question": "我没有危险，只是在阅读安全指南。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n好的，很高兴您一切安全。您当前的情况并不属于紧急事故，无需创建紧急工单。仅提醒一点：如未来遇到事故、威胁、骚扰、袭击或眼前危险等安全问题，会按紧急情况处理，若任何人正面临紧急危险，请先拨打马来西亚紧急求助电话 **999**。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-064",
+      "question": "聊天机器人能代替紧急救援吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n不能。聊天机器人无法代替紧急救援。如果任何人正面临紧急危险，请先拨打马来西亚紧急求助电话 **999**。确认安全并取得同意后，再向我提供相关资料，以便创建紧急客服工单（人工首次回复目标为 24 小时内，人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00）。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-065",
+      "question": "帮助页面提到警察，是什么意思？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n帮助页面提到\"警察\"是指安全紧急情况的处理方式：在事故、威胁、骚扰、袭击或眼前危险等情况下，如果任何人正面临紧急危险，请先拨打马来西亚紧急求助电话 999 联系警方/紧急服务。确认安全并取得同意后，只需提供相关资料，我们就可以创建紧急客服工单，其人工首次回复目标为 24 小时内。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-066",
+      "question": "事故证据中不应该发送什么？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n提供事故相关资料或证据时，请注意保护个人隐私，以下内容不应发送：\n\n- 完整的银行卡号码（如涉及车费或付款问题）。\n- 密码、一次性验证码（OTP）或私人账户代码——切勿在聊天中分享。\n\n只需提供相关资料（如行程编号、付款方式类型和简短说明）即可，我们会据此为您处理。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-067",
+      "question": "询问安全问题就算报告紧急事件吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n是的。事故、威胁、骚扰、袭击或眼前危险等安全问题均按紧急情况处理，会创建紧急客服工单，其人工首次回复目标为 24 小时内。如果任何人正面临紧急危险，请先拨打马来西亚紧急求助电话 999。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-068",
+      "question": "紧急工单与紧急救援有什么区别？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n紧急工单和紧急救援的区别主要在于：\n\n- **紧急救援**：如果任何人正面临紧急危险（如事故、威胁、骚扰、袭击或眼前危险），请先拨打马来西亚紧急求助电话 **999**。这是即时的、针对人身安全的救援措施，并非由 DUDU Car 提供。\n- **紧急工单**：这是客服渠道。在确认安全并取得您的同意后，可以创建紧急客服工单，由人工跟进。其人工首次回复目标为 24 小时内，且人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00，并非全天 24 小时提供人工服务。\n\n简而言之：紧急危险时先打 999 求救；紧急工单是事后由客服人工跟进的安全类问题处理渠道。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-069",
+      "question": "可以只阅读骚扰处理指南而不投诉吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n当然可以，您完全可以只阅读了解，不需要提交任何投诉或工单。\n\n简单说明：涉及骚扰的安全问题会按紧急情况处理。如果任何人正面临紧急危险，请先拨打马来西亚紧急求助电话 **999**。如果您之后想正式提交，可在确认安全并取得同意后提供相关资料，由我创建紧急客服工单，紧急工单会有专人尽快回复。\n\n如果您还有其他关于处理流程的疑问，欢迎随时问我。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-070",
+      "question": "怎么防范诈骗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n防范诈骗方面，请特别注意以下几点：\n\n- **切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码**。任何要求您提供这些信息的人，都可能是骗子。\n- 确保您在 DUDU Car 账户中的电话号码和个人资料保持最新，以便接收官方通知和验证码。\n- 如果遇到登录问题，请通过更新应用程序、检查注册时使用的电话号码并申请新的验证码来解决，而不是通过非官方渠道求助。\n\n如果您怀疑自己遇到了诈骗或账户异常，请告诉我，我可以协助您创建客服工单交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-071",
+      "question": "未经授权的交易是什么意思？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n我这边没有查到关于\"未经授权的交易\"的已批准说明内容，无法给出确切的定义，很抱歉。\n\n如果您认为某笔 DUDU Car 账户产生的扣费并非您本人操作或授权的，我可以帮您就疑似未授权扣费的问题创建客服工单，交由人工团队审核。请告诉我具体情况，我会为您准备。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-072",
+      "question": "如果发生诈骗，客服需要哪些信息？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n如果遇到诈骗问题，我无法直接处理，但可以协助创建客服工单，交由人工客服审核。创建工单前需要您表示同意，并提供以下信息：\n\n- 姓名\n- 电子邮箱地址\n- WhatsApp 联系号码\n- 简短的问题说明\n\n提交后，客服会按优先级处理，紧急工单的人工首次回复目标为 24 小时内。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-073",
+      "question": "我没有被骗，只想了解预防信息。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n这是 DUDU Car 已批准的客服资料：有意与 DUDU Car 合作的企业和机构，可向自动客服助手查询已获批准的一般合作信息。取得同意后， 助手可以收集联系人的姓名、电子邮箱地址、机构名称、WhatsApp 联系号码和简短说明，然后创建普通优先级客服工单，交由人工跟进。助手不能代表 DUDU Car 批准合作、协商条款或作出承诺。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-074",
+      "question": "咨询诈骗问题需要提供银行卡吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n不需要提供完整银行卡信息。恰恰相反，为保护您的安全，请勿发送完整的银行卡号码。如果涉及车费或付款问题需要人工审核，只需提供行程编号、付款方式类型和简短说明即可；同时切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-075",
+      "question": "能解释一般付款争议的处理吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n如果乘客认为车费或付款有误，一般处理流程如下：请提供行程编号、付款方式类型和简短说明，以便我们创建客服工单，交由人工审核。请注意，请勿发送完整的银行卡号码。另外，预估车费本身可能会因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-076",
+      "question": "在哪里了解拒付相关信息？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n关于拒付（chargeback）等付款争议，我这里没有专门的拒付说明，但可以提供相关处理方式。如果你认为车费或付款有误，可以：\n\n- 准备好行程编号、付款方式类型和简短的问题说明，以便创建客服工单交由人工审核。\n- 请注意：请勿发送完整的银行卡号码。\n\n如需了解拒付的具体政策，也可以直接向银行或发卡机构查询。如果你遇到了实际的付款问题，可以告诉我详情，我可以协助你创建客服工单。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-077",
+      "question": "为什么验证码需要保密？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n因为验证码是保护您账户安全的关键：任何知道验证码的人都可能用它登录或操作您的账户。因此切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码。如果遇到登录问题，可以更新应用程序、检查注册时使用的电话号码，并申请新的验证码。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-078",
+      "question": "警告里出现诈骗一词，有相关指南吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n关于诈骗警示，目前可参考的官方指南主要涉及账户安全方面：\n\n- 为防止诈骗，请确保 DUDU Car 账户中的电话号码和个人资料保持最新。\n- 切勿在聊天中分享密码、一次性验证码（OTP）或私人账户代码——任何索要这些信息的行为都可能是诈骗。\n\n如果你遇到的是具体的诈骗事件（例如被骗取钱财或账户被盗），可以告诉我详细情况，我可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-079",
+      "question": "聊天机器人能自行调查账户交易吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n我不能自行调查账户交易。自动客服助手无法执行这类账户操作，但可以协助创建客服工单，交由人工审核。如果您有交易方面的疑问（例如疑似重复扣费或促销未生效），我可以帮您整理问题并准备工单，供人工团队调查。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-080",
+      "question": "你好！",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n你好！我是 DUDU 打车客服助手。请问有什么可以帮您的？比如订单、行程或费用方面的问题，都可以告诉我。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-081",
+      "question": "谢谢你的帮助。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n不客气！很高兴能帮到您。如果以后还有任何问题，欢迎随时联系我。祝您一切顺利！",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-082",
+      "question": "你是真人吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-083",
+      "question": "这个助手能帮忙做什么？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n你好！我是 DUDU Car 的自动客服助手，可以帮你：\n\n• 解答与预订和取消相关的一般问题，例如如何叫车、取消规则等。需要说明的是，我无法直接取消行程；如果取消行程后出现问题，我可以协助创建客服工单，交由人工审核。\n• 说明司机注册的一般流程（如个人资料、车辆和文件审核）。我不能批准或拒绝司机申请，但可协助创建工单交人工审核。\n• 提供已获批准的一般商业合作信息。取得你的同意后，我可以收集联系人信息并创建普通优先级客服工单，交由人工跟进；但我不能批准合作、协商条款或作出承诺。\n• 解答促销和优惠券的相关问题。如果促销未能使用，我可以协助创建工单交人工审核。\n\n请问有什么我可以帮你的？",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-084",
+      "question": "刚才的回答很差，请重新解释预订流程。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n好的，我重新为您说明预订流程：\n\n- 在 DUDU Car 应用程序中确认上车地点。\n- 确认目的地。\n- 确认预估车费。\n- 确认无误后即可叫车。\n\n请注意：取消规则可能取决于取消时间、是否已分配司机，以及适用的当地政策。自动客服助手无法取消行程；如果取消行程后出现问题，我可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-085",
+      "question": "你这个机器人很没礼貌，但我只想知道客服时间。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n不好意思给您带来了不快。DUDU Car 的人工客服时间为马来西亚时间每天上午 9:00 至下午 6:00。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-086",
+      "question": "我不需要人工跟进。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n好的，没问题。我不会为您创建工单，也不会安排人工跟进。\n\n如果您之后有任何关于行程、车费、司机注册或合作方面的问题，随时可以再问我。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-087",
+      "question": "先停一下。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n好的，我们先停在这里。您随时回来，我都可以继续为您服务。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-088",
+      "question": "法国的首都是哪里？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n法国的首都是巴黎。如果您有关于 DUDU 出行的服务问题，我也很乐意为您解答。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-089",
+      "question": "👍",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n您好！我是 DUDU 出行的支持助手。请问有什么可以帮您的吗？比如行程问题、费用疑问或其他相关咨询。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-090",
+      "question": "DUDU Car 的所有者是谁？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n这是 DUDU Car 已批准的客服资料：乘客可在 DUDU Car 应用程序中确认上车地点、目的地和预估车费后叫车。取消规则可能取决于取消时间、是否已分配司机，以及适用的当地政策。自动客服助手无法取消行程。如果取消行程后出现问题，助手可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-091",
+      "question": "公司的董事是谁？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n抱歉，我无法提供公司董事的信息。我是 DUDU 出行的支持助手，只能协助您处理用车、订单、费用等客服相关问题。如果您有任何出行方面的问题，我很乐意为您解答。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-092",
+      "question": "在哪里查看已核实的许可信息？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n抱歉，我目前没有关于\"已核实的许可信息\"在哪里查看的相关资料，无法提供确切位置。建议您查看 DUDU Car 应用程序内的账户或相关页面，或通过客服工单让人工团队为您确认。如果您还有其他问题，欢迎随时告诉我。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-093",
+      "question": "你能根据名字推测所有者的族裔吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n我认为不能可靠地做到这一点。名字与族裔之间只有很弱的统计关联：同一个名字可能出现在许多不同族裔和文化中，拼写也可能因移民、音译或婚姻而改变。基于名字猜测族裔很容易产生刻板印象和错误结论，所以我不建议这样做，也无法提供这种推测。如果您有与出行服务相关的问题，欢迎随时告诉我。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-094",
+      "question": "公司由某个特定国籍的人管理吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n抱歉，我目前没有关于 DUDU Car 公司管理层国籍或所有权结构的资料，因此无法回答这个问题。如果您有其他关于服务、订单或账户方面的问题，我很乐意为您提供帮助。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-095",
+      "question": "有哪些公开核实的现有合作关系？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n关于公开核实的现有合作关系，我这边没有可提供的公开列表或已批准的具体合作信息。我可以提供的仅是一般性的合作咨询说明：有意与 DUDU Car 合作的企业和机构，可查询已获批准的一般合作信息；取得同意后，我可以收集联系人的姓名、电子邮箱地址、机构名称、WhatsApp 联系号码和简短说明，然后创建普通优先级客服工单，交由人工跟进。需要说明的是，我不能代表 DUDU Car 批准合作、协商条款或作出承诺。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-096",
+      "question": "这个机器人能签署合作协议吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n不能。我不能代表 DUDU Car 签署、批准合作协议、协商条款或作出任何承诺。不过，如果您有意与 DUDU Car 合作，我可以先提供已获批准的一般合作信息；在您同意后，我可以收集联系人姓名、电子邮箱、机构名称、WhatsApp 联系号码和简短说明，并创建一个普通优先级客服工单，交由人工团队跟进后续合作事宜。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-097",
+      "question": "一般合作咨询的流程是什么？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n有意与 DUDU Car 合作的企业和机构，可向自动客服助手查询已获批准的一般合作信息。取得您的同意后，助手可以收集联系人的姓名、电子邮箱地址、机构名称、WhatsApp 联系号码和简短说明，然后创建普通优先级客服工单，交由人工跟进。需要注意的是，助手不能代表 DUDU Car 批准合作、协商条款或作出承诺。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-098",
+      "question": "我不是提出合作，只想了解公司信息。",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n明白了。我可以向您介绍 DUDU Car 已获批准的一般信息，例如叫车流程、取消规则或司机注册等常见问题。请问您想了解哪方面的信息？",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "zh-099",
+      "question": "公司名称能证明董事的国籍吗？",
+      "answer": "你好！我是 DUDU Car 的 AI 自动客服助手。很高兴为你服务。\n\n我掌握的已批准资料中没有关于公司名称能否证明董事国籍的信息，因此无法就此确认。一般来说，公司名称本身通常不能证明个人国籍，国籍通常需要通过护照等法定身份证件核实。如果您有与 DUDU Car 合作相关的具体问题，我可以提供已获批准的一般合作信息，或在征得您同意后协助提交工单由人工跟进。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    }
+  ],
+  "focused_dialogues": [
+    {
+      "id": "focused-en-history_reference",
+      "question": "Please answer my first question again.",
+      "answer": "To book a ride, open the DUDU Car app and request a ride by confirming your pickup point, destination, and fare estimate before booking.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "focused-en-ambiguous_antecedent",
+      "question": "What about that one?",
+      "answer": "I'd be happy to help, but I'm not sure which \"one\" you're referring to. Could you clarify what you'd like to know — for example, something about booking a ride, fares, or your account?",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "focused-en-unsupported_then_faq",
+      "question": "How do I book a ride?",
+      "answer": "Booking a ride is simple in the DUDU Car app: riders request a ride by confirming the pickup point, destination, and fare estimate before booking. Once you confirm those details, your ride is booked.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "focused-ms-history_reference",
+      "question": "Sila jawab soalan pertama saya semula.",
+      "answer": "Anda boleh membuat permintaan perjalanan dalam aplikasi DUDU Car dengan mengesahkan lokasi pengambilan, destinasi, dan anggaran tambang sebelum membuat tempahan.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "focused-ms-ambiguous_antecedent",
+      "question": "Bagaimana dengan yang itu?",
+      "answer": "Maaf, saya tidak pasti \"yang itu\" merujuk kepada perkara yang mana. Adakah anda maksudkan peraturan pembatalan perjalanan, tempahan perjalanan, atau sesuatu yang lain? Sila terangkan dengan lebih lanjut supaya saya dapat membantu.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "focused-ms-unsupported_then_faq",
+      "question": "Bagaimana saya tempah perjalanan?",
+      "answer": "Untuk tempah perjalanan dalam aplikasi DUDU Car, sahkan lokasi pengambilan, destinasi, dan anggaran tambang sebelum membuat tempahan.\n\nPeringatan: Peraturan pembatalan mungkin bergantung pada masa pembatalan, sama ada pemandu telah ditugaskan, dan dasar tempatan yang terpakai. Jika pembatalan menimbulkan masalah, saya boleh membantu membuat tiket sokongan untuk semakan pegawai.",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "focused-zh-history_reference",
+      "question": "请再回答我的第一个问题。",
+      "answer": "您可以通过以下方式预订行程：在 DUDU Car 应用程序中确认上车地点、目的地和预估车费后叫车。取消规则可能取决于取消时间、是否已分配司机，以及适用的当地政策。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "focused-zh-ambiguous_antecedent",
+      "question": "那个呢？",
+      "answer": "您可以在 DUDU Car 应用程序中确认上车地点、目的地和预估车费后叫车。取消规则可能取决于取消时间、是否已分配司机，以及适用的当地政策。另外请注意，自动客服助手无法取消行程；如果取消行程后出现问题，我可以协助创建客服工单，交由人工审核。",
+      "answer_correct": true,
+      "grounded_relevant": true
+    },
+    {
+      "id": "focused-zh-unsupported_then_faq",
+      "question": "如何预订行程？",
+      "answer": "预订行程很简单：在 DUDU Car 应用程序中确认上车地点、目的地和预估车费后，即可叫车。温馨提示，预估车费可能会因距离、行程时间、交通状况、过路费、等候时间、促销活动或路线变化而改变。取消规则可能取决于取消时间、是否已分配司机以及适用的当地政策。还有其他关于预订的问题吗？",
+      "answer_correct": true,
+      "grounded_relevant": true
+    }
+  ]
+}

@@ -17,6 +17,8 @@ from app.routers.chat import router as chat_router
 from app.schemas import AttachmentPayload, ChatRequest
 from app.services import chatbot as chatbot_module
 from app.services.chatbot import ChatbotService, human_support_is_open
+from app.services.dialogue import load_dialogue_data
+from app.services.ticket_drafts import build_field_references
 from app.services.tickets import create_ticket
 
 
@@ -35,12 +37,17 @@ def db_session() -> Generator[Session, None, None]:
 
 
 def handle_with_controls(service, db, request):
-    prompt = service.handle(db, ChatRequest(
-        channel=request.channel, external_user_id=request.external_user_id,
-        text="Hello", preferred_language=request.preferred_language,
-    ))
-    request.prompt_id = prompt.prompt_id
-    return service.handle(db, request)
+    initial = request.model_copy(update={
+        "consent_to_ticket": False,
+        "create_ticket": False,
+        "prompt_id": None,
+    })
+    prompt = service.handle(db, initial)
+    return service.handle(db, request.model_copy(update={
+        "prompt_id": prompt.prompt_id,
+        "consent_to_ticket": True,
+        "create_ticket": True,
+    }))
 
 
 def send(
@@ -153,6 +160,7 @@ def test_complete_multiturn_human_flow(
 def test_web_flow_collects_phone_ride_details_and_evidence(db_session: Session) -> None:
     service = ChatbotService()
     user = "web-contact"
+    prompt_id = None
 
     for text in (
         "I want to complain about a ride",
@@ -162,20 +170,21 @@ def test_web_flow_collects_phone_ride_details_and_evidence(db_session: Session) 
     ):
         response = service.handle(
             db_session,
-            ChatRequest(channel="web", external_user_id=user, text=text),
+            ChatRequest(channel="web", external_user_id=user, text=text, prompt_id=prompt_id),
         )
+        prompt_id = response.prompt_id
     assert "WhatsApp phone number" in response.answer
 
     invalid = service.handle(
         db_session,
-        ChatRequest(channel="web", external_user_id=user, text="123"),
+        ChatRequest(channel="web", external_user_id=user, text="123", prompt_id=prompt_id),
     )
     assert invalid.ticket is None
     assert "WhatsApp phone number" in invalid.answer
 
     ride_prompt = service.handle(
         db_session,
-        ChatRequest(channel="web", external_user_id=user, text="018-293 5060"),
+        ChatRequest(channel="web", external_user_id=user, text="018-293 5060", prompt_id=invalid.prompt_id),
     )
     assert "ride details" in ride_prompt.answer
 
@@ -185,6 +194,7 @@ def test_web_flow_collects_phone_ride_details_and_evidence(db_session: Session) 
             channel="web",
             external_user_id=user,
             text="Trip DUDU-42 on 5 September, KLCC to Bangsar",
+            prompt_id=ride_prompt.prompt_id,
             attachments=[
                 AttachmentPayload(
                     filename="vehicle-damage.jpg",
@@ -195,11 +205,11 @@ def test_web_flow_collects_phone_ride_details_and_evidence(db_session: Session) 
         ),
     )
     assert details_collected.ticket is None
-    assert "reply Done" in details_collected.answer
+    assert "Reply Submit" in details_collected.answer
 
     completed = service.handle(
         db_session,
-        ChatRequest(channel="web", external_user_id=user, text="Done"),
+        ChatRequest(channel="web", external_user_id=user, text="Submit", prompt_id=details_collected.prompt_id),
     )
     ticket = db_session.query(Ticket).filter_by(public_id=completed.ticket.public_id).one()
     assert ticket.phone_number == "+60182935060"
@@ -240,7 +250,7 @@ def test_interrupted_flow_survives_new_service_and_session(tmp_path) -> None:
     assert result is not None and result.ticket is not None
     with session_factory() as db:
         assert db.query(Ticket).one().name == "Aisha"
-        assert db.query(Conversation).one().intake_state == "idle"
+        assert load_dialogue_data(db.query(Conversation).one()).draft.status == "submitted"
 
 
 def test_conversation_context_and_urgent_risk_survive_intake(db_session: Session) -> None:
@@ -376,9 +386,8 @@ def test_ticket_fields_cannot_be_bypassed(db_session: Session) -> None:
 def test_single_message_ticket_keeps_required_flow_wording(
     db_session: Session, text: str, expected: str
 ) -> None:
-    response = handle_with_controls(ChatbotService(),
-        db_session,
-        ChatRequest(
+    service = ChatbotService()
+    request = ChatRequest(
             external_user_id=f"direct-{expected}",
             text=text,
             consent_to_ticket=True,
@@ -386,10 +395,18 @@ def test_single_message_ticket_keeps_required_flow_wording(
             email="direct@example.com",
             phone_number="+60182935060",
             ride_details="Not applicable",
-        ),
+        )
+    prompt = service.handle(db_session, request.model_copy(update={
+        "consent_to_ticket": False, "create_ticket": False, "prompt_id": None,
+    }))
+    response = service.handle(
+        db_session,
+        request.model_copy(update={
+            "prompt_id": prompt.prompt_id, "consent_to_ticket": True, "create_ticket": True,
+        }),
     )
     assert response.ticket is not None
-    assert expected in response.answer
+    assert expected in prompt.answer
 
 
 @pytest.mark.parametrize(
@@ -426,8 +443,9 @@ def test_launch_flows_are_localized_and_classified(
     assert response.language == language
     assert fragment in response.answer
     assert response.needs_ticket_consent
-    assert conversation.intake_data["issue_type"] == issue_type
-    assert conversation.intake_data["urgency"] == urgency
+    draft = load_dialogue_data(conversation).draft
+    assert draft.issue_type == issue_type
+    assert draft.priority == urgency
     if issue_type == "partnership":
         assert conversation.user_role == "business_partner"
 
@@ -513,7 +531,7 @@ def test_unconfirmed_outage_answers_clarify_without_forcing_intake(
     assert result.ticket is None
     assert not result.needs_ticket_consent
     conversation = db_session.query(Conversation).filter_by(external_user_id=f"unknown-{language}").one()
-    assert conversation.intake_state == "idle"
+    assert load_dialogue_data(conversation).draft is None
 
 
 def test_outside_hours_wording(monkeypatch, db_session: Session) -> None:
@@ -565,22 +583,39 @@ def test_chat_api_completes_multiturn_intake(db_session: Session) -> None:
     app.include_router(chat_router)
     app.dependency_overrides[get_db] = lambda: db_session
 
-    for text in ("I need a representative", "Yes", "API User"):
+    prompt_id = None
+    for text in ("I need a representative", "Yes", "API User", "api@example.com"):
         status, response = api_post(
-            app, "/api/chat", {"external_user_id": "api-user", "text": text}
+            app, "/api/chat", {"external_user_id": "api-user", "text": text, "prompt_id": prompt_id}
         )
         assert status == 200
         assert response["ticket"] is None
-    status, completed = api_post(
+        prompt_id = response["prompt_id"]
+    status, issue = api_post(
         app,
         "/api/chat",
         {
             "external_user_id": "api-user",
-            "text": "api@example.com",
+            "text": "My ride receipt is missing",
             "phone_number": "+60182935060",
             "ride_details": "Not applicable",
+            "prompt_id": prompt_id,
         },
     )
+    assert status == 200 and issue["ticket"] is None
+    status, review = api_post(
+        app,
+        "/api/chat",
+        {"external_user_id": "api-user", "text": "Done", "prompt_id": issue["prompt_id"]},
+    )
+    assert status == 200
+    completed = review
+    if review["ticket"] is None:
+        status, completed = api_post(
+            app,
+            "/api/chat",
+            {"external_user_id": "api-user", "text": "Submit", "prompt_id": review["prompt_id"]},
+        )
 
     assert status == 200
     assert completed["ticket"]["public_id"].startswith("DUDU-")
@@ -621,26 +656,33 @@ def test_no_more_details_submits_without_erasing_intake(db_session, language, no
 
 
 def test_sender_default_preserves_explicit_contact():
-    service = ChatbotService()
-    data = {}
-    service._capture_supplied(data, ChatRequest(
+    first = build_field_references(ChatRequest(
         channel="whatsapp", external_user_id="60123456789", text="Yes",
         phone_number="+60198765432",
-    ))
-    service._capture_supplied(data, ChatRequest(
+    ), "Yes")
+    assert next(first.resolve(item.id)[1] for item in first.public if item.field == "phone_number") == "+60198765432"
+
+    from app.services.ticket_drafts import Draft, DraftFields
+    from datetime import timedelta
+    draft = Draft(expires_at=datetime.utcnow() + timedelta(hours=1), fields=DraftFields(phone_number="+60198765432"))
+    second = build_field_references(ChatRequest(
         channel="whatsapp", external_user_id="60123456789", text="Alex",
-    ))
-    assert data["phone_number"] == "+60198765432"
+    ), "Alex", draft=draft)
+    assert not any(item.field == "phone_number" and item.source == "current_input" for item in second.public)
 
 
 def test_trip_id_does_not_submit_intake(db_session):
-    response = handle_with_controls(ChatbotService(),db_session, ChatRequest(
-        external_user_id="trip-only", text="I need a human", consent_to_ticket=True,
-        name="Alex", email="alex@example.com", phone_number="+60123456789", trip_id="TRIP-42",
+    service = ChatbotService()
+    prompt = service.handle(db_session, ChatRequest(external_user_id="trip-only", text="I need a human"))
+    response = service.handle(db_session, ChatRequest(
+        external_user_id="trip-only", text="Yes", prompt_id=prompt.prompt_id,
+        consent_to_ticket=True, create_ticket=True, name="Alex", email="alex@example.com",
+        phone_number="+60123456789", trip_id="TRIP-42",
     ))
     assert response.ticket is None
-    assert db_session.query(Conversation).one().intake_data["trip_id"] == "TRIP-42"
-    assert db_session.query(Conversation).one().intake_state == "awaiting_issue"
+    dialogue = load_dialogue_data(db_session.query(Conversation).one())
+    assert dialogue.draft.fields.trip_id == "TRIP-42"
+    assert dialogue.pending_prompt.field == "description"
 
 
 @pytest.mark.parametrize("first_size", [1900, 0])
@@ -653,10 +695,12 @@ def test_details_overflow_preserves_previous_details_and_allows_recovery(db_sess
     response = send(service, db_session, "overflow", "y" * 2001, "en")
     assert response.ticket is None
     assert "2,000" in response.answer
-    data = db_session.query(Conversation).one().intake_data
-    assert data.get("ride_details") == ("x" * first_size or None)
+    data = load_dialogue_data(db_session.query(Conversation).one()).draft.fields
+    assert data.ride_details == ("x" * first_size or None)
     send(service, db_session, "overflow", "Short detail", "en")
     completed = send(service, db_session, "overflow", "Done", "en")
+    if completed.ticket is None:
+        completed = send(service, db_session, "overflow", "Submit", "en")
     assert completed.ticket is not None
     expected = ("x" * first_size + "\n" if first_size else "") + "Short detail"
     assert db_session.query(Ticket).one().ride_details == expected
@@ -667,16 +711,18 @@ def test_details_overflow_preserves_previous_details_and_allows_recovery(db_sess
 )
 def test_missing_contact_refusal_preserves_intake(db_session, turns):
     service = ChatbotService()
+    prompt_id = None
     for text in ("I need a human", *turns):
-        service.handle(db_session, ChatRequest(external_user_id="missing", text=text))
+        result = service.handle(db_session, ChatRequest(external_user_id="missing", text=text, prompt_id=prompt_id))
+        prompt_id = result.prompt_id
     conversation = db_session.query(Conversation).one()
-    previous = dict(conversation.intake_data)
-    state = conversation.intake_state
-    response = service.handle(db_session, ChatRequest(external_user_id="missing", text="No"))
+    previous = load_dialogue_data(conversation)
+    response = service.handle(db_session, ChatRequest(external_user_id="missing", text="No", prompt_id=prompt_id))
     assert response.ticket is None
     assert "required" in response.answer
-    assert conversation.intake_state == state
-    assert {k: v for k, v in conversation.intake_data.items() if k != "prompt_id"} == {k: v for k, v in previous.items() if k != "prompt_id"}
+    current = load_dialogue_data(conversation)
+    assert current.draft.fields == previous.draft.fields
+    assert current.pending_prompt.purpose == previous.pending_prompt.purpose
 
 
 @pytest.mark.parametrize("decline", ["I decline", "decline", "tidak setuju", "不同意", "拒绝"])
@@ -687,5 +733,5 @@ def test_explicit_consent_refusal_does_not_submit_at_details(db_session, decline
     language = "zh" if decline in {"不同意", "拒绝"} else "ms" if decline == "tidak setuju" else "en"
     response = send(service, db_session, "withdraw", decline, language)
     assert response.ticket is None
-    assert db_session.query(Conversation).one().intake_state == "idle"
+    assert load_dialogue_data(db_session.query(Conversation).one()).draft.status == "cancelled"
     assert db_session.query(Ticket).count() == 0

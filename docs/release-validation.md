@@ -1,6 +1,6 @@
 # Release Validation and Public-Beta Activation
 
-Status: **SMART live behavior enabled; post-enable observation pending**
+Status: **LangChain Waves 1–6 complete; Wave 7 complete; Wave 8 publication/staging preparation in progress — see [SMART.md](../SMART.md)**
 Go/no-go owner: Cze Yik
 Support lead and CCO: Jane
 Beta: 10–14 September 2026
@@ -8,7 +8,68 @@ Beta: 10–14 September 2026
 The approved beta release recorded below is historical. It is not the SMART release candidate and
 does not prove the current candidate is deployed or approved.
 
-## SMART release candidate — local validation and live production state
+## LangChain Wave 6 candidate — 15 September 2026
+
+All twelve audit fixes are implemented. Cze Yik's corrected
+[human submission](evaluation/langchain-wave6-human-review-submitted-20260915.json) matches the
+exact final 300 FAQ and nine focused answers and passes both semantic scores for every answer.
+The [reviewed report](evaluation/langchain-live-wave6-reviewed-20260915.json) passes all Wave 6
+acceptance gates. The user resumed Wave 7 on 15 September 2026; the candidate has not yet been
+published, staged or deployed.
+
+| Gate | Current evidence |
+| --- | --- |
+| Full hosted coverage and dispositions | PASS: 357/357 scenarios; 348/348 expected dispositions, including 300/300 FAQ dispositions |
+| Mandatory and focused behavior | PASS: 30/30 intakes, 18/18 handoffs, 9/9 focused dialogues; zero unwanted offers or unintended mutations |
+| Hosted reliability and latency | PASS: 733 provider calls, 728 successes, four timeouts; five agent failure fallbacks across 419 executions; turn p95 22.444 seconds |
+| Hosted spend | PASS: USD 0.231998 observed, USD 0.457734 conservative under the USD 1.00 run cap; five incomplete-usage events retain full-turn reserves |
+| 10,000-message projection | PASS: USD 8.101 using conservative cost and 565 inbound turns, below USD 15 |
+| Fresh outage | PASS: 348/348 dispositions, 30/30 intakes, 18/18 handoffs, 9/9 focused; zero unwanted offers, unintended mutations or provider calls |
+| PostgreSQL burst | PASS: eight senders / four workers, queue p95 0.079 seconds, zero duplicates |
+| Local validation | PASS: Python 3.11/PostgreSQL suite 528 passed, two skipped; final evaluator checks 26 passed; fresh migration, schema drift and dependency integrity checks pass |
+| Docker test target | PASS: 529 passed, eight skipped; `dudu-support:wave6-audit-test`, index `sha256:31b3210abe74bd30c327d8454bcf8dae015e8a8d0755407091bcfba7710bb075` |
+| Semantic acceptance | PASS: 300/300 FAQ and 9/9 focused answers for correctness and grounded relevance; EN/MS/ZH each 100/100 FAQ, held-out paraphrases 60/60 |
+| Combined Wave 6 acceptance | PASS: complete human review of 309 exact answers; evaluator `rollout_ready=true` |
+
+Evidence: [final accounted hosted report](evaluation/langchain-live-wave6-audit-accounted-20260915.json),
+[outage report](evaluation/langchain-outage-wave6-audit-20260915.json),
+[burst report](evaluation/langchain-burst-wave6-audit-20260915.json).
+The [original hosted report](evaluation/langchain-live-wave6-audit-20260915.json) and checkpoint remain
+unchanged. [Accounting provenance](evaluation/langchain-live-wave6-audit-accounting-20260915.json)
+records source hashes and five reserve corrections without changing answers or making provider calls.
+The focused nine-case hosted check cost USD 0.011548; tracked conservative hosted spend is approximately
+USD 4.27 including historical reserves. Verified rates and active limits are recorded in SMART.md.
+Importing the corrected human review made no provider calls and preserved the evaluated answers,
+usage, cost and latency.
+
+## LangChain release preparation — 15 September 2026
+
+Cze Yik renewed the existing AWS-0104 exceptions for outbound TCP 443/465 and AWS-0136 for
+AWS-managed SNS encryption through **17 September 2026**, exclusively for staging and dark
+deployment with customer sending disabled. This does not extend the public beta or notification
+waiver. Trivy uses `exp:2026-09-17`, a conservative date-only cutoff; recheck the gate before release.
+
+Read-only AWS discovery used the `dudu-production` profile in account `173454940059`, region
+`ap-southeast-5`. Foundation and production stacks exist; staging must be recreated for this
+candidate. The current production secret reports `META_SEND_ENABLED=true`,
+`NOTIFICATION_SEND_ENABLED=false`, `LLM_ENABLED=true`, and `LLM_CUSTOMER_CONTEXT_ENABLED=true`.
+The runtime container values still require verification. Preparation preserves those settings;
+staging and the authorized dark deployment use disabled sending.
+
+Local release checks pass: **554 PostgreSQL tests, two skipped**; fresh migration to
+`e5c1a2b3d4f6`, schema drift and dependency integrity pass. AMD64/ARM64 Docker test targets each
+pass 545 tests with eight skips; the final nine workflow checks, including three later ECR cases,
+pass in the full PostgreSQL run. ARM64 ClamAV build/version checks pass. Dependency, high-confidence
+static, source/container and dynamic security gates pass with the current exceptions.
+
+The [Wave 7 report](evaluation/langchain-wave7-local-20260915.json) records checks, source hashes and
+the local runtime image. Cutover now validates configuration before downtime, preserves backup
+references on failed retries, checks durable row counts and typed state, and waits for a complete
+worker cycle. Production promotion requires successful staging for the exact SHA and an immutable
+ECR repository. The [runbook](production-platform.md) covers deployment and compatible-runtime recovery.
+Candidate publication, CI/Security, staging, production and observation remain pending.
+
+## Historical SMART release — production state recorded 12 September 2026
 
 Candidate source: `3e6b81376cc36fedaae56d296bc59df2a07c2a6b` (merged PR #4 into `dev`)
 Local verification image: `dudu-support:smart-check` (`sha256:cc7dce73d738b0eae39c8df616fe71bddd8390da11f74dcbe4f137800ec4a419`)

@@ -39,6 +39,8 @@ from app.services.media import (
     process_next_media,
     validate_media,
 )
+from app.services.dialogue import load_dialogue_data
+from app.services.ticket_drafts import ConsentEvidence, DialogueData, DraftFields, make_prompt, new_draft
 
 
 APP_SECRET = "test-meta-app-secret-at-least-24"
@@ -60,6 +62,37 @@ JPEG = (
     + b"\xff\xda\x00\x08\x01\x01\x00\x00\x3f\x00"
     + b"\x00\xff\xd9"
 )
+
+
+def test_upload_replay_reuses_verified_object_after_acceptance():
+    from botocore.exceptions import ClientError
+
+    class S3:
+        saved = None
+        versions = 0
+
+        def put_object(self, **kwargs):
+            assert kwargs["IfNoneMatch"] == "*"
+            if self.saved:
+                raise ClientError({"Error": {"Code": "PreconditionFailed"},
+                                   "ResponseMetadata": {"HTTPStatusCode": 412}}, "PutObject")
+            self.saved = kwargs
+            self.versions += 1
+            raise KeyboardInterrupt("crash after object acceptance")
+
+        def head_object(self, **kwargs):
+            assert kwargs == {"Bucket": self.saved["Bucket"], "Key": self.saved["Key"]}
+            return self.saved
+
+    storage = object.__new__(PrivateObjectStore)
+    storage.settings = Settings(_env_file=None, media_bucket="synthetic")
+    storage.client = S3()
+    with pytest.raises(KeyboardInterrupt):
+        storage.put("approved/test.png", io.BytesIO(PNG), "image/png", "digest")
+    storage.put("approved/test.png", io.BytesIO(PNG), "image/png", "digest")
+    assert storage.client.versions == 1
+    with pytest.raises(MediaRejected, match="stored_object_mismatch"):
+        storage.put("approved/test.png", io.BytesIO(PNG), "image/png", "different")
 
 
 @pytest.fixture()
@@ -301,17 +334,39 @@ def test_signed_media_webhook_is_queued_exactly_once(db_session: Session) -> Non
     attachment = db_session.query(MediaAttachment).one()
     assert attachment.status == "queued"
     assert attachment.object_key is None
+    conversation = db_session.query(Conversation).one()
+    assert conversation.dialogue_data["evidence_group"] == attachment.evidence_group
+    # Media ownership changes the typed dialogue once; an attachment-only outage
+    # turn does not invent a handoff offer.
+    assert conversation.dialogue_revision == 1
+    assert "evidence_group" not in conversation.intake_data
     assert db_session.query(WhatsAppInboundMessage).count() == 1
     assert "quarantined" in db_session.query(WhatsAppOutboundMessage).one().body
 
 
 def test_media_reply_keeps_intake_open_and_prompts_for_done(db_session: Session) -> None:
+    draft = new_draft(expiry_minutes=60)
+    draft.fields = DraftFields(
+        name="Alex",
+        email="alex@example.com",
+        phone_number="+60123456789",
+        description="My ride receipt is missing",
+    )
+    draft.issue_collected = True
+    draft.consent = ConsentEvidence(
+        prompt_id="consent-prompt",
+        draft_id=draft.id,
+        draft_version=draft.version,
+        originating_turn="consent-turn",
+        customer_input="Yes",
+        recorded_at=datetime.utcnow(),
+    )
+    dialogue = make_prompt(DialogueData(draft=draft), "details", "details-turn")
     conversation = Conversation(
         channel="whatsapp",
         external_user_id="60108865432",
         preferred_language="en",
-        intake_state="awaiting_additional_details",
-        intake_data={"consent": True, "name": "Alex", "email": "alex@example.com", "phone_number": "+60123456789", "issue_collected": True, "ride_details_collected": True, "details_complete": False},
+        dialogue_data=dialogue.model_dump(mode="json"),
     )
     db_session.add(conversation)
     db_session.commit()
@@ -320,9 +375,9 @@ def test_media_reply_keeps_intake_open_and_prompts_for_done(db_session: Session)
 
     db_session.refresh(conversation)
     reply = db_session.query(WhatsAppOutboundMessage).one().body
-    assert conversation.intake_state == "awaiting_additional_details"
+    assert load_dialogue_data(conversation).pending_prompt.purpose == "details"
     assert "quarantined for security checks" in reply
-    assert "reply Done" in reply
+    assert "Reply Done" in reply
 
 
 def test_object_store_uses_explicit_regional_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -20,6 +20,7 @@ from app.models import (
     WhatsAppOutboundMessage,
 )
 from app.services.media import PrivateObjectStore
+from app.services.dialogue import scrub_dialogue_private_data
 
 
 logger = logging.getLogger(__name__)
@@ -309,6 +310,34 @@ def _expire_chats(
             )
         if webhook_audit_ids:
             db.execute(delete(AuditLog).where(AuditLog.id.in_(webhook_audit_ids)))
+        db.commit()
+
+    retained_conversations = db.execute(
+        select(Conversation)
+        .where(
+            Conversation.created_at < cutoff,
+            ~_active_hold("conversation", Conversation.id, now),
+            ~exists().where(Message.conversation_id == Conversation.id),
+            exists().where(
+                MediaAttachment.conversation_id == Conversation.id,
+                MediaAttachment.ticket_id.is_(None),
+            ),
+        )
+        .order_by(Conversation.created_at)
+        .limit(limit)
+    ).scalars().all()
+    if not dry_run:
+        for conversation in retained_conversations:
+            evidence_group = db.execute(
+                select(MediaAttachment.evidence_group)
+                .where(
+                    MediaAttachment.conversation_id == conversation.id,
+                    MediaAttachment.ticket_id.is_(None),
+                )
+                .order_by(MediaAttachment.created_at.desc())
+                .limit(1)
+            ).scalar_one_or_none()
+            scrub_dialogue_private_data(conversation, evidence_group)
         db.commit()
 
     conversation_ids = db.execute(

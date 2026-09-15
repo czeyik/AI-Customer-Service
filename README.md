@@ -83,16 +83,16 @@ publishes them:
 docker compose exec api python scripts/stage_website.py --cco-username jane
 ```
 
-The importer accepts only HTTPS pages on `duducar.co`, reads at most 100 sitemap URLs and 2 MB per
-page, and removes scripts, navigation, forms, and footers. Jane must review and activate each
-language version through her authenticated session.
+The importer accepts the exact HTTPS pages configured in `WEBSITE_KNOWLEDGE_URLS`, reads at most
+2 MB per page, and removes scripts, navigation, forms, and footers. The allowlist defaults to empty.
+Jane must review and activate each language version through her authenticated session.
 
 Knowledge management uses Jane's normal named-admin session, not a shared API key. A CCO client
 can obtain its CSRF token from `GET /api/knowledge/session`, list the bounded version history at
 `GET /api/knowledge/documents`, and use the documented publish, activate, remove, and rollback
 endpoints. Every mutation records Jane's account, source URI, version, and replacement details.
-Customer retrieval queries only effective `active` versions and uses the indexed PostgreSQL
-trigram candidate search before bounded in-process ranking.
+Customer retrieval ranks all effective `active` chunks up to the 500-chunk ceiling, including
+titles and tags. A larger corpus requires clarification until SQL ranking is introduced.
 
 ## Reproducible Checks And Migrations
 
@@ -137,9 +137,10 @@ outbound worker separately:
 python -m app.workers.whatsapp
 ```
 
-The webhook never calls Meta inline. It stores the unique inbound message ID, conversation state change,
-and reply together; the worker sends queued replies with bounded retries and moves permanent or
-exhausted failures to a dead-letter state. Raw HTTP access logging is disabled because Meta's
+The webhook stores each unique inbound event before acknowledging it. The worker processes that
+durable inbox and commits conversation changes, tickets and queued replies together. It sends replies
+with bounded retries for explicit rejections; uncertain sends await delivery reconciliation.
+Permanent or exhausted failures enter a dead-letter state. Raw HTTP access logging is disabled because Meta's
 verification request includes the private verify token in its query string.
 
 ## Secure media
@@ -224,7 +225,7 @@ curl -X POST http://localhost:8000/api/chat \
   }'
 ```
 
-Create a complaint ticket after consent:
+Start a complaint and obtain the response's consent `prompt_id`:
 
 ```bash
 curl -X POST http://localhost:8000/api/chat \
@@ -233,31 +234,50 @@ curl -X POST http://localhost:8000/api/chat \
     "channel": "web",
     "external_user_id": "demo-user-1",
     "text": "I want to complain because I was overcharged for my trip",
-    "user_role": "rider",
+    "user_role": "rider"
+  }'
+```
+
+Reply with that `prompt_id`, consent and the required contact details to submit:
+
+```bash
+curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channel": "web",
+    "external_user_id": "demo-user-1",
+    "text": "Yes, submit my overcharge complaint with these details.",
+    "prompt_id": "<consent-prompt-id>",
     "name": "Demo Rider",
     "email": "demo@example.com",
+    "phone_number": "+60123456789",
     "account_id": "DUDU123",
     "trip_id": "TRIP456",
-    "consent_to_ticket": true
+    "consent_to_ticket": true,
+    "create_ticket": true
   }'
 ```
 
 ## Hosted LLM Direction
 
-Production uses the hosted model through a provider-neutral adapter:
+The LangChain release candidate uses one bounded `create_agent` dialogue agent.
+Current acceptance and deployment status: [SMART.md](SMART.md). Model choices:
 
 1. GLM-5.3-Flash as the approved hosted model.
 2. The deterministic approved-knowledge responder during provider outages or rejected output.
 3. DeepSeek V4 Flash retained only as an evaluated alternative, not a pilot provider.
 
-Set `LLM_ENABLED=true` and provision `ZAI_API_KEY` outside Git. Calls have an eight-second timeout,
-bounded input/output, no tools, and receive approved knowledge rather than customer messages.
-Invalid, unsafe, ungrounded, or failed responses use the deterministic approved-knowledge path.
+Set `LLM_ENABLED=true` and provision `ZAI_API_KEY` outside Git. With customer context enabled,
+the agent receives approved knowledge, minimized messages and opaque field references. Seven
+Python business tools stage validated changes; PostgreSQL commits them after authorization checks.
+Each turn allows five model requests and ten native tool calls, including the structured final
+response, within 60 seconds; each request is capped at 30 seconds, 15,000 input characters and
+300 output tokens. Invalid, unsafe, ungrounded or failed output uses the local recovery path.
 
 Run the repeatable trilingual outage evaluation with:
 
 ```bash
-python scripts/release_eval.py --mode outage
+python scripts/release_eval.py --suite smart --mode outage --input-price 0.15 --output-price 0.50
 ```
 
 The authorized hosted-model command, evidence fields, go/no-go record, and activation procedure

@@ -1,907 +1,732 @@
-# Smart Chatbot Execution Handoff
-
-Date: 10 September 2026
-
-Status: Implemented locally; verification and release gates pending. Not committed, pushed, deployed, or activated.
-
-## Current agent handoff — 10 September 2026
-
-**Read this section first.** It supersedes the original “not implemented” status. The requirements
-below remain the acceptance contract. The user interrupted implementation to request this handoff;
-continue from the working tree, not from scratch. Do not discard or recreate the changes.
-
-### Workspace and authorization
-
-- Repository: `/home/czeyik/Documents/AI-Customer-Service`; branch `dev`.
-- Current base HEAD: `9d6c1ea6d0e291d1b953694ce487f6fda2aed3ff`.
-- Remote: `https://github.com/czeyik/AI-Customer-Service.git`.
-- All implementation changes are **uncommitted**. `SMART.md`, the evaluation data/results, migration,
-  inbox service and SMART regression tests are untracked; include them deliberately in the release.
-- Local implementation and synthetic hosted-model testing were authorized. No production secrets,
-  knowledge, configuration, deployment, or customer messages were changed by this work.
-- Do not impersonate Jane/CCO approval, publish unreviewed policies, or infer a production GO from
-  passing local tests. Cze Yik owns GO/no-go; Jane is the support lead and CCO.
-- Follow root `AGENTS.md`: minimal shared fixes, no new dependencies or unrelated infrastructure.
-  No subagents were used; do not introduce delegation unless authorized.
-
-### Completed implementation
-
-1. **One structured GLM call per eligible turn** in `app/services/answer_generation.py` and
-   `chatbot.py`: minimized current question, bounded sanitized prior exchange/topic/source context,
-   actual local prompt, intake stage and field-role indicators. The old answer-rewriter path was
-   removed. Answer, clarification, troubleshooting, offers and intake actions share one schema.
-2. **Local authority over mutations:** consent/submission, ownership, priority and notifications
-   remain local. Explicit local handoff requests and Yes/No/Done/Skip/Submit override model action
-   proposals. Pause/cancel/resume need matching local intent. Unknown model-only handoffs are
-   optional offers and leave intake idle. Standalone identity identifies an automated AI assistant;
-   mixed identity/business questions can still use GLM.
-3. **Flexible intake:** fields in any order, combined fields, corrections, explicit contact numbers
-   preserved, actual issue collection after a bare human request, side questions, pause/resume,
-   expiry, bounded accumulated details, missing-field recovery, local correction review, and
-   explicit submission. “No” to more details finishes details; a trip ID does not submit. Control
-   words cannot become names. Existing-case updates/reopening require ownership and confirmation.
-4. **Provider boundary:** separate local extraction/storage and provider minimization in `pii.py`.
-   Known identifiers/contact fields become opaque roles; uncertain identifying narratives and
-   oversized questions stay local. No raw history, ticket bodies, attachments or contact values are
-   deliberately forwarded. Regex is not represented as a universal anonymizer. Regression checks
-   capture provider inputs. Whole excerpts are dropped to fit 8,000 characters; output stays at
-   300 tokens with an eight-second timeout. Citation/numeric/unsupported-claim rejection checks
-   remain guards, not a semantic proof. Usage, reasoning details and outcomes are logged.
-5. **Retrieval and governed website knowledge:** rank the complete effective corpus up to the
-   explicit 500-chunk ceiling, include titles/multiword tags and cross-language sources, preserve
-   source language, clarify unresolved conflicts. Website staging uses an exact CCO-selected HTTPS
-   allowlist (empty by default), bounded extraction and redirect restrictions, preserves nested
-   lists/tables/conditions/links, and permits an audited effective date on activation. Changed pages
-   stay drafts. No website content has been approved or published in this task.
-6. **Durable WhatsApp processing:** webhooks persist inbound events before acknowledgment. New
-   `app/services/inbound.py` uses ordered per-sender claims and four workers; provider calls happen
-   outside DB transactions. A persisted attempt marker prevents a second model request after a
-   crash. State versions, prompt IDs, quoted-message IDs and timestamps reject stale controls.
-   Ticket/audit/outbox commit together. Outbound retries preserve sender order, including timestamp
-   ties. API clients must return `prompt_id` for consequential boolean controls.
-7. **Evidence ownership:** explicit evidence groups bind pre/during-intake uploads to the intended
-   case. Scan timing changes availability, not ownership. Pending and approved media bind at
-   submission; rejected/other-case media do not. Staff can see confirmed customer case updates.
-8. **Migration:** `d9010a1b2c3d_smart_conversation_integrity.py`, after `c81d4e2a7f10`, adds unique
-   conversation ownership, inbound claims/status and evidence groups. It refuses pre-existing
-   duplicate `(channel, external_user_id)` owners before DDL. Existing inbound rows remain `done`.
-9. **Artifacts/docs:** `data/evaluation/smart-non-escalation.tsv` has 100 distinct scenarios in EN/MS/ZH;
-   `scripts/smart_eval.py`, `scripts/smart_burst.py`, new SMART tests and updated existing tests are
-   present. `release_eval.py` defaults to SMART; `--suite legacy` preserves the old suite and
-   `--intake-only` runs handoff/intake diagnostics. Docker includes evaluation data. Architecture,
-   privacy-copy draft, governance and rollback notes are in `docs/smart-implementation.md` and the
-   modified privacy/security/requirements documents.
-
-### Verification evidence — exact status at handoff
-
-- Latest completed **current-source Docker test build**: **208 passed, 4 skipped**.
-  Image: `dudu-support:smart-check`; log: `/tmp/smart-build-verified.log`.
-- Previous PostgreSQL-inclusive full run: **204 passed, 2 skipped**, before the last action-precedence
-  parameterization and equal-timestamp outbox change. Do not label this the final-source PG run.
-  The final-source PG run remains to be executed; expected count is 210 passed / 2 skipped, but
-  record the actual result, not that expectation.
-- Latest focused intake tests: **87 passed** (`/tmp/smart-action-check.log`). They include all six
-  competing model actions against local controls. Latest transport tests: **18 passed**
-  (`/tmp/smart-order-check.log`), including equal-timestamp retry ordering.
-- Latest completed **corrected live intake diagnostic**, `docs/evaluation/smart-live-intake-final.json`:
-  **18/18 necessary handoffs and 30/30 correct intake completions**, 6/6 and 10/10 respectively in
-  each language. Actual name/email/phone values were checked, not just ticket existence.
-  236 calls, 235 provider successes, 278,444 input tokens, 31,199 completion tokens; USD **0.057366**
-  at verified list prices. One failed provider call safely fell back. This diagnostic has **zero
-  non-escalation sessions** and is not a substitute for the full matrix.
-- Latest outage artifact: `docs/evaluation/smart-outage.json`: 300/300 non-escalation, 18/18 handoffs,
-  30/30 correct intakes, zero unintended mutations. It predates the final precedence/outbox patch;
-  refresh it after the final-source checks.
-- Synthetic PG burst: `docs/evaluation/smart-burst.json`, eight senders/four workers/two-second
-  simulated provider: **5.991697-second reply-queued p95, zero duplicate replies**. This excludes
-  external Meta delivery; it is not staging end-to-end evidence.
-- Local runtime image: `dudu-support:smart-local`, **amd64**, content ID
-  `sha256:cc1ba542afed2088747b2ba9b46ca4f689d492a1f886497b6ce83bb6d9e9e619`.
-  This is a local image ID, **not** the ARM64 ECR digest required for production. Runtime build log:
-  `/tmp/smart-runtime-build.log`.
-- Migration head was successfully applied to the disposable local PostgreSQL database. Nothing was
-  migrated in staging/production during this task. `git diff --check` passed before this handoff.
-- All semantic correctness/grounded-relevance review denominators are **0 / pending CCO review**.
-  Do not claim 95% semantic correctness from routing checks or API successes. The 20 designated
-  holdout scenarios were rerun during development; add a fresh independent holdout for release review.
-
-**Final full live run completed while this handoff was being written.**
-`docs/evaluation/smart-live-verified.json` is now complete; do not launch another paid run unless
-source changes or a specific acceptance failure requires it. Results: **295/300 non-escalation**
-(EN 99/100, MS 97/100, ZH 99/100), **18/18 necessary handoffs**, **30/30 correct intakes**,
-**zero unintended mutations**, five non-mutating unexpected offers. Every language exceeds the
-95% automated non-escalation threshold. Provider: 531 calls / 527 successes, 602,547 input tokens,
-67,608 completion tokens; USD **0.124186** measured at the verified list prices; sample projection
-**USD 2.339 per 10,000 calls**; non-escalation response p95 **3.413 seconds**. These are synthetic
-service timings and sample cost projections, not real Meta latency or a hard budget maximum.
-Family failures: {"corporate": 1, "fraud": 3, "safety": 1}. Designated holdout results: 60/60
-translations (development reruns, not a fresh independent release holdout). Semantic/grounding
-review remains unscored. The run includes the final conversation fixes; the later outbox tie-break
-change does not participate in these direct-service calls. Log: `/tmp/smart-live-verified.log`.
-No further model evaluation needs to remain running for this handoff.
-
-Earlier artifacts `smart-live.json`, `smart-live-iteration-2.json`, `smart-live-iteration-3.json`, and
-`smart-live-intake.json` are **failed development iterations**, not release passes. They exposed
-false model-only intake, issue-collection misses, then model pause/cancel/correction/case proposals
-overriding local prompts. The fixes above address those causes. Keep their provenance; never combine
-repeated runs/translations as additional distinct scenarios. One intermediate full run was stopped
-before producing a report; do not claim its usage as measured. Complete-run costs and projections
-are in their JSON files; aggregate development spend is not a complete billing reconciliation.
-
-### Resume checklist — do these in order
-
-#### 1. Close local verification and record the completed results
-
-1. Read the completed `docs/evaluation/smart-live-verified.json` (results above). Record its
-   per-language metrics, family/holdout results, usage, cost and p95 in `docs/smart-implementation.md`
-   and the new release record. Do not repeat this paid run just to obtain an already available result.
-2. Apply the acceptance gates in this file explicitly. **SMART CLI currently emits a report and
-   `rollout_ready=false`; exit code 0 is not a release pass.** For the automated development slice,
-   require >=95% non-escalation per language/overall, >=95% handoff, >=95% correct cooperative intake,
-   all critical human/safety/consent/correction regressions, and zero consequential false mutations.
-   If failures remain, inspect the saved intake traces, fix the shared cause, add one regression,
-   rerun affected cases and then the full suite. Do not tune only an individual matrix phrase.
-3. Run the final-source PostgreSQL checks below. The disposable DB already exists and is migrated;
-   only clear its synthetic rate counters before rerunning (otherwise fixed-key rate tests collide).
-   **Never execute this TRUNCATE against a real environment.**
-
-```bash
-cd /home/czeyik/Documents/AI-Customer-Service
-docker exec smart-check-postgres psql -U postgres -d smart_checks -c 'TRUNCATE rate_limit_buckets;'
-docker run --rm --network smart-check \
-  -e PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
-  -e TEST_POSTGRES_URL=postgresql+psycopg://postgres:synthetic-check@smart-check-postgres/smart_checks \
-  dudu-support:smart-check python -m pytest -q -p no:cacheprovider --tb=short
-```
-
-4. Refresh outage evidence without reading the real `.env`:
-
-```bash
-docker run --rm -v "$PWD:/work:ro" -v /dev/null:/work/.env:ro -w /work \
-  dudu-support:smart-check python scripts/release_eval.py --suite smart --mode outage \
-  --input-price 0.15 --output-price 0.50 > docs/evaluation/smart-outage.json
-```
-
-5. Only if a live rerun is necessary, use synthetic inputs and the existing local key privately:
-
-```bash
-docker run --rm --user 0 -v "$PWD:/work:ro" -w /work dudu-support:smart-check \
-  python scripts/release_eval.py --suite smart --mode live \
-  --input-price 0.15 --output-price 0.50 > docs/evaluation/smart-live-verified.json
-```
-
-   Do not overwrite a running report. `--intake-only` is available for focused diagnostics. The live
-   script uses in-memory SQLite, does not contact Meta or send notifications, and guards observed
-   model spend at USD 0.25 per language. Recheck official pricing if the date/model changes. The
-   system `.venv` is broken; use Docker rather than rebuilding the local Python environment.
-6. If source code changes, rebuild both `--target test` and `--target final`, rerun appropriate
-   checks, and replace the recorded local image ID. Do not reuse stale image evidence.
-7. Finish release documentation: add a new **SMART pending/validated release section** to
-   `docs/release-validation.md`; its current PASS/159-test/old-SHA entry is historical and must not
-   be presented as this release. Add the new defaults to `infra/production/runtime.env.example`
-   (currently still missing them): `LLM_CUSTOMER_CONTEXT_ENABLED=false`, `INTAKE_EXPIRY_MINUTES=60`,
-   `WEBSITE_KNOWLEDGE_URLS=[]`. `.env.example` and `app/config.py` already contain these controls.
-8. After local DB verification is complete, remove only the disposable `smart-check-postgres`
-   container and `smart-check` network. Preserve the existing BuildKit container and both images.
-
-#### 2. Obtain the specific release inputs that code cannot supply
-
-These are the remaining owner/CCO decisions, not reasons to redo implementation:
-
-- Jane/CCO and Cze Yik: approve the revised customer-question/context data flow, privacy-copy
-  wording and effective date, confirm provider DPA coverage, and publish the approved notice before
-  enabling real customer-context transmission. Draft is `docs/privacy-notice-chatbot-addendum.md`.
-- Jane/CCO: select the exact `https://duducar.co/...` support/policy URLs, review extracted snapshots
-  and conditions/conflicts, and supply their effective dates. Do not invent URLs or an approver.
-- Jane/CCO: review captured EN/MS/ZH answers and faithful translations, score answer correctness and
-  relevant grounded answers separately, and review a fresh independent holdout. Populate genuine
-  review values rather than treating `null` as a pass. `run_smart(..., reviews=...)` accepts a
-  dictionary keyed by IDs such as `en-000` with `answer_correct` and `grounded_relevant` booleans;
-  the CLI does not currently expose a reviews-file argument. Attach the approved review artifact
-  and denominators to the release record. Require >=95% in each applicable language/overall.
-- Cze Yik: record the new GO/no-go after all gates below pass. Existing beta/notification/security
-  waivers expire 14 September 2026; confirm current validity if deployment occurs later. Do not
-  silently extend beta dates, spend caps or waivers.
-
-#### 3. Commit, push, CI, and dark staging deployment
-
-1. Inspect `git diff --check` and `git status`, include all intended modified/new files including
-   this handoff and evaluation artifacts, exclude `.env`, local secrets, logs and unrelated files.
-   Commit the verified change on a release branch from the current working tree; push it. Record
-   its exact 40-character SHA. Run `.github/workflows/ci.yml` and `security.yml` and resolve failures
-   or obtain the existing explicitly governed exception process; do not invent scan passes.
-2. Use the existing AWS/GitHub setup, **not new infrastructure**: region `ap-southeast-5`, foundation
-   stack `dudu-support-foundation`, environment stacks `dudu-support-staging` and
-   `dudu-support-production`. Check actual stack/environment availability read-only first; the
-   current cloud state was not revalidated in this conversation. Use Systems Manager, not SSH.
-3. Prepare the staging runtime secret `dudu-support/staging/runtime-env` privately. Keep
-   `META_SEND_ENABLED=false` for deployment; keep customer context disabled until the approvals in
-   step 2 permit its intended use. Preserve existing secrets/caps. Do not print populated secrets.
-4. Dispatch `.github/workflows/release.yml` with `environment=staging` on the pushed release ref:
-   `gh workflow run release.yml --ref <release-ref> -f environment=staging`.
-   Watch the run to success. It builds ARM64 app and ClamAV images, resolves ECR immutable digests,
-   deploys via SSM, runs `alembic upgrade head`, retention and `/ready` checks. Record both ECR
-   digests and SHA. The amd64 local image above is not the production artifact.
-5. Before migration on any real DB, check:
-   `SELECT channel, external_user_id, COUNT(*) FROM conversations GROUP BY channel, external_user_id HAVING COUNT(*) > 1;`
-   If rows exist, stop migration and reconcile ownership/history with the owner; do not delete
-   conversations or drop the uniqueness requirement to get a green deploy. Confirm a recoverable
-   backup. Expect new head `d9010a1b2c3d`. Existing processed inbox rows stay done; do not replay them.
-
-#### 4. Staging acceptance on the exact immutable release
-
-1. After approved processing scope/configuration is in place, set staging
-   `LLM_CUSTOMER_CONTEXT_ENABLED=true` through the existing secret/config refresh process. Confirm
-   workers and API both receive it. Enable staging Meta sending only for the authorized test setup.
-2. Set the approved exact `WEBSITE_KNOWLEDGE_URLS` JSON list. Stage each selected URL with
-   `python scripts/stage_website.py --cco-username <actual-CCO-username> --url <approved-url>` under
-   authorized CCO operation. Review drafts in the existing knowledge admin flow. Activation is
-   `POST /api/knowledge/documents/{document_id}/activate` with authenticated CCO session/CSRF and
-   `{"effective_at":"<approved-ISO-date>"}`. The agent must not log in as or invent approval by Jane.
-3. Exercise actual staging WhatsApp in EN/MS/ZH: informational questions and followups, mixed
-   identity/business questions, contextual offer acceptance with separate consent, negative consent,
-   combined/out-of-order fields, all contact corrections, side questions, No/Done/Skip, missing
-   mandatory fields, expiry, pause/resume/cancel, issue collection, corrected review/submission,
-   legitimate human/safety/fraud/complaint/account/partnership requests, existing-case confirmation,
-   and a new unrelated issue after a closed case. Verify persisted values and exactly one ticket.
-4. Exercise text captions and attachment-only messages, uploads before/during/after intake,
-   pending/approved/rejected scans, confirmed existing-case evidence, and unrelated evidence groups.
-   Verify ownership and staff display, not merely reply text.
-5. Exercise duplicate and out-of-order webhooks, quoted stale Yes, equal timestamps, retries,
-   concurrent senders, worker termination after claim/provider attempt and before commit, outbound
-   retry ordering, provider timeout/invalid/ungrounded output, and DB/ClamAV/S3/Meta/SMTP recovery.
-   Verify durable inbox/outbox, no lost fields, no duplicate consent/tickets/notifications, beta
-   limits, and no second provider call on a reclaimed attempted event.
-6. Measure actual inbound-to-Meta-accepted latency under representative four-way bursts: >=95%
-   exactly one response within 30 seconds; p95 below 30 seconds. Preserve the approved call/message
-   and spend caps. Record model usage including reasoning, rejection/fallback rates and costs.
-7. Repeat the existing production readiness/security/dependency/backup/restore/rollback/roll-forward
-   checks described in `docs/production-platform.md`, `docs/release-validation.md`, and CI/security
-   workflows on these exact digests. `/ready` alone only validates DB migration, not release fitness.
-8. Record actual results and CCO review. Any code change means a new SHA/image and renewed relevant
-   staging validation. Only a fully passed staging SHA/digest pair is eligible for production.
-
-#### 5. Production deployment, activation, observation, rollback
-
-1. Obtain the recorded Cze Yik GO after all preceding gates, with published privacy notice, approved
-   corpus/effective dates and current waiver/beta validity. Capture current production state and
-   rollback pair read-only; historical production SHA in `docs/release-validation.md` is not proof
-   of today's deployed state.
-2. Back up and check duplicate owners before migration. Set the production runtime secret
-   `dudu-support/production/runtime-env` to `META_SEND_ENABLED=false` and
-   `LLM_CUSTOMER_CONTEXT_ENABLED=false` for the dark deploy. Plan the inbox/worker transition so
-   received events remain durable; never purge the inbox or replay old processed events.
-3. Dispatch: `gh workflow run release.yml --ref <release-ref> -f environment=production -f release_sha=<exact-staging-tested-40-character-SHA>`.
-   The workflow reuses the staging ECR image pair. Verify workflow/SSM success, the exact digests,
-   migration `d9010a1b2c3d`, API/worker health, and `https://support.duducaradmin.com/ready`.
-4. Stage/activate only the same CCO-approved production knowledge snapshots through the audited
-   knowledge flow; verify effective dates and source versions match release evidence. Set the
-   approved runtime allowlist and expiry. Do not make arbitrary production knowledge edits.
-5. Activate as the separate controlled config change: `LLM_CUSTOMER_CONTEXT_ENABLED=true`, restore
-   the authorized `META_SEND_ENABLED`/beta settings, refresh the API and worker through the existing
-   compose/secret process. Keep notifications under the explicit valid waiver or approved setting.
-   Never change the eight-second/300-token/model/budget defaults without new evidence and review.
-6. Observe for 60 minutes and record readiness, delivery/read states, duplicates/dead letters,
-   intake/ticket counts, consent/evidence integrity, model outcomes/rejections/errors, p95, host
-   resources, alarms, backup, spend and beta volumes. Apply the existing launch-contract triggers:
-   immediate disable for security/data-loss triggers; pause/rollback after 15 minutes above 5%
-   failures/duplicates or p95 >30s, total answer failure, availability <99%, total spend forecast
-   >USD65/actual USD70, or AWS actual USD30. Reconfirm current approved thresholds before activation.
-7. Rollback: first disable customer-context transmission and outbound sending, preserve and
-   deliberately drain/pause the durable inbox, then use `/opt/dudu/rollback-images` with the existing
-   `/opt/dudu/current/deploy.sh <app-digest> <clamav-digest>` process through SSM. **Do not downgrade
-   the migration.** An old worker does not understand the queued inbox; account for every
-   queued/processing event before returning to that image. If compatibility cannot be assured,
-   keep traffic paused and forward-fix rather than losing/replaying events.
-8. Final deliverable: committed SHA, staging/production immutable app+ClamAV digests, actual complete
-   test/evaluation/CCO/staging/readiness results, publication/effective-date and GO records,
-   activation timestamp, observation outcome, and verified rollback pair in the release record.
-
----
-
-## Revised execution architecture — takes precedence over earlier details
-
-This revision incorporates the user's review request and approval to revise the handoff. The goal
-is natural GLM conversation with grounded answers and human support only when needed. Implement
-the shared conversation model below rather than adding one keyword exception per example.
-
-### Conversation interpretation and context
-
-Use at most one GLM call per eligible inbound turn to interpret ordinary language, mixed intent,
-clarification, troubleshooting and intake interruptions. Local code enforces consent, validation,
-permissions, ticket mutations, urgency and notifications. Model output proposes actions; it does
-not authorize or execute them. Preserve narrowly defined immediate-safety responses.
-
-Only standalone, unambiguous identity questions should short-circuit to a local response. For
-"Hi, are you human? How do I book a car?", answer the business question as well. Do not introduce
-another broad keyword router for greetings, scope, complaints or prohibited actions before GLM.
-
-Maintain bounded sanitized context: current topic, relevant source IDs, previous question/options,
-troubleshooting already attempted, pending offer, intake stage and field-presence indicators.
-Use a short sanitized prior exchange where needed, with explicit size limits. Raw history,
-contact values, ticket bodies and attachments remain excluded from provider input. This revises
-the earlier current-question-only restriction: it cannot support "What about tomorrow?", "I tried
-that", "the second option", or corrections naturally. Update the privacy/data-flow documentation
-accordingly. Prior model answers are context, never authoritative policy.
-
-The response schema must support answering, clarifying, troubleshooting, offering handoff,
-interpreting intake, correcting fields, pausing/resuming, cancelling and submitting. These may
-be separate fields: one turn can answer a side question and correct a field. Require citations
-for business claims, not for clarification, small talk or local identity statements. Add a clear
-clarification path before escalation when the request or antecedent is ambiguous.
-
-### Flexible local intake
-
-Keep a local validated intake record. Ask only for missing required information, accept multiple
-fields in any order, support corrections and preserve information across side questions. Separate
-pause, cancellation, expiry and submission. Remember pending ticket offers without forcing intake,
-so a contextual acceptance works while unrelated acknowledgements never imply consent.
-
-Fix these additional confirmed weaknesses in `app/services/chatbot.py` and shared callers:
-
-- `_continue_intake` treats `No` as cancellation at every stage. "No" to "Any more details?" must
-  finish details, not erase the ticket. Distinguish refusal of consent from missing information.
-- A sentence containing name and email can become the entire name. Extract and validate fields
-  locally and ask about ambiguous assignments rather than repeatedly requesting supplied details.
-- Corrections at later stages are appended as ride details rather than updating the intended field.
-- `_capture_supplied` repeatedly defaults to the WhatsApp sender number, overwriting an explicitly
-  chosen alternative contact. Default only when no explicit contact exists.
-- A ticket initiated by "I need a human" never necessarily collects the actual issue. Obtain a
-  useful issue description and include relevant later details for staff.
-- Supplying a structured trip ID marks all details complete. Field presence is not submission intent.
-- Accumulated ride details can exceed the final 2,000-character schema limit and fail at submission.
-  Bound/validate accumulation early and preserve details without silent truncation.
-- Only safety has an explicit priority update during intake. Reassess newly disclosed fraud/payment
-  information against the intended case without keyword-only urgency upgrades.
-- Provide a concise local summary and correction opportunity before ambiguous extracted information
-  is submitted. Do not add repeated confirmations after an unambiguous review/submission.
-- Missing required email/name/phone currently causes a dead end. Explain requirements and an honest
-  recovery path. Do not claim submission or silently relax mandatory fields; any partial-ticket or
-  alternative-contact policy change requires an owner decision if needed.
-- Support additional details/corrections for the intended existing case after submission. Distinguish
-  new issues from continued cases; do not create duplicates or reopen unrelated closed tickets.
-
-Separate inbound local parsing, permitted local storage and provider payload construction. A
-stronger provider redactor must not erase email/phone values before local intake extracts them.
-Keep actual values local and supply opaque placeholders and field roles to GLM. Do not claim regex
-redaction guarantees anonymity for arbitrary prose. If minimization is uncertain, use local
-clarification instead of forwarding raw sensitive content.
-
-### Knowledge and reasoning
-
-Fix candidate selection as well as ranking: content-only candidate filtering currently prevents
-tag-only synonyms from retrieving a document, and limiting before ranking can exclude the best
-website source. Use bounded broader retrieval or clarification on a lexical miss; do not equate
-the existing overlap score with answerability. Reuse existing PostgreSQL and helpers first.
-
-Separate source language from response language. Approved English website facts may be faithfully
-translated into Malay/Chinese, with evaluation; this does not create an independently approved
-translated policy. Do not invent source versions or exclude users solely for asking in another
-language. This supersedes the earlier prohibition on cross-language retrieval.
-
-Citation, number and word-overlap checks do not establish factual entailment. Test plausible invented
-claims that share words/numbers with their sources. Permit straightforward deductions from approved
-facts, validate calculations locally where applicable, and preserve conditions/units. Never invent
-eligibility, exceptions, prices, account status or completed actions. Define precedence for conflicting
-seed/website facts; clarify unresolved conflicts instead of silently combining them. Verify website
-extraction preserves relevant nested text, lists, tables, conditions and links before approval.
-
-### Evidence ownership and state consistency
-
-Current ticket creation and media scanning use different timestamp-based attachment selection.
-An upload before intake can be omitted when scanned early but attached when scanned later, or attached
-to the wrong later case. Bind evidence to the intended intake/case explicitly. Scan timing determines
-availability, not ownership. Test uploads before/during/after intake and pending/rejected evidence.
-Media stays out of GLM: answer caption text or ask for a description without claiming to see content.
-
-Inspect existing locks and shared callers, then ensure concurrent/duplicate/out-of-order events cannot
-lose fields, create duplicate conversations/tickets, or duplicate notifications. Conversation lookup
-currently has no uniqueness guarantee in its index. Bind consequential replies to active prompt/state
-using available metadata, without requiring every WhatsApp user to quote replies manually.
-
-Provider calls currently run during webhook processing before commit. Test realistic provider latency
-under bursts. Avoid long database locks over network calls; use state-version checks or existing queue
-patterns if needed. Preserve event durability, ordered replies and beta caps. Never promise ticket
-creation before commit succeeds.
-
-### Revised evaluation and rollout requirements
-
-Use at least 100 distinct non-escalation scenarios represented in all three languages, paired with
-legitimate escalation cases. Include held-out paraphrases and multi-turn sessions. Count distinct
-scenarios separately from translations and repeat runs. Measure unnecessary escalation, missed
-necessary escalation, answer correctness and intake completion separately.
-
-- At least 95% correct non-escalating behavior overall and per language on the reviewed suite.
-- At least 95% relevant grounded answers for answerable sessions overall and per language.
-- At least 95% appropriate handoff for legitimate escalation sessions; all critical safety and
-  explicit-human-request regressions must pass.
-- At least 95% correct completion for cooperative intake sessions; all critical consent, correction
-  and data-preservation regressions must pass.
-- Zero unintended consequential mutations in regressions: consent, ticket creation/reopening,
-  urgent upgrade, staff notification, or cross-case evidence assignment.
-- Zero prohibited sensitive values in captured provider inputs for privacy regression cases.
-- Existing end-to-end p95 below 30 seconds under representative concurrency and approved spend caps.
-
-These replace blanket "all linguistic cases pass" wording below while retaining zero-tolerance
-regression checks for consequential errors. Passing a finite suite does not prove coverage of 95%
-of all possible human utterances. Report denominators, per-family failures and held-out results.
-
-Historical cost/latency figures below are context, not guarantees. Verify actual model availability,
-pricing and token accounting; estimate costs from representative new prompts and bounded context.
-The previous USD 30 figure is not a hard upper bound: character limits do not establish token limits,
-and reasoning usage must be accounted for. The 300-token output cap may not fit richer structured
-responses; adjust only with measured evidence and corresponding production validation changes.
-
-Execution order: reproduce bugs; fix local intake/state and provider minimization; add context and
-single-call interpretation; fix retrieval and governed website staging; verify case/media/transport
-integrity; update documentation; run expanded live/outage and staging evaluations. Deliver code,
-runnable checks, scenario results, actual cost/latency projections and rollout/rollback evidence.
-Follow CCO publication and existing production go/no-go controls. No impersonated approvals, raw
-customer test transmissions, or unrelated infrastructure expansion.
-
-## Objective
-
-Make the DUDU Car chatbot answer straightforward customer questions intelligently from approved
-knowledge instead of prematurely or repeatedly directing customers to human follow-up. Preserve
-the capped-beta limits, deterministic safety controls, knowledge governance, privacy redaction,
-and outage fallback.
-
-Success means that natural English, Bahasa Malaysia, and Simplified Chinese paraphrases of
-approved support questions receive relevant grounded answers, while explicit human requests,
-genuine incidents, complaints, prohibited account actions, and unknown questions follow the
-appropriate controlled path.
-
-## Confirmed diagnosis
-
-The GLM API is enabled in production with `glm-5.3-flash`; this is not primarily a provider outage
-or model-quality problem. The application currently prevents GLM from acting as the chatbot's
-reasoning layer:
-
-1. `ChatbotService._respond` applies deterministic ticket rules and lexical retrieval before GLM.
-   A ticket decision cannot be reconsidered by the model (`app/services/chatbot.py`).
-2. Low retrieval confidence immediately starts ticket intake rather than offering an optional
-   escalation while leaving the conversation idle.
-3. Retrieval uses literal token overlap. Semantically equivalent wording such as "order a car"
-   and "book a ride" can fail to match (`app/services/retrieval.py`).
-4. Broad complaint terms such as `problem`, `issue`, and `report` can trigger ticket intake even
-   when used in an ordinary informational question (`app/services/guardrails.py`).
-5. Once ticket intake starts, all later messages are handled as intake input. Natural cancellation
-   or a new question is ignored unless it exactly matches a small allowlist such as `No`, `stop`,
-   or `never mind` (`app/services/chatbot.py`).
-6. GLM receives only retrieved excerpts, not the customer's question. It is therefore an answer
-   rewriter, not a question-answering reasoner (`app/services/answer_generation.py`).
-7. Production beta traffic inspected during the investigation made zero GLM-generation calls.
-   The observed conversations entered complaint or unconfirmed-question intake instead.
-8. Existing release evaluation uses canned phrases and verifies routing, source selection, and
-   provider calls, but does not adequately measure paraphrase quality, negation, interruption,
-   or recovery from unwanted ticket intake (`scripts/release_eval.py`).
-
-## Decisions approved by Cze Yik
-
-- Send the redacted current customer question and bounded sanitized context to Z.AI for reasoning.
-- Do not send customer identifiers, raw sensitive data, tickets, attachments, or full conversation
-  history to Z.AI.
-- Use one GLM request for normal question answering and disposition; do not add a separate model
-  routing call.
-- Keep deterministic handling for security, immediate safety, explicit human requests, complaints
-  that genuinely require review, and prohibited account actions.
-- Unknown questions may offer a support ticket but must not enter ticket intake until the customer
-  explicitly accepts.
-- Bot-identity questions must receive a deterministic answer identifying the assistant as an
-  automated AI assistant; they must not trigger GLM or human follow-up.
-- Harmless greetings and small talk should receive a brief natural response and redirect to DUDU
-  Car support without human follow-up.
-- Questions unrelated to DUDU Car should receive a concise scope redirect without a ticket offer.
-- Questions about DUDU Car ownership, directors, licensing, or management may be answered only from
-  approved corporate sources. Never infer ethnicity, nationality, or another personal
-  characteristic from names, language, appearance, or location. If the requested company fact is
-  not verified, say so; offer a ticket only when the customer explicitly asks the company to reply.
-- Anger, profanity, or criticism directed at the chatbot is conversational frustration, not by
-  itself a complaint requiring human follow-up. Respond calmly, acknowledge the failed interaction,
-  stop any unwanted consent loop, and invite the customer to restate the question. Do not retaliate,
-  lecture, claim feelings, or create a ticket merely because profanity was used.
-- Distinguish chatbot-directed frustration from a genuine complaint about a driver, ride, payment,
-  DUDU Car service, or another reviewable business event. An explicit human request still starts
-  the consent flow, and a credible threat or immediate danger still uses the safety flow.
-- Natural cancellation, negation, and new questions must be able to exit or interrupt pending
-  consent.
-- Use selected, reviewed `duducar.co` support and policy pages as governed knowledge.
-- Do not ingest the entire website sitemap indiscriminately.
-- Website content must be snapshotted as a draft, reviewed by the CCO, assigned an effective date,
-  and activated before customer retrieval can use it.
-- Changed website content must return to draft review rather than silently changing active answers.
-- Preserve verified source-language metadata; allow faithful, evaluated translation into the
-  requested response language without inventing translated source records.
-- Preserve deterministic fallback when GLM is unavailable, invalid, unsafe, or ungrounded.
-
-These decisions supersede the current rule that only approved knowledge, never a customer message,
-may be sent to Z.AI. Update the affected approved documentation and customer-facing privacy copy
-before activation. Permitted provider context follows the revised architecture above.
-
-## Target architecture
-
-```text
-Inbound customer message
-        |
-        +-- redact sensitive data
-        |
-        +-- deterministic security, immediate-safety, and bot-identity checks
-        |
-        +-- local field extraction and bounded sanitized conversation context
-        |
-        +-- retrieve relevant active knowledge
-        |      +-- approved seed corpus
-        |      +-- CCO-approved website snapshots
-        |
-        +-- one GLM request
-               +-- redacted current question
-               +-- sanitized topic, previous prompt and intake field-presence context
-               +-- relevant approved excerpts
-               +-- requested response language
-               +-- structured result with disposition, answer, and citations
-        |
-        +-- validate proposed changes and apply authorized local state/ticket operations
-```
-
-Suggested structured dispositions include `answer`, `clarify`, `troubleshoot`, `offer_ticket`, and
-`explicit_handoff`, plus proposed intake continuation/correction/pause/cancel/submission. The exact
-schema may differ if a smaller change fits the existing code, but output must remain validated and
-grounded. Do not give GLM action tools or authority to create tickets directly.
-
-Because website knowledge can exceed the existing 8,000-character prompt limit, retrieve a bounded
-set of relevant active chunks before generation. Do not send the complete website or full corpus
-on every request.
-
-## Minimal implementation scope
-
-### 1. Answer generation
-
-- Change `ApprovedKnowledgeResponder.generate` and `_messages` to accept the already-redacted
-  current question and bounded sanitized context described in the revised architecture.
-- Include that question in the model prompt.
-- Require structured JSON containing a validated disposition, answer, and non-empty citations when
-  an answer is returned.
-- Continue rejecting ungrounded numbers, URLs, unsafe action claims, malformed output, and invalid
-  citations.
-- Preserve the deterministic fallback and the existing provider-neutral adapter.
-- Keep one provider call per eligible customer message, `reasoning_effort: low`, the eight-second
-  timeout, and bounded input/output sizes unless evaluation demonstrates a necessary change.
-
-### 2. Routing and ticket intake
-
-- Attempt a grounded answer for ordinary informational questions before offering human follow-up.
-- Answer bot-identity and basic capability questions deterministically without a provider call.
-- Handle greetings and harmless small talk briefly, then redirect to DUDU Car assistance.
-- Redirect unrelated general-knowledge questions to the DUDU Car scope without offering or starting
-  a ticket.
-- Answer corporate ownership, leadership, licensing, and management questions only from approved
-  corporate knowledge. Do not infer ethnicity, nationality, or other personal characteristics.
-- Treat insults, profanity, and frustration directed at the chatbot as a recoverable conversation
-  failure. Give one concise de-escalating response, cancel unwanted pending consent when indicated,
-  and return to normal question handling.
-- Set a brief neutral boundary for repeated abuse that contains no support request. Do not escalate
-  merely as punishment; retain the existing rate limit for spam and abuse volume.
-- Narrow broad complaint matching so words such as `problem`, `issue`, or `report` alone do not
-  force a ticket when the message is an informational question.
-- Retain urgent safety and fraud handling and explicit human escalation.
-- For low-confidence or unsupported questions, answer that the information cannot be confirmed and
-  offer a ticket without changing `conversation.intake_state`.
-- Start consent intake only after an explicit acceptance or explicit ticket request.
-- Expand yes/no/cancel understanding to natural negation and cancellation in all three languages.
-- While awaiting consent, treat a clear unrelated question as a new question rather than repeating
-  the consent prompt.
-- Do not weaken consent requirements for actual ticket creation.
-
-#### Known false-escalation cases to eliminate
-
-The current implementation makes decisions from isolated keyword presence and exact state-machine
-phrases. The implementation and evaluation must cover these collision classes, not only the example
-wording:
-
-- Bot-directed anger: `angry`, `rude`, `terrible`, `bad service`, `not happy`, insults, and profanity
-  can be criticism of the automated interaction rather than a reportable business incident.
-- Generic problem language: `issue`, `problem`, `report`, `aduan`, `masalah`, `问题`, and similar words
-  can appear in informational questions, instructions, quotations, or hypothetical examples.
-- Human-related words without human intent: questions such as "Are you human?", "What are human
-  support hours?", or text containing `agent` or `representative` do not necessarily request a
-  handoff.
-- Informational safety language: questions about accident procedure, harassment policy, hospitals,
-  police, emergencies, or safety rules do not necessarily report a current incident. Preserve the
-  urgent path when the message describes a credible current event or immediate danger.
-- Informational fraud language: questions about fraud prevention, scams, or unauthorized-transaction
-  policy do not necessarily report that fraud occurred to the customer.
-- Informational partnership language: questions about existing partnerships or collaboration policy
-  do not necessarily propose a new partnership.
-- Quoted or negated actions: "The app says cancel my ride", "Why can't I delete my account?", or
-  "I do not want a refund" must not be treated as commands merely because an action phrase appears.
-- Paraphrases, typos, and morphology: literal token overlap can miss `order` versus `book`, singular
-  versus plural, common misspellings, and other semantically equivalent wording.
-- Long but relevant questions: the current confidence score divides overlap by every query token, so
-  added detail can lower confidence below the escalation threshold.
-- Short, mixed-language, or misdetected messages: language selection can search the wrong language
-  corpus, particularly for short Malay messages without one of the fixed hints.
-- Stopword-only and conversational messages: greetings, acknowledgements, and basic identity or
-  capability questions can produce no retrieval tokens and fall into unconfirmed-question intake.
-- Sticky intake at every stage: a new question can be mistaken for consent, a name, ride details, or
-  additional evidence after any ticket intake has started. Interruption handling is required beyond
-  only the `awaiting_consent` state.
-- Stale intake across sessions: `started_at` is stored but never used to expire or reset intake, so a
-  user returning hours or days later can still be forced through an abandoned ticket flow. Define a
-  bounded intake expiry and return expired conversations to normal question handling without
-  creating a ticket.
-- Unconditional closed-ticket reopening: `ChatbotService.handle` currently calls
-  `reopen_closed_ticket_for_customer` before interpreting every message. A greeting, identity
-  question, unrelated question, or ordinary FAQ can silently reopen the customer's latest closed
-  ticket and notify staff. Reopen only on explicit intent to continue that case, ideally with an
-  unambiguous ticket reference or confirmation.
-- Unbound WhatsApp replies: the webhook stores `context_message_id` but the chatbot does not use it.
-  A delayed or quoted `Yes` can be applied to the wrong prompt or intake stage. Consent and other
-  consequential replies must be bound to the active prompt/state and handled safely when stale or
-  out of order.
-- Language-selection commands during intake: a request such as "speak English" can be processed as
-  a name or ride detail after switching the response language. Language commands must change only
-  the language and then repeat or resume the correct prompt.
-- Safety words during unrelated intake: any later message containing a safety keyword upgrades the
-  pending ticket to urgent even when it is informational, quoted, or a new question. Urgency changes
-  require evidence of a current incident, not keyword presence alone.
-- Media without incident intent: an image or video sent for an informational question must not
-  automatically force ticket collection solely because an attachment exists.
-- Bare acknowledgements and reactions: `yes`, `thanks`, emoji-only messages, or other context-free
-  replies received while idle must not create an unconfirmed-question ticket offer. When reply
-  context is unavailable, ask a neutral clarification without escalation.
-- Repeated ticket language in valid answers: the deterministic fallback appends a ticket invitation
-  to every grounded answer, and several approved excerpts mention human review. An answerable FAQ
-  must not sound escalated merely because the source contains escalation wording. Mention a ticket
-  only when the selected disposition warrants it or the customer says the answer did not resolve
-  the question.
-- Security phrases in benign context: quoted or educational discussion of phrases such as "ignore
-  previous instructions" must not automatically become a hostile prompt-injection refusal when the
-  surrounding request is clearly benign. Maintain a secure refusal for actual instruction override
-  attempts.
-- Mixed-intent priority collisions: a message can contain both an ordinary question and a trigger,
-  or both a security phrase and a genuine safety report. Define explicit precedence so the system
-  answers what is safe to answer, never misses immediate danger, and does not escalate solely on the
-  lower-confidence interpretation.
-- Client-supplied control fields: `create_ticket` and `consent_to_ticket` bypass natural-language
-  intent when set by an API client. Accept them only as deliberate UI/API actions with tested
-  provenance; accidental defaults or stale client state must not start intake or imply consent.
-
-The implementation should determine intent from the whole redacted message and conversation state.
-Keywords may remain high-recall signals, but except for narrowly justified security or immediate
-safety cases, a single keyword must not be sufficient to start ticket intake.
-
-### 3. Knowledge retrieval
-
-- Improve retrieval for paraphrases and synonyms without introducing a new service prematurely.
-- Reuse PostgreSQL and its existing `pg_trgm` support where useful, and retain bounded in-process
-  ranking. Add curated aliases/tags for known support concepts if that is the smallest reliable
-  solution.
-- Evaluate retrieval using natural phrasings rather than only exact corpus vocabulary.
-- Introduce embeddings or a vector database only if the expanded evaluation proves the simpler
-  retrieval approach inadequate. With the present corpus size, they are not a default requirement.
-
-### 4. Website knowledge
-
-The repository already includes an HTTPS-only `duducar.co` extractor and staging command in
-`app/services/website_knowledge.py` and `scripts/stage_website.py`. Production currently contains
-only 24 active `cco_approved_corpus` documents—eight topics in three languages—and no website
-documents.
-
-- Add an explicit allowlist for customer-support, service, booking, payment, chargeback/dispute,
-  driver-conduct, and other CCO-selected policy URLs.
-- Exclude general marketing pages, counters, promotional claims, contact forms, and unrelated
-  partnership announcements unless specifically approved as support facts.
-- Fix the staging workflow: it currently creates website drafts without `effective_at`, while
-  activation rejects documents without an effective date. Ensure a reviewed draft can receive an
-  effective date and be activated through the governed workflow.
-- Keep drafts inactive until CCO approval.
-- Preserve URL, content hash, version, approver, effective date, and audit history.
-- On a later crawl, create a new draft only when content changed. Never overwrite or automatically
-  activate the current version.
-- Retrieval and GLM prompts may use only effective `active` versions.
-- Z.AI must never crawl `duducar.co` directly; the application supplies only selected approved
-  snapshot excerpts.
-
-### 5. Privacy and documentation
-
-- Update `docs/requirements-summary.md`, `docs/privacy-notice-chatbot-addendum.md`,
-  `docs/launch-contract.md`, the relevant customer copy, and data-flow/security documentation to
-  reflect the approved transmission of the redacted current question and bounded sanitized context
-  to Z.AI in Singapore.
-- State the minimization boundary accurately: no raw identifiers, ticket bodies, attachments,
-  account data or full conversation history are sent; bounded sanitized context is allowed.
-- Extend `redact_sensitive` before sending questions to Z.AI. It currently redacts payment cards,
-  identity numbers, and labelled secrets, but does not generally redact email addresses, phone
-  numbers, or names embedded in free text. Structured customer fields must remain excluded, and
-  free-text email/phone patterns must be covered. Handle names conservatively without destroying the
-  meaning needed to answer the support question.
-- Keep the existing API DPA/provider review record and update it if the approved processing scope
-  needs amendment.
-- Update tests that currently assert no part of the customer message reaches the provider. Replace
-  that assertion with proof that the redacted question is present while identifiers and sensitive
-  values are absent.
-
-### 6. Observability
-
-- Record provider outcome, latency, prompt/completion token counts, grounding rejection, and
-  deterministic fallback in operationally visible structured logs or metrics.
-- Do not log raw prompts, raw customer questions, identifiers, or provider responses.
-- Add aggregate measurements for answered, ticket-offered, ticket-started, provider-failed, and
-  grounding-rejected outcomes.
-
-## Cost and capacity constraints
-
-The previous live release evaluation recorded USD 0.002030 for 15 model calls, approximately
-USD 0.000135 per call. At that observed rate, 10,000 calls would be about USD 1.35. Larger prompts
-containing the redacted question and more knowledge make USD 2-5 a reasonable beta planning range.
-
-The exact public price for `glm-5.3-flash` was not listed on the Z.AI pricing page during this
-investigation. Using the published, more expensive GLM-5 rates as a conservative proxy and the
-assumed token usage previously gave an illustrative USD 30 scenario for 10,000 one-call messages.
-This is not an upper bound or a verified price for the configured model. Recalculate using measured
-context/reasoning usage and verified billing rates. A separate routing call is not the default design.
-
-Remain within the existing capped-beta controls:
-
-- 200 messages per user per day.
-- 2,000 messages per day globally.
-- 10,000 messages total.
-- Existing USD 15 hosted-model allowance and overall launch spend controls.
-- At most one GLM call per eligible inbound message.
-- No larger EC2 instance or new managed data service unless measurements prove it necessary and the
-  owner approves the additional scope.
-
-## Required executable checks
-
-Follow the repository's existing test style and leave the smallest reliable executable checks for
-all non-trivial logic. At minimum cover:
-
-- A redacted question reaches the fake provider, but name, email, phone, account/trip identifiers,
-  payment-card data, OTPs, and external user ID do not.
-- Natural paraphrases of booking, fare/payment, promotion, login, driver onboarding, support hours,
-  and approved website topics retrieve the correct source and produce a grounded answer.
-- A fresh "How do I order a car?"-style question is answered rather than escalated.
-- "Are you AI?" and "Are you a human?" receive the deterministic bot-identity answer, make no GLM
-  call, and do not offer or start a ticket.
-- Greetings and harmless small talk respond briefly without escalation.
-- Unrelated questions redirect to DUDU Car support without offering or starting a ticket.
-- Questions that ask whether the company is run by people of a particular ethnicity or nationality
-  do not cause demographic inference. The chatbot answers only with verified approved corporate
-  facts or says that it lacks verified information, without automatic escalation.
-- Chatbot-directed anger, insults, or profanity receive a calm recovery response and no ticket
-  offer. If the message also contains a substantive DUDU Car question, that question is answered.
-- Anger about a concrete driver, ride, payment, or service event remains eligible for the genuine
-  complaint flow; credible threats or immediate danger remain eligible for the safety flow.
-- Informational, hypothetical, quoted, and negated uses of every complaint, human, safety, fraud,
-  partnership, and prohibited-action keyword do not start intake solely because of that keyword.
-- Relevant long-form, typo-containing, mixed-language, and natural paraphrase questions do not fall
-  below the answer path solely because of lexical scoring artifacts.
-- A new question interrupts any ticket-intake stage safely rather than being stored as a name,
-  consent decision, ride detail, or evidence description.
-- Abandoned intake expires after the approved interval and a later greeting or FAQ resumes normal
-  support without escalation.
-- A greeting, FAQ, identity question, or unrelated message never reopens a closed ticket. Explicit
-  case-continuation intent and confirmation reopen only the intended closed ticket.
-- Delayed, quoted, stale, or out-of-order WhatsApp replies cannot provide consent or populate the
-  wrong intake field merely because their text is `Yes`, `No`, `Done`, or another state keyword.
-- A language-switch command during every intake stage changes language without being stored as
-  consent, name, contact data, ride details, or evidence.
-- Informational safety wording during an existing normal intake does not upgrade urgency; a paired
-  current-danger statement still upgrades it immediately.
-- Informational media messages do not force ticket intake when no incident, complaint, human request,
-  or explicit ticket request is present.
-- Context-free acknowledgements, thanks, reactions, and emoji-only messages do not offer or start a
-  ticket while idle.
-- Grounded FAQ answers and deterministic fallbacks do not append generic human-follow-up language
-  unless the response disposition is `offer_ticket` or the customer explicitly remains unresolved.
-- Deliberate API control actions still work, while absent, accidental, or stale `create_ticket` and
-  `consent_to_ticket` values cannot falsely start intake or create a ticket.
-- An unsupported DUDU Car question may offer a ticket but leaves intake idle.
-- A subsequent ordinary question can be answered after an unsupported question.
-- Natural phrases equivalent to "I don't need a human follow-up" and "stop bro" cancel pending
-  consent; add Malay and Chinese equivalents.
-- Explicit `Yes` still starts/continues intake, explicit `No` cancels it, and a ticket is never
-  created without consent and required details.
-- Informational uses of `problem`, `issue`, and `report` do not automatically create tickets.
-- Explicit human requests, genuine complaints, fraud, safety emergencies, and prohibited account
-  actions retain their required behavior and priority.
-- Provider timeout, invalid JSON, invalid citations, unsupported numbers/URLs, and unsafe claims
-  fall back safely.
-- Website staging enforces the host/redirect/size limits, uses the allowlist, ignores unwanted HTML,
-  creates inactive versions, supports assigning an effective date, and never auto-activates
-  changed pages.
-- Website knowledge is unavailable before activation and retrievable after CCO activation.
-- Approved English website facts can support faithful Malay/Chinese answers; tests verify meaning,
-  conditions and source attribution without inventing translated source versions.
-
-Expand `scripts/release_eval.py` with varied natural phrasing, negation, multi-turn interruption,
-and unsupported questions. Semantic answer relevance—not merely a non-empty source list—must be
-part of evaluation.
-
-Build a CCO-reviewed false-escalation matrix with no fewer than 100 cases and representation in all
-three launch languages. Cover every configured complaint, human, safety, fraud, partnership,
-account-action, and prompt-injection trigger in multiple intent forms where linguistically valid:
-
-- genuine affirmative incident or request;
-- informational question;
-- negation;
-- quotation or reported speech;
-- hypothetical or policy question;
-- chatbot-directed criticism;
-- unrelated homonym/context;
-- mixed intent;
-- active, stale, and interrupted intake state; and
-- fresh, active, and closed-ticket conversation state.
-
-Include retrieval misses, long queries, typos, code-switching, greetings, reactions, media captions,
-and client control-field cases in the same suite. Record expected `disposition`, intake state,
-ticket-state mutation, urgency, provider-call count, and whether a ticket was offered. Measure false
-escalation as any unexpected ticket offer, intake transition, ticket creation/reopening, urgency
-upgrade, or staff notification.
-
-## Acceptance criteria
-
-Implementation is ready for staged release only when all of the following are true:
-
-1. At least 95% of an expanded, CCO-reviewed trilingual evaluation set receives the expected
-   disposition and, where answerable, a factually correct grounded answer.
-2. At least 95% of answerable paraphrases across every active knowledge topic are answered without
-   human follow-up.
-3. Zero test cases create a ticket without explicit consent and the existing required contact data.
-4. Zero prohibited identifiers or sensitive values reach the provider in automated redaction tests.
-5. Every generated factual answer cites only active, effective knowledge supplied in that request.
-6. Unsupported questions do not lock the conversation into ticket intake.
-7. Explicit safety, fraud, human, complaint, and prohibited-action flows retain their approved
-   priorities and wording requirements.
-8. Provider failure produces the approved deterministic fallback and never causes total answer
-   failure.
-9. End-to-end p95 remains below the existing 30-second launch threshold under representative
-   concurrency. The historical 3.679-second evaluation is a comparison, not a fixed requirement.
-10. Projected model spend remains within the USD 15 beta allowance and at most one provider call is
-    made per eligible inbound message.
-11. Website changes cannot reach customers without a versioned CCO approval and effective date.
-12. The full automated suite, live-model evaluation, outage evaluation, staging WhatsApp flow, and
-    production readiness checks pass before activation.
-13. Evaluated identity, greeting, harmless small-talk, unrelated, and unverified demographic
-    questions produce the approved non-escalating behavior; none starts or offers ticket intake
-    unless the customer explicitly asks the company to respond.
-14. Evaluated chatbot-directed anger, keyword-collision, negation, quotation, hypothetical,
-    paraphrase, long-query, language-mismatch, intake-interruption, and informational-media cases
-    avoid false escalation, while paired genuine incident cases still take the required controlled
-    path.
-15. At least 95% of the CCO-reviewed false-escalation matrix avoids every unexpected escalation
-    effect, with no individual launch language below 95%. The denominator and failures must be
-    reported; test omissions do not count as passes.
-16. Regardless of the aggregate percentage, there are zero false ticket creations, zero false
-    closed-ticket reopenings, zero false consent recordings, zero false urgent upgrades, and zero
-    staff notifications caused by non-escalation scenarios. The 5% tolerance applies only to a
-    non-mutating wrong response disposition or ticket offer during evaluation.
-
-## Deployment sequence
-
-1. Implement and test locally without modifying production knowledge or configuration.
-2. Update and approve the privacy/data-flow documentation before enabling customer-question
-   transmission.
-3. Select and review the initial website URL allowlist with the CCO.
-4. Stage website snapshots, assign effective dates, review them, and activate only approved pages in
-   staging.
-5. Run the expanded outage and live-model evaluations and record aggregate results, latency, token
-   use, and projected cost.
-6. Exercise natural multi-turn WhatsApp conversations in staging, including cancellation and
-   switching from a ticket offer back to a general question.
-7. Deploy the exact staging-tested immutable image to production through the existing release
-   process.
-8. Activate the behavior as a controlled change and monitor answer disposition, provider failures,
-   grounding rejection, latency, spend, and ticket-start rate during the observation window.
-9. Use the existing rollback process if launch thresholds fail; do not destructively reverse data
-   migrations.
-
-## Out of scope
-
-- Giving GLM account, booking, refund, cancellation, payment, or ticket-creation tools.
-- Sending attachments, full conversation history, tickets, or raw identifiers to Z.AI.
-- Automatic publication of website changes.
-- Crawling sites other than `https://duducar.co`.
-- Adding web search to customer answers.
-- Adding a vector database, second model call, larger host, or new dependency without evaluation
-  evidence that the approved minimal design cannot meet the acceptance criteria.
+# LangChain dialogue refactor — execution handoff
+
+Prepared: 13 September 2026.
+Repository: /home/czeyik/Documents/AI-Customer-Service.
+Reference revision: 6d2ce8d (Record SMART activation state).
+Status: **Waves 1–7 complete. Wave 8 source publication and staging preparation in progress; the LangChain candidate is not yet deployed.**
+
+## 1. Objective and scope
+
+Replace the current dialogue engine with one LangChain create_agent agent. LangChain owns
+understanding, conversational replies, tool selection, clarification, interruptions, corrections,
+and the choice of which missing ticket detail to request next. Python business functions own
+validation and authorization. PostgreSQL owns durable state and mutations.
+
+This is a substantial replacement of the conversation core, not a wrapper around its existing
+state machine. Preserve FastAPI, PostgreSQL, WhatsApp transport, administration, knowledge approval,
+ticket operations, media processing, notifications, retention, and deployment infrastructure.
+
+The user selected LangChain deliberately. Do not reopen the LangChain-versus-LangGraph decision.
+Do not introduce a custom LangGraph workflow, Rasa, Langflow, multiple agents, a vector database,
+a second model, hosted tracing, or a generic orchestration/tool framework. LangGraph dependencies
+installed by LangChain are expected; writing a separate graph is not part of this design.
+
+This document replaces the previous SMART handoff in full. Historical evaluation reports remain
+historical evidence, not results for this refactor. This plan supersedes the former implementation
+requirements for one model call per turn, no model tools, and the fixed intake-state dialogue.
+It does not change approved customer-service policies, required ticket fields, spend/traffic limits,
+knowledge authority, or permission to perform account/refund/payment/booking changes.
+
+Read AGENTS.md and follow its minimal-code rules. LangChain and one necessary provider integration
+are intentional additions. No further dependency is justified merely because an example uses it.
+Use the configured development subagents when useful, as explicitly requested in the current execution session. The application still has one dialogue agent.
+
+The user explicitly included pushing this refactor to production in the execution scope on
+13 September 2026. When asked to execute this handoff, complete implementation, source publication,
+staging validation and production deployment through wave 8. Do not stop after local completion or
+ask for the same deployment authorization again once the stated gates pass. This document update
+does not start execution now.
+
+Production deployment includes the necessary Git push, PR/merge through repository policy, image
+publication, tested migration and release workflow. Preserve the currently authorized customer-
+sending and notification settings: deployment alone does not authorize enabling previously disabled
+external messages, extending the beta, publishing knowledge, or inventing CCO approval. Carry forward
+actual session authorization and honor real repository/environment protection gates. Missing access
+does not prevent independent work; record the exact remaining access or gate when reached.
+
+## 2. Fixed architecture decisions
+
+### 2.1 One application path
+
+~~~text
+WhatsApp durable inbox / existing Chat API
+    -> ChatbotService.handle: claim/load, validate input, build snapshot
+    -> sanitize recent messages + draft view + approved knowledge
+    -> LangChain create_agent: bounded model/tool loop
+    -> validate final result and staged business requests
+    -> short transaction: recheck version/lease/confirmation, apply changes
+    -> commit conversation + ticket + audit + notifications + outbound reply
+    -> existing WhatsApp sender / Chat API response
+~~~
+
+Keep ChatbotService.handle and the external ChatRequest / ChatResponse interface where practical.
+Update every internal caller whose semantics change. Do not maintain two production dialogue owners.
+The old engine may remain temporarily callable for baseline tests during development only.
+
+### 2.2 Responsibility boundaries
+
+| Responsibility | Owner |
+| --- | --- |
+| Interpret intent and choose answer/clarification/handoff/draft action | LangChain agent |
+| Choose next missing field and phrase ordinary questions | LangChain agent |
+| Answer side questions and resume a draft naturally | LangChain agent |
+| Required fields, bounds, consent evidence, ownership, priority, legal transitions | Python domain functions |
+| Exact consent/review/receipt text and control metadata | Local rendering after validation |
+| Customer identity, field values, evidence ownership and case data | Application/database |
+| Event deduplication, sender ordering, leases and outbox retries | Existing transport |
+| Provider failure, explicit local controls and urgent safety response | Small deterministic fallback/control boundary |
+
+The domain returns facts such as missing_fields, invalid_fields and confirmation_required.
+It must not choose a fixed name-then-email-then-phone sequence on the successful agent path.
+Ordinary clarification and FAQ handling must not pass through keyword-based intake branches.
+Preserve actual action prohibitions and urgent safety handling; do not remove guardrails wholesale.
+
+### 2.3 Draft and state contract
+
+Use Pydantic, already installed, for validated state. Add Conversation.dialogue_data as JSON and
+Conversation.dialogue_revision as an integer revision. Keep Message as the transcript store.
+Do not add a memory database or a custom checkpointer.
+
+The versioned dialogue_data contains:
+
+- schema_version (initially 1), optional draft, optional pending offer, pending prompt, the current
+  unassigned evidence_group, and the last relevant case reference/operation receipt. Keep unassigned
+  media ownership here even before a draft exists; transfer the group to the intended draft/case.
+- Draft: ID, version, status (active, paused, cancelled, submitted), start/expiry timestamps,
+  validated contact/issue/ride fields, completion flags, issue type/priority proposals, consent
+  evidence, review requirement, evidence group and existing media metadata.
+- Pending prompt: server-generated ID, purpose (offer, consent, field, details, review,
+  case_confirmation), optional field name, draft/case reference and version, and originating turn.
+- Confirmation/receipt metadata: the customer input that authorized an operation, matching
+  prompt/version and resulting case reference. Keep it bounded; no unbounded operation journal.
+
+No draft is represented by draft=null. Derive missing fields instead of persisting a second truth.
+Keep customer language/risk/role on the existing Conversation fields. Increment the revision for
+every committed dialogue/evidence change that can invalidate a running turn, including media
+association changes. Separate the draft version from the conversation revision: transcript changes
+need not invalidate a confirmed draft, but changes to reviewed draft contents do.
+
+The pending prompt records what was actually asked. It supports input extraction and confirmation;
+it is not an awaiting_* state machine prescribing the next conversational branch.
+
+### 2.4 Preserve current submission semantics
+
+These are requirements, not optional redesign decisions:
+
+1. An optional handoff offer does not start intake. Accepting the offer leads to separate consent.
+   Explicit human/incident requests retain their required intake behavior.
+2. Record consent only from an actual current customer reply to the relevant prompt or a valid
+   API control carrying that prompt ID. A tool argument consent=true is never evidence.
+3. Name, valid email, valid contact phone and actual issue are required. Preserve WhatsApp sender
+   phone defaulting without overwriting an explicitly supplied contact number.
+4. Fields may arrive together or in any order. Corrections preserve other fields. Multiple candidate
+   emails require clarification. A trip ID alone does not complete the issue or submit.
+5. Preserve existing Done/Skip/No-more-details submission paths when consent and all required
+   details exist, the reply matches the current details prompt, and no correction requires review.
+   Preserve the existing valid API supplied-details completion path too.
+6. If review is required, only explicit submission against the current review version submits.
+   Corrections invalidate review. Do not add mandatory review to every legacy completion path.
+7. No to more details differs from explicit consent withdrawal. Withdrawal cancels. No to a required
+   contact field preserves the draft and explains the requirement.
+8. Pause/resume/cancel, language switches, side questions, expiry and provider failures preserve
+   appropriate fields. Expiry uses the existing configured interval.
+9. Case updates/reopening require ownership plus confirmation tied to the intended case/update.
+   A greeting or unrelated question never reopens a ticket.
+10. Preserve accumulated-detail and case-update limits, priorities, evidence groups, required
+    safety/response-time wording and notification behavior.
+
+Use a small shared validator for consequential replies. Accept known local phrases; clarify
+   uncertain authorization instead of trusting model confidence. Other dialogue remains agent-owned.
+A side question cannot silently turn into a field value or consent. Record prompts actually sent;
+an abandoned prompt proposal is not authorization context.
+
+### 2.5 Tool contract
+
+Implement ordinary Python functions with LangChain bindings in services/dialogue.py. Domain
+functions live in services/ticket_drafts.py and existing ticket services. No tool registry layer.
+
+| Tool | Responsibility |
+| --- | --- |
+| search_knowledge | Existing governed retrieval; approved excerpt IDs, versions and content |
+| update_ticket_draft | Start/update a turn-local draft with validated customer field references; return missing/invalid fields |
+| set_draft_status | Stage pause/resume/cancel with validated customer intent |
+| prepare_ticket_review | Validate draft; stage exact local review and prompt/version metadata |
+| request_ticket_submission | Validate current consent/completion evidence and stage one submission |
+| get_owned_case | Resolve only a case owned by the runtime customer; return a minimized view |
+| request_case_update | Prepare confirmation or stage the matching confirmed update/reopening |
+
+Identity, channel, database access, prompt authority and field values come from runtime context;
+they are not model-controlled arguments. Field references resolve only to current customer input
+or an already validated draft. Reject unknown references and model-invented values.
+Issue/detail collection may refer to the locally stored current message; the model must not
+reconstruct private narratives from sanitized text. Never return raw contacts, ticket bodies,
+attachment content, secrets or arbitrary database records to the model.
+
+Tools stage changes in one turn-local working copy. They must not commit SQL, send messages, enqueue
+notifications or claim success. Reads use short transactions ending before the next model call.
+Later tools see the working copy. Identical requests are idempotent; conflicting submissions/
+updates in one turn are rejected. Results say prepared/rejected, never that an uncommitted ticket
+was created. Server-generated tool-result metadata identifies staged operations.
+
+Final structured output contains answer text, cited excerpt IDs and a bounded next-prompt proposal
+(purpose and optional field). It does not repeat the old action enum as a second router.
+Validate consequential prompts against the working draft. Locally render exact consent/review/
+submission/case-update messages. If a staged mutation conflicts with the final response, reject
+the inconsistent result rather than carrying out a hidden action.
+
+### 2.6 Atomic execution and recovery
+
+1. Reuse inbound claiming and sender ordering. Persist the existing provider-attempt marker before
+   the first external call. Its new meaning is one agent execution attempted, not one model call.
+2. Load transcript/draft/revision and prepare private field references. Release the transaction.
+3. Execute the bounded agent with turn-local tools. No long transaction spans model I/O.
+4. Validate completed output, citations, staged operations and limits. Failure discards agent
+   proposals; local fallback may process only independently valid explicit controls.
+5. Lock/reload conversation and inbound claim. Recheck revision, lease token, ordering, prompt/
+   version, validation and ownership. A stale result cannot mutate the new state.
+6. Apply operations once through existing services. Commit ticket, audit, notification rows,
+   messages, conversation, inbound completion and one outbox reply together.
+7. Render definitive receipts from actual database results inside that transaction; expose them
+   only after commit. Never return a model's speculative success claim.
+8. Crash before commit: retry through deterministic recovery without another agent run.
+   Crash after commit: inbound deduplication and existing outbox delivery handle recovery.
+
+For the Chat API, retain prompt/version controls and revision checks. Repeated confirmation of
+the same operation returns its recorded outcome without repeating the mutation. Do not claim
+exactly-once handling of arbitrary unkeyed HTTP requests; do not add a general request ledger.
+API tests must distinguish retrying a confirmation from making a new unrelated request.
+
+### 2.7 Context, retrieval, provider and cost
+
+- Persist messages once. Reconstruct agent input each turn; no separate persistent LangChain
+  checkpointer, summary service, embeddings or long-term personal memory in this refactor.
+- Start with at most 12 recent inbound/outbound messages, oldest first, also bounded by the existing
+  input cap. Current question and authoritative draft/control metadata take precedence. Trim older
+  history first and remove whole excerpts if needed. Count system prompt, tool schemas, history,
+  tool results and excerpts. Do not truncate confirmation into a different meaning.
+- Sanitize every historical message and tool result, not just the newest input. Raw reviews contain
+  contacts: replace them with a safe marker/field-presence view. If minimization fails, omit that
+  history item or request a local rephrase for the current input.
+- Reuse pii.py and local extraction. Bare names may be interpreted locally when responding to an
+  actual name prompt. Corrected historical values must not leak on later turns.
+- Keep approved retrieval unchanged initially, including the 500-chunk ceiling. Supply an initial
+  search from the current sanitized question; the agent may search with a context-resolved query.
+  Deduplicate identical searches within a turn.
+- Cite only excerpts actually supplied this turn. Previous bot statements are not policy. Reject
+  factual output if the supporting source versions cease to be approved/effective before commit.
+- Retain the configured Z.AI model initially. Verify actual tool calling and structured output;
+  the current JSON-only urllib adapter is not already agent compatible.
+- User-approved active limits (validated live): 5 model requests total, 10 total native
+  tool calls per turn including the structured final response (business-action calls may be fewer),
+  60 seconds for the entire agent run, and each model call limited to
+  min(30 seconds, remaining deadline).
+  Schema-repair calls count. Disable hidden SDK retries. Check limits before the next request;
+  execute draft-changing tools serially.
+- Wave 6 measured an irreducible 11,835-character request after excerpt compaction; the user-approved input cap is now 15,000 characters,
+  enforced on every call. Keep the 300-output-token cap. If the integration
+  experiment shows they cannot fit tool schemas or valid output, make the smallest measured config
+  adjustment and record token/spend/latency effects. Keep the approved 5-call, 60-second,
+  USD 15 beta and 30-second response requirements.
+- Record model attempts, tool calls, input/output/reasoning usage when reported, fallbacks and
+  elapsed time. No private fields, prompts, raw tool arguments or hidden reasoning in logs.
+- Measure cost per inbound turn and completed conversation/ticket. Project the existing
+  10,000-message beta from messages, not 10,000 model calls. Preserve aggregate spend/traffic caps.
+
+## 3. File boundaries
+
+| File(s) | End state |
+| --- | --- |
+| app/services/chatbot.py | Thin turn handler; no successful-path fixed intake dialogue |
+| app/services/dialogue.py (new) | Agent, prompt, bindings, context assembly and limits |
+| app/services/ticket_drafts.py (new) | Typed draft/control models, pure validation and staged operations |
+| app/services/answer_generation.py | Model integration, output guards, deterministic fallback/local rendering |
+| app/services/tickets.py, ticket_operations.py | Reuse durable ticket/update/audit/notification operations |
+| app/services/pii.py, language.py, guardrails.py | Shared extraction, minimization, language and safety behavior |
+| app/models.py, new Alembic revision | Add dialogue JSON/revision; migrate existing drafts |
+| app/services/inbound.py, app/routers/chat.py, webhooks_meta.py | Transport with updated state/evidence/attempt semantics |
+| app/config.py, .env.example, requirements files | Necessary integration and bounded execution settings |
+| infra/production/deploy.sh, .github/workflows/release.yml if needed | Tested quiesce/migrate/start sequence and immutable staging-to-production promotion |
+| Existing tests, evaluation scripts and docs | Adapt assertions; evaluate new owner; remove stale descriptions |
+
+Prefer these files over a new package hierarchy. A small additional test file is acceptable.
+Do not create interfaces/base classes beyond framework requirements.
+
+## 4. Execute in bounded waves
+
+Run waves in order. Start each context window with AGENTS.md, sections 1–3, the ledger below,
+and only the current wave's listed files. Do not reload every historical evaluation or the entire
+repository on every resume. Each wave must end with a runnable state for its checks; intermediate
+waves need not be deployable.
+
+Use one wave per context window. If continuing automatically with available context, still finish
+the checkpoint first. Do not request permission at each wave boundary. If context runs short
+mid-wave, record the exact incomplete step; never label the wave complete.
+
+At each wave boundary:
+
+1. Run focused checks and git diff --check. Inspect failures; do not hide them with new skips.
+2. Update the ledger: status, changed files, commands/results, measured decisions, blocker and exact
+   next step. Keep the latest checkpoint under 25 lines.
+3. Record environment prerequisites without secrets; link reports rather than pasting logs.
+4. Preserve unrelated changes. Do not auto-commit/push unless requested in the execution session.
+   Record the actual starting revision, which may differ from this plan's reference revision.
+
+### Wave 1 — Baseline and provider compatibility
+
+**Read:** requirements.in, requirements.txt header, pyproject.toml, Dockerfile, app/config.py,
+answer_generation.py, chatbot.py, test/evaluation entry points, current requirements/release docs,
+and official LangChain APIs below.
+
+**Steps:**
+
+1. Record branch, revision and working-tree status. Find Python 3.11 or use Docker; do not change
+   the system Python. Run the existing full local suite once and record actual failures/skips.
+2. Identify implementation-specific state assertions before changing the state machine. Preserve
+   behavior outcomes as the baseline rather than promising unchanged private helper names.
+3. Pin a compatible stable LangChain release with create_agent. Prefer an official Z.AI integration
+   if it supports the configured model/features; otherwise use langchain-openai with the configured
+   Z.AI endpoint if the protocol check passes. Do not silently switch model/provider.
+4. Regenerate hash-locked requirements under Python 3.11 using the repository's pip-compile workflow.
+   Preserve unrelated direct pins; inspect transitive changes. Keep lock tooling out of runtime.
+   Check Alpine and intended ARM64 build/install compatibility. Report a concrete packaging blocker
+   instead of changing the platform speculatively.
+5. Add a small runnable fake-chat-model check: one tool call then structured final output, invalid
+   response, timeout and attempt accounting. Use framework APIs; no custom model hierarchy if a
+   supported integration works.
+6. With provider access and session authorization, run the same bounded synthetic scenario against
+   the configured model. Record model identity, tool/schema support, tokens and limitations. If
+   unavailable, mark live compatibility pending and continue offline waves.
+
+**Checks:** hash-locked install, pip check, baseline suite, fake integration test, runtime packaging.
+Do not switch application dialogue yet.
+
+**Exit:** exact dependency/provider choices recorded; baseline known; standard agent runs with a
+fake model. Live support must be demonstrated before release, not inferred from mocks.
+
+### Wave 2 — Extract draft rules and preserve behavior
+
+**Read:** chatbot.py, tickets.py, ticket_operations.py, schemas.py, pii.py,
+tests/test_ticket_intake.py, test_smart_conversation.py and test_smart_integrity.py.
+
+**Steps:**
+
+1. Use rg to find every caller of extraction/control/ticket/case helpers. Extract shared business
+   checks into ticket_drafts.py; reuse existing email/phone validation.
+2. Implement section 2.3 models and section 2.5 pure draft operations. Return working copies and
+   validation results without SQL commits or fixed next-field selection.
+3. Separate private values from model-safe field references. Prove customer provenance; reject
+   invented identities/values and ambiguous candidates.
+4. Bind consent, completion, review and case confirmation to prompt/version evidence. Implement all
+   section 2.4 behavior, especially Done/No completion versus consent withdrawal/correction review.
+5. Move exact control/review/receipt text and necessary fallback helpers into the response module.
+   Agent and fallback must call the same business checks.
+6. Temporarily adapt the old handler to extracted functions as needed to keep comparison tests
+   runnable. Do not create a new normal-path rules router.
+
+**Checks:** focused ticket/SMART tests; pure-rule tests for forged consent, changed versions, missing
+fields, invalid references, bounds, ambiguous controls, owned cases and idempotent staging.
+
+**Exit:** rules are testable without LLM/SQL commit, baseline dialogue remains available for comparison,
+and no duplicated authorization rules exist in separate callers.
+
+### Wave 3 — Persistent state, migration and bounded memory
+
+**Read:** models.py, existing migrations, chatbot load/store helpers, pii.py,
+webhooks_meta.py::_queue_media, retention.py, data-lifecycle/media integrity tests.
+
+**Steps:**
+
+1. Add dialogue_data and dialogue_revision through an additive Alembic revision against the actual
+   migration head. Do not edit an applied migration.
+2. Translate legacy drafts: idle becomes no draft unless an offer/case context exists; paused becomes
+   paused; other awaiting_* states become active with a corresponding prompt purpose/field.
+   Preserve consent, contacts, issue/details flags, expiry, review, last case, pending case update,
+   prompt ID and evidence group. Preserve media-only conversation evidence even with no active draft.
+3. Keep old columns as dormant diagnostic snapshots for this release. The new runtime cannot
+   read/write them after conversion. Do not add permanent dual writes.
+4. Preserve only provable confirmation metadata. When proof is missing, keep fields and require
+   renewed confirmation. Preflight unknown/malformed records with IDs/reasons before mutation;
+   provide a documented repair path instead of silently dropping/resetting data.
+5. Build bounded context from Message rows and a sanitized draft view. Test references at least
+   three exchanges back, safe omission, review sanitization and whole-input bounds.
+6. Update new-runtime evidence access and revision increments. Extend existing retention/hold handling
+   where necessary so new state does not retain private data beyond current rules.
+
+**Checks:** fresh and populated disposable PostgreSQL migration; every legacy state including paused,
+review and case confirmation; invalid-record preflight; alembic check; history PII capture/truncation;
+evidence ownership; retention and holds.
+
+**Exit:** migration loses no fields/cases/media; new typed storage and bounded history work.
+Old writers must be quiesced before production migration; do not deploy intermediate waves.
+
+### Wave 4 — LangChain dialogue and tools
+
+**Read:** new draft/context code, selected model integration, retrieval.py, output validation,
+official agent/tool/middleware APIs for the pinned version.
+
+**Steps:**
+
+1. Implement create_agent in dialogue.py with one model, seven tools, structured final output and
+   only necessary context/limit middleware.
+2. Prompt for approved-source EN/MS/ZH answers, ambiguity clarification, natural corrections,
+   interruptions, resumable drafts and appropriate handoff. Supply authoritative draft facts rather
+   than duplicating business validation in a large prompt.
+3. Implement section 2.5 tool contracts with serial working-copy updates and short reads. Exclude
+   arbitrary identity, SQL, external URL and filesystem capabilities.
+4. Let the agent propose the next field/question. Validate it and locally render consequential
+   prompts with IDs; ensure stored metadata exactly matches the prompt actually sent.
+5. Enforce deadlines, model/tool budgets and usage accounting, including schema retries and tool-result
+   size. A timeout must not leave background work capable of committing later.
+6. Validate factual output against supplied sources and existing rejection checks. Semantic correctness
+   remains a separate evaluation; citations/numeric matching do not prove it.
+7. Keep retrieval unchanged; demonstrate a follow-up search rewritten using conversation context.
+
+**Checks:** actual create_agent loop with a fake model, not a mock of the whole agent. Cover FAQ,
+multi-turn reference, side question/resume, combined/corrected fields, bad schema, invented
+source/field/case references, conflicting/repeated tools, limits, timeout and provider-input capture.
+
+**Exit:** complete synthetic agent conversations run with no committed side effects and no hidden
+fixed-order intake router.
+
+### Wave 5 — Turn handler, transport and fallback cutover
+
+**Read:** chatbot.py, inbound.py, chat/WhatsApp routers, ticket services, transport/transaction/media
+tests, results of waves 2–4.
+
+**Steps:**
+
+1. Replace ChatbotService.handle internals with section 2.6. Preserve API response fields and prompt
+   controls. Update every caller, including scripts/tests injecting the old answer_generator or
+   using commit=False.
+2. Stage operations throughout execution; apply under the final revision/lease lock. Commit ticket,
+   audit, notifications, transcript, inbound completion and outbox together.
+3. Keep ordering/quoted-reply/timestamp checks. Adapt the attempt marker to one bounded agent run;
+   crash recovery cannot start another model loop.
+4. Return committed local receipts. Reject stale state or withdrawn source versions without applying
+   proposals. Preserve useful customer input for recovery.
+5. Implement compact outage handling through shared draft validators, local required-field prompts,
+   approved-knowledge fallback and urgent safety response. A fixed fallback collection order is
+   allowed; retaining the old successful-path interpreter/router is not.
+6. After tests pass, delete obsolete _prepare_turn/_respond/_continue_intake routing and the old
+   ConversationResult/provider protocol. Preserve necessary business/security behavior in shared
+   functions rather than keeping dead copies.
+7. Check media, administration and retention state interactions and revision consistency.
+
+**Checks:** real PostgreSQL faults/concurrency: crash before/after commit, lease loss, concurrent
+customer turns, duplicate tools/confirmation/events, stale/quoted replies, case ownership,
+pending/approved media, outbound retry ordering, API compatibility and outage intake completion.
+
+**Exit:** one dialogue entry point; no model I/O holding locks; failure/data/mutation guarantees
+preserved; old production dialogue deleted.
+
+### Wave 6 — Evaluation, budgets and behavioral acceptance
+
+**Read:** scripts/release_eval.py, smart_eval.py, smart_burst.py, existing TSV matrices,
+release-validation tests, current launch contract and baseline checkpoint.
+
+**Steps:**
+
+1. Adapt the existing evaluation harness to the agent boundary and typed draft. Preserve scenarios
+   and expected outcomes. Replace exact field-order/ordinary wording assertions only where agent
+   freedom intentionally changes them; preserve control/receipt/policy wording requirements.
+2. Add focused multi-turn cases: reference three or more exchanges back, intake side question,
+   topic switch/return, corrected historical contact, ambiguous antecedent, language switch,
+   unsupported topic then FAQ, and provider failure after a staged operation.
+3. Retain EN/MS/ZH and paired real versus hypothetical/quoted/negated safety/fraud/complaint/
+   human-request/prohibited-action cases. False urgency/notifications count as mutations.
+4. Count inbound turns, actual model attempts, tools, successful conversations/tickets, fallbacks,
+   usage, cost and latency separately. Make --max-cost apply to SMART and aggregate across language
+   workers with an in-flight reserve. Existing per-language checks and call-based projections do not
+   cover multi-call turns. Reserve conservatively before calls; stop before exceeding the allowed cap.
+5. Store new reports as docs/evaluation/langchain-*.json. Preserve historical SMART reports.
+   Include revision, dependency/model versions, limits and denominators. Do not transfer historical
+   semantic-review scores to new answers.
+6. Run deterministic/outage checks, full suite and representative PostgreSQL burst first. Then run
+   authorized synthetic hosted evaluation with current verified rates and the allowed spend.
+   Missing access means a specific pending gate, not abandoning independent offline work.
+7. Measure whole-turn/queue latency and project 10,000 messages from actual usage. Keep model spend
+   within USD 15 and response p95 within 30 seconds.
+8. Fix demonstrated shared causes and repeat affected checks. Do not automatically add a vector
+   store, extra agents, another provider or a larger budget when evaluation fails.
+
+**Acceptance:**
+
+- At least 95% expected disposition and correct grounded relevant answers overall and per launch
+  language; at least 95% answerable-paraphrase deflection.
+- Every mandatory intake/handoff case passes.
+- Zero unauthorized consent, creations, reopenings, urgent upgrades or staff notifications.
+- Zero prohibited provider-input values in capture tests; no lost data/duplicate mutation under faults.
+- Outage handling remains usable and preserves drafts.
+- Semantic quality is reviewed against actual new answers, not source presence or API success.
+- Existing applicable release checks remain. Pending live/semantic checks cannot be called a pass.
+
+**Exit:** offline evidence complete; authorized live evidence recorded or specifically pending;
+measured cost/latency assessed against unchanged launch limits.
+
+### Wave 6 repository-wide audit — complete
+
+The twelve requested audit items are implemented. Historical reports remain immutable; the earlier
+347/348 hosted result is not acceptance evidence for these changes. Fresh outage evidence is
+[`langchain-outage-wave6-audit-20260915.json`](docs/evaluation/langchain-outage-wave6-audit-20260915.json):
+348/348 dispositions, 30/30 intakes, 18/18 handoffs, 9/9 focused behaviors, no unwanted offers,
+no unintended mutations and no provider calls. The fresh full hosted run also passes all automatic
+behavior, latency and budget gates: 348/348 dispositions, 30/30 intakes, 18/18 handoffs, 9/9 focused
+behaviors, zero unwanted offers/mutations and 22.444-second turn p95. Cze Yik's corrected human
+review passes correctness and grounded relevance for all 300 FAQ and nine focused answers,
+including all 60 held-out paraphrases. No Wave 6 acceptance items remain pending.
+
+| Item | Implemented change | Validation |
+| --- | --- | --- |
+| Factual-negative offers | Shared EN/MS/ZH offer/draft guard rejects factual negation while retaining actual incident/human requests. | Domain and native final/tool regressions; fresh outage and full hosted run have zero offers, including hosted `zh-063`. |
+| Native final repair | Expected field updates and valid successor prompts are checked inside ToolStrategy repair and again before commit. A consumed field prompt cannot remain active after completion. | Actual four-call repair regression preserves the original staged input and returns a valid details prompt. |
+| Exact controls | Exact authorized consent and unambiguous dedicated email/phone are local terminals. Mixed contact corrections retain agent execution; only validated changed existing email/phone are preapplied. | Zero-call/retrieval tests; mixed questions and names remain agent-owned. |
+| Tool filtering | Native middleware recomputes available tools after each action; existing tool guards remain. | Same-turn update/review and owned-case flows; serialized schemas including final response: 3,440 characters unfiltered, 1,098 FAQ, 2,176 active intake, 2,599 complete intake, 1,351 case lookup. |
+| Retrieval reuse | Terminal controls skip retrieval; exact initial sanitized query seeds per-turn reuse. Mixed corrections retain excerpts and search access. | Initial/changed/context-resolved query and source-ID regressions. |
+| Spend accounting | Actual reservations precede dispatch/checkpoint markers; partial usage is retained, unknown usage retains a full-turn reserve, settlement is idempotent. Failed calls remain unknown even when a retry reports tokens; beta projections use conservative cost. | 26 evaluator tests pass. Full hosted cost: USD 0.231998 observed, USD 0.457734 conservatively bounded; five unknown-usage events retain reserves. |
+| Durable evaluation | Writability preflight, atomic fsync/replace, per-turn checkpoints, case selection and manifests. Resume verifies code, settings, matrix and corpus fingerprints. | Completed cases replay without cost duplication; subsets cannot pass full coverage. Uncertain interrupted cases fail closed. |
+| Migration cutover | Pull/validate before stopping writers, drain leases/transactions, fresh backup, preflight/migrate/check, start only new writers. Consent conversion requires evidence from the current draft boundary. | Cutover success/failure shell tests; populated PostgreSQL migration preserves corrected contacts, evidence and queued submission. |
+| Dispatch fence | Persist agent attempt immediately before first dispatch. Known pre-dispatch deadline expiry clears only the same owned claim's marker. | Pre-dispatch crash remains eligible; post-dispatch retry uses fallback; lease/deadline tests. The unavoidable commit/network crash gap remains conservative. |
+| Remote-operation recovery | Outbound attempts become durable uncertain records before network I/O. Signed Meta status correlation reconciles acceptance; unknown sends stay uncertain. SMTP uses stable Message-ID; media uses conditional object creation. | Crash/replay, callback ordering/ownership, ambiguous rejection and S3 version tests; manual audited SMTP reconciliation documented. |
+| Idle polling | Probe for ready inbox work before creating a thread pool. | Idle check: one query, no threads. PostgreSQL eight-sender/four-worker burst: queue p95 0.079 seconds, zero duplicates. |
+| Active documentation | README, security, implementation, validation and platform docs describe current tools, limits, cutover and recovery; historical results remain dated. | Active limits: 15,000 input characters, 300 output tokens, five provider requests, ten native tools including final response, 30s/call, 60s/run, 90s lease. |
+
+Schema evidence: [`langchain-tool-schema-wave6-audit-20260915.json`](docs/evaluation/langchain-tool-schema-wave6-audit-20260915.json).
+Queue evidence: [`langchain-burst-wave6-audit-20260915.json`](docs/evaluation/langchain-burst-wave6-audit-20260915.json).
+No speedup is inferred from schema size alone. The working create_agent/ToolStrategy/ToolRuntime path,
+opaque references, consent/ownership checks and atomic business commits remain the architecture.
+
+Final hosted evidence: [accounted report](docs/evaluation/langchain-live-wave6-audit-accounted-20260915.json).
+The [original report](docs/evaluation/langchain-live-wave6-audit-20260915.json) and durable checkpoint
+remain unchanged. The [accounting provenance](docs/evaluation/langchain-live-wave6-audit-accounting-20260915.json)
+records the five added full-turn reserves and source hashes; no provider calls or answer changes
+were made during reconciliation. The conservative projection is USD 8.101 per 10,000 inbound messages.
+
+#### Wave 6 closure — 15 September 2026
+
+The authoritative corrected [human submission](docs/evaluation/langchain-wave6-human-review-submitted-20260915.json)
+matches all 309 evaluated question/answer pairs exactly. Submission SHA-256:
+`54207fbe3ad5c5559e910bd72e07272d9c4a8b38823cc997f597f03404078856`.
+It was imported into the [reviewed report](docs/evaluation/langchain-live-wave6-reviewed-20260915.json)
+without provider calls or changes to answers, measured usage, cost or latency. Reviewed-report SHA-256:
+`507040394710097cb971c663520ef9e2d837dc9b6204d633cdb6f82ac6a4fe89`.
+
+| Semantic gate | Final result |
+| --- | --- |
+| FAQ correctness and grounded relevance | PASS: 300/300 for each score; EN/MS/ZH each 100/100 |
+| Focused dialogue correctness and grounded relevance | PASS: 9/9 for each score |
+| Held-out paraphrases | PASS: 60/60; EN/MS/ZH each 20/20 |
+| Complete human review | PASS: all 309 answers have both literal Boolean scores |
+| Combined Wave 6 acceptance | PASS: evaluator `rollout_ready=true`; all automatic and semantic gates pass |
+
+Wave 6 was closed at the user-requested session boundary. The user separately resumed Wave 7
+on 15 September 2026; current release progress is recorded in the ledger below.
+
+Verified LangChain references: [unit testing](https://docs.langchain.com/oss/python/langchain/test/unit-testing),
+[structured output](https://docs.langchain.com/oss/python/langchain/structured-output),
+[selecting tools](https://docs.langchain.com/oss/python/langchain/context-engineering#selecting-tools),
+[testing](https://docs.langchain.com/oss/python/langchain/test), and
+[custom middleware](https://docs.langchain.com/oss/python/langchain/middleware/custom).
+
+### Wave 7 — Cleanup and release preparation
+
+**Read:** final diffs, README/requirements, docs/smart-implementation.md, release/platform/privacy
+docs, infra/production/deploy.sh, compose.yml, .github/workflows/release.yml, CI configuration
+and ledger. Do not repeat unchanged paid evaluations without cause.
+
+**Steps:**
+
+1. Use rg over app/scripts/tests/docs for awaiting_* routing, intake_data writes, old provider
+   protocols, one-call assumptions and no-tool claims. Remove runtime legacy-state references;
+   migration fixtures and historical evidence may retain them.
+2. Remove temporary compatibility paths and unused direct dependencies. Keep dormant legacy columns
+   for this release; later removal is out of scope. No engine-selection flag. Keep existing
+   LLM/context switches and deterministic outage behavior.
+3. Update README, requirements, implementation/data-flow and release docs to describe actual tools,
+   state, limits and commands. Fix documentation drift without rewriting historical evidence.
+4. Implement and document the release sequence in the existing deployment script. At the reference
+   revision it runs migrations before replacing running containers; that is insufficient for this
+   state conversion. Validate configuration and pull images before downtime. Quiesce/drain old API
+   and combined-worker writers (including media/retention), verify no active writer/claim remains,
+   take a fresh recoverable backup, run preflight/apply the tested migration, then start only new
+   writers. Verify readiness and draft/case/media integrity. Keep PostgreSQL/data volumes intact.
+   Preserve queued events; webhook arrivals during maintenance must receive a retryable failure
+   rather than a successful acknowledgment for an unpersisted event. Prevent mixed old/new writers.
+5. Document rollback: after new-format turns commit, an old image cannot safely use dormant legacy
+   snapshots. Use the new runtime with LLM disabled or a compatible forward fix. Old-image rollback
+   requires no new writes or a separately tested reverse conversion preserving all new records.
+   Never restore an old database snapshot over new customer records.
+6. Run required final tests, dependency integrity, Docker build and schema drift checks. Assess
+   security/dependency CI effects from the added framework and record actual results. Add one focused
+   runnable deployment check proving stop/backup/preflight/migration/start ordering and failure
+   handling. A failed migration must not restart an incompatible old writer or erase the backup.
+7. Mark local implementation complete only when true. Record pending live/release gates, then
+   continue to wave 8. Local completion is not completion of the production deployment scope.
+
+**Exit:** one production dialogue implementation, reproducible dependencies, complete local checks,
+accurate docs and a tested migration/deployment/recovery procedure ready for wave 8.
+
+### Wave 8 — Publish, validate in staging and deploy to production
+
+**Read:** wave 6 evidence and wave 7 checkpoint, .github/workflows/release.yml, ci.yml, security.yml,
+infra/production/deploy.sh and compose.yml, docs/production-platform.md, docs/release-validation.md,
+docs/launch-contract.md. Discover current GitHub/AWS state read-only before making changes; historical
+SHAs, image digests, secret versions, approvals and deployment results are not this release's evidence.
+
+**Entry:** waves 1–7 local work complete. Before production dispatch, actual provider compatibility,
+new hosted/semantic evaluation, staging and candidate CI/security gates must pass; GitHub/AWS access
+and applicable platform approvals must be available. Steps below establish those release gates.
+Do not reuse the previous SMART release's one-off staging waiver or expired exceptions. If a gate
+is pending, finish available preparation and record the specific requirement.
+
+**Steps:**
+
+1. Commit the focused refactor and push its branch. Open/update the release PR into dev, the integration
+   branch used by the recorded release, following current repository protections. Include behavior,
+   migration/recovery and verification results. Resolve actual CI/security failures and merge through
+   the normal permitted workflow. Do not force-push protected branches or bypass required approvals.
+2. Record the full 40-character merged candidate SHA. Require CI and Security success on the candidate
+   actually being released. Keep the release ref fixed during staging; subsequent source changes need
+   their own checks and staging. A documentation-only evidence commit is distinct from the image SHA.
+3. Inspect AWS account/region and the existing dudu-support-foundation, dudu-support-staging and
+   dudu-support-production stacks. Resolve instances and ECR from stack outputs, not copied IDs.
+   Keep ap-southeast-5 and existing infrastructure/budget limits. Record current production image pair,
+   migration head and relevant feature-switch values without printing runtime secrets.
+4. Dispatch .github/workflows/release.yml with environment=staging on the ref for that exact candidate.
+   The current staging workflow builds its checked-out GITHUB_SHA, not the release_sha input; verify
+   the run's actual SHA matches the candidate. It builds/publishes ARM64 images and resolves immutable
+   app and ClamAV digests. Wait for workflow and SSM completion; record run ID, SHA and both digests.
+5. In isolated staging, exercise the populated legacy-to-new migration, pending/paused/review drafts,
+   evidence ownership, inbox recovery, duplicate events, model outage and the new fallback recovery
+   procedure. Check database, ClamAV, storage and worker health. Complete required end-to-end channel
+   checks with authorized test recipients/windows; do not send to arbitrary customers or staff.
+   If a fix is necessary, return to the affected wave and stage the new candidate before promotion.
+6. Schedule production within the documented 02:00–04:00 Asia/Kuala_Lumpur maintenance window unless
+   an existing session instruction authorizes a different window. Confirm recoverable backup capacity,
+   completed staging results and applicable budget/contract dates. Do not extend the 10–14 September
+   beta or expired waivers automatically. A dark deployment may still proceed if permitted; customer
+   activation must remain within the applicable contract.
+7. Record the predeployment META_SEND_ENABLED, NOTIFICATION_SEND_ENABLED, LLM_ENABLED and
+   LLM_CUSTOMER_CONTEXT_ENABLED values. The deployment script requires META_SEND_ENABLED=false.
+   Temporarily disable sending when necessary using the established secret/configuration path; avoid
+   unrelated secret edits. Keep previously disabled switches disabled. Confirm the wave 7 deployment
+   procedure will quiesce writers, back up and preflight after image/configuration validation;
+   the production dispatch in step 8 executes that procedure once.
+8. Dispatch the same release workflow with environment=production and release_sha set to the exact
+   staging-tested 40-character candidate. Use the tested workflow ref. Promote the identical app and
+   ClamAV digest pair; do not rebuild for production. Monitor the workflow/SSM result through completion.
+   Do not report deployment from a workflow dispatch acknowledgment alone.
+9. Verify the public https://support.duducaradmin.com/ready response, running API/worker image digests,
+   applied migration head, container health and new schema. Confirm converted draft/case/media counts,
+   absence of mixed-version writers, and inbox/outbox recovery. Use minimized aggregate evidence;
+   do not copy customer records into release documentation. Exercise a bounded authorized smoke test
+   proving the running release invokes LangChain and preserves ticket/confirmation behavior.
+10. Restore only pre-existing authorized traffic/notification settings after checks pass, or apply a
+    newer explicit session instruction. Keep LLM/context settings consistent with the approved model
+    evaluation and provider-data boundary. The last recorded production state had Meta sending off;
+    deployment success must not silently enable it. Record deployed and customer-sending status
+    separately. Previously disabled customer sending does not prevent completing a dark deployment.
+11. Observe production for 60 minutes after the final intended configuration. Monitor public readiness,
+    alarms/resources, provider/tool errors, queue age, duplicates/dead letters, mutation errors,
+    latency, traffic and spend using existing monitoring. Preserve the launch-contract thresholds.
+    Immediately stop outbound for security/data-loss/unauthorized-action triggers; on other threshold
+    breaches, use the tested fallback/forward-fix procedure. After new-state writes, do not blindly
+    run /opt/dudu/rollback-images with an old incompatible application. Observation with no customer
+    traffic is deployment-health evidence, not a claim of live customer-service quality.
+12. Record the actual source SHA, workflow/SSM IDs, immutable digests, migration, staging results,
+    backup reference, production checks, restored switch states and observation start/end/outcome in
+    docs/release-validation.md. Update the SMART ledger and commit/push the release evidence through
+    normal repository policy without rebuilding the already validated artifact. Report the exact
+    deployed version and whether customer sending is enabled. If a protection gate or credential is
+    missing, report its concrete requirement; never label an attempted deployment successful.
+
+**Checks:** required candidate CI/security, staging migration and recovery, identical digest promotion,
+successful production workflow/SSM, public/internal readiness, correct running code/schema, intact
+customer state and durable queues, and a completed 60-minute observation without unresolved triggers.
+
+**Exit:** the LangChain refactor is running in production on the tested immutable images, its migration
+and operational checks pass, intended authorized settings are in place, observation is recorded,
+and release evidence is published. No additional deployment permission question is needed solely
+because this wave reaches production; honor actual platform gates and unresolved material decisions.
+
+## 5. Commands and references
+
+Run inside Python 3.11. If the host lacks python, use the repository container workflow;
+do not assume historical virtualenvs exist.
+
+~~~bash
+python -m pip install --require-hashes -r requirements.txt
+python -m pip check
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
+docker build --target test -t dudu-support:langchain-check .
+git diff --check
+~~~
+
+During waves 1–7, migrations and alembic check run only against disposable databases.
+Set DATABASE_URL and TEST_POSTGRES_URL to disposable test databases using the existing setup;
+the latter enables real concurrency checks. Never use staging/production or a valuable personal
+database for tests. Reuse PostgreSQL/pg_trgm prerequisites documented in README. Wave 8 explicitly
+applies the tested release migration to staging and production through the deployment workflow;
+never point fixture-driven/destructive tests at production.
+
+~~~bash
+alembic upgrade head
+alembic check
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q tests/test_smart_integrity.py
+python scripts/smart_burst.py
+python scripts/release_eval.py --suite smart --mode outage
+~~~
+
+Adapt the live CLI in wave 6; pass verified rates and a session-authorized spend cap.
+Do not paste historical rates or API keys into commands.
+
+Confirm APIs for the dependency version pinned in wave 1:
+
+- [Agents](https://docs.langchain.com/oss/python/langchain/agents)
+- [Tools/runtime context](https://docs.langchain.com/oss/python/langchain/tools)
+- [Short-term memory](https://docs.langchain.com/oss/python/langchain/short-term-memory)
+- [Middleware](https://docs.langchain.com/oss/python/langchain/middleware/overview)
+- [Structured output](https://docs.langchain.com/oss/python/langchain/structured-output)
+
+Do not redesign fixed decisions in later waves. Resolve version-specific syntax through official
+docs and tests. If evidence makes a requirement impossible, record the concrete failing check
+and smallest proposed change; continue independent work and surface only the decision needing
+the owner. Do not invent working provider behavior or migrate unsafe data.
+
+## 6. Progress ledger — update at every wave boundary
+
+| Wave | Status | Evidence / next action |
+| --- | --- | --- |
+| 1. Baseline/provider | Complete | LangChain/Z.AI agent compatibility proven offline and live; see checkpoint |
+| 2. Domain rules | Complete | Typed pure draft/control/case rules extracted; baseline preserved |
+| 3. State/memory | Complete | Typed storage, migration, bounded context and lifecycle checks pass |
+| 4. Agent/tools | Complete | Bounded create_agent loop and seven turn-local tools pass synthetic conversations |
+| 5. Handler cutover | Complete | Staged execution, atomic commit, transport recovery and typed fallback pass |
+| 6. Evaluation | Complete | Automatic acceptance passes; corrected user review passes all 300 FAQ and nine focused answers, including 60 held-out paraphrases. Reviewed report has `rollout_ready=true`. |
+| 7. Release preparation | Complete | One dialogue owner; tested cutover, recovery and staging-success gates; 554 PostgreSQL tests pass. [Local evidence](docs/evaluation/langchain-wave7-local-20260915.json). |
+| 8. Production deployment | Preparation in progress | Publish the candidate, pass exact-SHA CI/Security, recreate and validate isolated staging, then deploy dark within the maintenance window and observe. |
+
+### Latest checkpoint
+
+- Waves 1–7 are complete. Wave 8 preparation is in progress; no LangChain candidate has been published, staged or deployed yet.
+- Original branch `smart-release-20260911`, starting revision `52c6247571d460c5f8d0a3b3d5eb47ce1fed33ed`; prior uncommitted work and the local AGENTS.md deletion remain preserved.
+- Publication uses isolated branch `langchain-release-20260915` from current `origin/dev` (`7f8f13f74161aa6ba9064e558ad00ae9a6486ead`) at `/tmp/dudu-langchain-release-20260915`.
+- Wave 6 [reviewed acceptance](docs/evaluation/langchain-live-wave6-reviewed-20260915.json) remains authoritative: 348/348 dispositions, 30/30 intakes, 18/18 handoffs, 9/9 focused; all 309 answers and 60 held-out paraphrases pass semantic review; `rollout_ready=true`.
+- No hosted model calls were made in Wave 7. Conservative tracked spend remains approximately USD 4.27; full-run conservative projection remains USD 8.101 per 10,000 messages, with p95 22.444 seconds.
+- Active limits remain input 15,000/output 300, five model requests, ten native tools including final response, 30s/call, 60s/run and 90s lease.
+- Runtime cleanup found one dialogue owner and no obsolete adapter or unused direct dependency. Dormant legacy columns are only cleared for privacy retention; the regression now includes old phone/account/trip values.
+- Cutover validates candidate settings before downtime, stops/drains all writers, preserves backup references on retry failure, compares all table counts and validates typed dialogue before retention/start. Startup waits for API, ClamAV and a complete worker cycle.
+- Production workflow requires exact-SHA successful staging and an actually immutable ECR repository. Apply the foundation role's new repository-scoped `ecr:DescribeRepositories` permission first.
+- Final Python 3.11/PostgreSQL suite: **554 passed, 2 skipped**. Fresh migration to `e5c1a2b3d4f6`, `alembic check`, hash install, dependency integrity and shell checks pass. Final workflow gate tests: **9 passed**.
+- Docker AMD64 and ARM64 test targets each pass **545 tests, 8 skipped**; the three later ECR cases pass in the final PostgreSQL suite. ARM64 ClamAV build/version checks pass.
+- Local security passes: pip-audit has zero advisories, Bandit high/high has zero findings, Gitleaks history has zero leaks, Trivy source/container has zero high/critical findings, ZAP has zero high-risk alerts.
+- Cze Yik renewed AWS-0104/AWS-0136 through 17 September 2026 for staging/dark deployment only, with customer sending disabled. Trivy uses the conservative `exp:2026-09-17` cutoff. The public beta and notification waiver are not extended.
+- Runtime verification image: `dudu-support:wave7-runtime`, index `sha256:e4c5e58a4a56b94bcac9402ec7c7bbc0d3aabea9ab3a48b7f241d87df7e6ea9f`. [Wave 7 evidence and source hashes](docs/evaluation/langchain-wave7-local-20260915.json).
+- AWS authentication works via profile `dudu-production` in account `173454940059`, region `ap-southeast-5`. Foundation and production exist; staging is absent. GitHub access works; `dev` requires successful `test` and an up-to-date branch, with no review requirement.
+- Current production secret reports Meta sending true, notifications false, LLM true and customer context true; runtime container values remain to be checked. Preparation has not changed production. Staging/dark deployment must disable sending.
+- Next: copy the focused candidate and referenced evidence into the publication worktree, commit/push and open its PR; complete candidate CI/Security, isolated staging and all Wave 8 gates. Keep the 02:00–04:00 Asia/Kuala_Lumpur production window.
+
+### Remaining work
+
+Wave 7 local implementation is complete. Continue Wave 8 from the checkpoint above. Preserve the
+accepted Wave 6 evidence and do not repeat unchanged paid evaluations or human review. Source
+publication, staging validation, production deployment and observation remain required.

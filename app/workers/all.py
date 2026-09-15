@@ -1,5 +1,6 @@
 import logging
 import time
+from pathlib import Path
 
 from app.config import get_settings
 from app.database import SessionLocal
@@ -9,6 +10,8 @@ from app.services.retention import run_retention
 from app.services.whatsapp import process_outbox
 from app.services.inbound import process_inbox
 from app.workers.backup import run_backup
+
+READY_FILE = Path("/tmp/worker-ready")
 
 
 def _schedule(operation, *, now: float, interval: int, failure_event: str) -> float:
@@ -21,6 +24,7 @@ def _schedule(operation, *, now: float, interval: int, failure_event: str) -> fl
 
 
 def main() -> None:
+    READY_FILE.unlink(missing_ok=True)
     settings = get_settings()
     logging.basicConfig(level=logging.INFO)
     next_backup = time.monotonic() + settings.backup_interval_minutes * 60
@@ -58,6 +62,7 @@ def main() -> None:
                 interval=24 * 60 * 60,
                 failure_event="retention_or_reconciliation_failed",
             )
+        READY_FILE.touch()
         if not processed:
             time.sleep(1)
 

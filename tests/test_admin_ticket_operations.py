@@ -30,7 +30,8 @@ from app.services.ticket_operations import (
 )
 from app.routers import admin as admin_router_module
 from app.routers.admin import assign, login
-from app.services.notifications import process_next_notification
+from app.services.notifications import EmailClient, EmailSendError, process_next_notification
+from app.services import notifications as notifications_module
 
 
 CZE_TOTP_FIXTURE = "JBSWY3DPEHPK3PXP"
@@ -314,14 +315,24 @@ def test_notification_worker_sends_email_and_approved_whatsapp_template(
     class FakeEmail:
         sent = []
 
-        def send(self, recipient, event_type, payload):
-            self.sent.append((recipient, event_type, payload))
+        def send(self, recipient, event_type, payload, *, message_id):
+            self.sent.append((recipient, event_type, payload, message_id))
 
     class FakeWhatsApp:
         sent = []
 
-        def send_template(self, recipient, template_name, language, parameters):
-            self.sent.append((recipient, template_name, language, parameters))
+        def send_template(
+            self,
+            recipient,
+            template_name,
+            language,
+            parameters,
+            *,
+            callback_data=None,
+        ):
+            self.sent.append(
+                (recipient, template_name, language, parameters, callback_data)
+            )
             return "wamid.test"
 
     settings = Settings(
@@ -343,9 +354,16 @@ def test_notification_worker_sends_email_and_approved_whatsapp_template(
     )
     assert fake_email.sent[0][:2] == (jane.email, "ticket_created")
     assert fake_whatsapp.sent == [
-        (value.phone_number, "ticket_status_en", "en", [value.public_id, "closed"])
+        (
+            value.phone_number,
+            "ticket_status_en",
+            "en",
+            [value.public_id, "closed"],
+            f"notification:{whatsapp.id}",
+        )
     ]
     assert email.status == whatsapp.status == "sent"
+    assert whatsapp.payload["provider_message_id"] == "wamid.test"
 
     failed = SupportNotification(
         ticket_id=value.id,
@@ -363,3 +381,127 @@ def test_notification_worker_sends_email_and_approved_whatsapp_template(
         whatsapp_client=fake_whatsapp,
     )
     assert failed.status == "dead_letter" and failed.last_error == "ValueError"
+
+
+def test_notification_crash_after_acceptance_stays_uncertain_and_is_not_retried(
+    db_session: Session,
+) -> None:
+    _, jane = provision_two_admins(db_session)
+    value = ticket(db_session)
+    notification = SupportNotification(
+        ticket_id=value.id,
+        recipient_admin_id=jane.id,
+        channel="email",
+        recipient=jane.email,
+        event_type="ticket_created",
+        payload={"public_id": value.public_id, "urgency": value.urgency},
+    )
+    db_session.add(notification)
+    db_session.commit()
+
+    class ProcessDied(BaseException):
+        pass
+
+    class AcceptedThenCrashed:
+        def send(self, recipient, event_type, payload, *, message_id):
+            current = db_session.get(SupportNotification, notification.id)
+            assert (current.status, current.attempts) == ("uncertain", 1)
+            assert message_id == notification.id
+            raise ProcessDied
+
+    settings = Settings(_env_file=None, notification_send_enabled=True)
+    with pytest.raises(ProcessDied):
+        process_next_notification(
+            db_session, settings=settings, email_client=AcceptedThenCrashed()
+        )
+    db_session.rollback()
+    db_session.refresh(notification)
+
+    assert (notification.status, notification.attempts) == ("uncertain", 1)
+    assert not process_next_notification(
+        db_session, settings=settings, email_client=AcceptedThenCrashed()
+    )
+
+
+def test_known_nonretryable_meta_rejection_dead_letters_notification(
+    db_session: Session,
+) -> None:
+    value = ticket(db_session)
+    notification = SupportNotification(
+        ticket_id=value.id,
+        channel="whatsapp",
+        recipient=value.phone_number,
+        event_type="ticket_status_changed",
+        payload={"public_id": value.public_id, "status": "closed", "language": "en"},
+    )
+    db_session.add(notification)
+    db_session.commit()
+
+    class RejectedWhatsApp:
+        def send_template(self, *args, **kwargs):
+            raise notifications_module.MetaSendError("400", False)
+
+    settings = Settings(
+        _env_file=None,
+        notification_send_enabled=True,
+        notification_max_attempts=3,
+        meta_send_enabled=True,
+        notification_template_names={"ticket_status_changed.en": "ticket_status_en"},
+    )
+
+    assert process_next_notification(
+        db_session, settings=settings, whatsapp_client=RejectedWhatsApp()
+    )
+    db_session.refresh(notification)
+    assert (notification.status, notification.attempts, notification.last_error) == (
+        "dead_letter",
+        1,
+        "400",
+    )
+
+
+@pytest.mark.parametrize("from_address", ["support@example.com", "DUDU Support <support@example.com>"])
+def test_email_message_id_is_stable_and_post_send_failure_is_uncertain(
+    monkeypatch: pytest.MonkeyPatch,
+    from_address: str,
+) -> None:
+    messages = []
+
+    class FakeSmtp:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+        def login(self, username, password):
+            pass
+
+        def send_message(self, message):
+            messages.append(message)
+            raise notifications_module.smtplib.SMTPServerDisconnected("after DATA")
+
+    monkeypatch.setattr(notifications_module.smtplib, "SMTP_SSL", FakeSmtp)
+    settings = Settings(
+        _env_file=None,
+        smtp_host="smtp.example.com",
+        smtp_username="user",
+        smtp_password="password",
+        smtp_from_address=from_address,
+    )
+
+    with pytest.raises(EmailSendError) as exc:
+        EmailClient(settings).send(
+            "admin@example.com",
+            "ticket_created",
+            {"public_id": "DUDU-1"},
+            message_id="stable-notification-id",
+        )
+
+    assert exc.value.uncertain
+    assert messages[0]["Message-ID"] == (
+        "<support-notification.stable-notification-id@example.com>"
+    )

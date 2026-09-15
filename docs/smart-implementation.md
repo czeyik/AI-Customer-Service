@@ -1,49 +1,44 @@
 # SMART implementation and release evidence
 
-The revised conversation implementation is deployed to production with customer-context transmission
-**enabled by explicit owner instruction**. `LLM_CUSTOMER_CONTEXT_ENABLED=true` and
-`META_SEND_ENABLED=false`; outbound Meta sending remains off. The owner directed that privacy-copy
-publication is deferred for now.
+## Current LangChain candidate — 15 September 2026
+
+[SMART.md](../SMART.md) records Wave 6 acceptance and deployment status. The LangChain
+candidate has not replaced the historical production release described below. Historical
+semantic scores and deployment waivers do not apply to this candidate.
 
 ## Conversation and intake
 
-The responder makes one structured interpretation request per eligible turn. Immediate safety,
-standalone identity and standalone language commands retain local handling. Local code validates
-contact fields, consent, submission, case ownership and priorities. A ticket offer leaves intake
-idle; acceptance opens the separate consent question. Pause/cancel/resume proposals require matching
-local customer intent. Explicit local handoff requests and Yes/No/Done/Skip/Submit controls
-take precedence over model action proposals. Model proposals cannot override ordinary contact fields.
-Side questions preserve the draft. Explicit
-case updates require confirmation against the owned case before changing or reopening it.
+One LangChain `create_agent` agent owns ordinary dialogue, clarification, tool choice and
+missing-field order. Seven scoped tools search knowledge, update or pause drafts, prepare
+review/submission, and look up or update an owned case. They stage changes in memory; Python
+validates consent, field references, ownership and priorities, and PostgreSQL commits the
+validated operations with conversation, audit, notification and reply rows.
 
-API clients should return the latest response's `prompt_id` when submitting `create_ticket` or
-`consent_to_ticket`. Missing or stale control tokens cannot authorize those actions. Ordinary text
-replies continue to work. WhatsApp additionally checks quoted reply IDs and event timestamps.
+A ticket offer leaves intake idle; accepting it opens a separate consent question. Names,
+email and contact numbers may arrive together or in any order. Side questions preserve fields;
+corrections invalidate a prior review. Done/Skip paths remain available for complete consented
+drafts. Case updates and reopenings need confirmation tied to the owned case.
 
-Names, email and contact numbers can be supplied in any order. Corrections update local fields;
-ambiguous email choices require clarification. Human requests collect the actual issue. Trip IDs
-do not imply submission. Accumulated ride details cannot exceed 2,000 characters; an oversized
-addition is rejected with a recovery prompt while earlier details remain. Local review precedes
-submission when fields have been corrected. Draft expiry defaults to 60 minutes and is configurable
-with `INTAKE_EXPIRY_MINUTES` (5–1,440 minutes).
+API clients return the current `prompt_id` for `create_ticket` or `consent_to_ticket` controls.
+WhatsApp additionally validates quoted reply IDs, event timestamps, claim ownership and leases.
+Accumulated ride details are limited to 2,000 characters. Draft expiry defaults to 60 minutes
+and is configurable with `INTAKE_EXPIRY_MINUTES` (5–1,440 minutes).
 
 ## Provider boundary
 
-Provider input contains approved excerpts, a minimized question of at most 1,600 characters,
-a topic of at most 100 characters, a previous sanitized question of at most 400 characters,
-a previous sanitized answer of at most 600 characters, up to four source keys, intake stage,
-pending-offer status and field-presence/role indicators. Prior answers are never policy.
-Raw local contact fields, account identifiers, ticket bodies, attachments and full history are
-excluded. Local extraction runs before provider minimization. Uncertain identifying narratives
-and oversized questions use local clarification; regex minimization is not a guarantee of anonymity
-for arbitrary prose.
+Input includes a minimized current question, up to 12 sanitized recent messages, bounded
+state/field-presence metadata, opaque references and approved excerpts. Raw contacts, reviews,
+case bodies and attachment contents remain local. Previous bot answers are never policy.
 
-The total prompt remains capped at 8,000 characters. Ranked excerpts are removed whole when needed
-to fit, and citations are validated only against excerpts actually sent. The output cap remains
-300 tokens and timeout eight seconds. Logs expose outcomes, latency and reported token counts,
-including reasoning-token details when supplied, without prompts or response bodies.
-Citation and numerical checks are rejection guards, not proof of semantic entailment. Semantic
-correctness and faithful translation require the separate reviewed evaluation denominator.
+The agent permits five actual model requests and ten native tool calls, including structured
+final output, within 60 seconds. Each call has a maximum 30-second timeout, 15,000 input
+characters (including tools/history/results) and 300 output tokens. SDK retries are disabled.
+Whole excerpts and older history are removed to fit. Citations must identify sources actually
+supplied and still approved at commit. Local recovery preserves drafts on provider failure.
+
+Logs contain attempt/tool counts, usage, outcome and timing without prompts, raw tool values
+or hidden reasoning. Correctness and faithful translation use a separate human review of the
+actual new answers.
 
 ## Knowledge governance
 
@@ -64,21 +59,28 @@ source blocks require review rather than silent splitting or truncation.
 The CCO activation endpoint accepts `{"effective_at": "2026-09-11T23:00:00+08:00"}`. Activation remains
 authenticated and audited. Content hashes exclude the approval schedule, so activating an unchanged
 snapshot does not make the next crawl produce a duplicate draft. Changed content remains inactive
-until approved. The production database now contains 18 active version-1 website documents and no
-remaining website drafts. All are approved under `jane` with effective instant
+until approved. As recorded on 12 September 2026, production contained 18 active version-1 website documents
+and no remaining website drafts. All are approved under `jane` with effective instant
 `2026-09-11T23:00:00+08:00` and audited publication events.
 
 ## Durability and evidence ownership
 
-Migration `d9010a1b2c3d` adds conversation uniqueness, inbound claims and evidence groups. It stops
+Migration `e5c1a2b3d4f6` adds typed dialogue JSON and revisions and preflights all legacy drafts
+before conversion. Imported consent must belong to the current draft’s start window; missing
+or older evidence preserves the fields and requires fresh consent. The earlier `d9010a1b2c3d`
+added conversation uniqueness, inbound claims and evidence groups. It stops
 before changing the schema if duplicate conversation owners exist; reconcile those records without
 losing histories or case ownership before retrying. Existing processed inbound rows remain `done`.
-Existing unassigned media is not guessed into a case by timestamp.
+Existing unassigned media is not guessed into a case by timestamp. Dormant legacy columns are
+never read for dialogue; retention still clears them so old private snapshots expire with the chats.
 
 Webhooks persist events and beta counters before acknowledging. The existing worker processes up to
 four senders concurrently, serializes each sender, and records a provider-attempt marker before
-network work. A retry after a worker crash uses fallback rather than issuing another model request.
-Provider calls run outside database transactions. State version checks discard stale proposals.
+the first model dispatch. A crash before that fence leaves the retry eligible; after the durable
+dispatch marker, recovery uses local fallback. The marker and network request are not atomic;
+a crash between them conservatively uses fallback.
+Provider calls run outside database transactions. Ninety-second leases cover the 60-second
+agent window and commit/recovery. State revision checks discard stale proposals.
 The ticket, audit and outbound reply commit together before delivery. Outbound retries preserve
 recipient order.
 
@@ -131,12 +133,11 @@ required.
 - `python scripts/release_eval.py --suite smart --mode outage --input-price 0.15 --output-price 0.50`:
   100 distinct non-escalation scenarios in English, Malay and Chinese, 18 paired legitimate handoff
   sessions and 30 intake sessions covering ten intake variants.
-- The same command with `--mode live` uses synthetic inputs only. Each language has an observed-spend
-  guard; latency and usage are recorded. Semantic review fields remain unscored until reviewed.
+- The same command with `--mode live` uses synthetic inputs only. Concurrent language workers share an in-flight worst-case spend reserve; latency and usage are recorded. Semantic review fields remain unscored until reviewed.
 - Add `--intake-only` to the SMART evaluation command for the 18 handoff and 30 intake diagnostics.
   This does not exercise the non-escalation matrix.
 - `python scripts/smart_burst.py`: eight synthetic senders through the PostgreSQL inbox with four
-  workers and two-second simulated provider latency. `smart-burst.json` records reply-queue latency,
+  workers in deterministic outage mode. `smart-burst.json` records reply-queue latency,
   which does not include Meta delivery time.
 
 The matrix is in `data/evaluation/smart-non-escalation.tsv`; its 20 held-out scenarios are reported
@@ -151,15 +152,16 @@ The [official Z.AI pricing table](https://docs.z.ai/guides/overview/pricing), ch
 10 September 2026, lists GLM-5.3-Flash at USD 0.15 per million input tokens and USD 0.50 per million
 output tokens (cached input USD 0.03). Evaluation projections use uncached input pricing and
 reported aggregate completion usage. Missing reasoning breakdowns are recorded as missing, not
-assumed to be zero. These are measured-sample projections, not a hard maximum for the 10,000-call
-beta. The existing USD 15 model allowance and beta message caps remain unchanged.
+assumed to be zero. These are measured-sample projections, not a hard maximum for the 10,000-message
+beta. Current LangChain projections count inbound messages, including multi-call turns. The existing USD 15 model allowance and beta message caps remain unchanged.
 
 The 18 website snapshots are active under the approved effective date. The owner explicitly deferred
 privacy-copy publication and authorized context enablement; the production API and worker now carry
 `LLM_CUSTOMER_CONTEXT_ENABLED=true` while `META_SEND_ENABLED=false`. Record the post-enable
 observation and final GO before restoring outbound Meta settings.
 
-For rollback, first disable `LLM_CUSTOMER_CONTEXT_ENABLED`, preserve the durable inbox and drain
-or pause its worker deliberately, then use the existing `/opt/dudu/rollback-images` process.
-Do not downgrade the data migration. An older image does not understand the new queued inbox:
-check for queued/processing events and ensure they are handled before returning to that worker.
+For the LangChain candidate, use the new runtime with `LLM_ENABLED=false` or a compatible forward
+fix after new-format turns have committed. Preserve the durable inbox. Dormant legacy snapshots
+cannot recover new dialogue changes, so `/opt/dudu/rollback-images` is safe only before new writes
+or after a separately tested reverse conversion. Never downgrade destructively or restore an old
+snapshot over new customer records. Follow the [deployment and recovery runbook](production-platform.md).
