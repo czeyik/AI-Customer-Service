@@ -127,8 +127,10 @@ most 35 days, and retention must be reapplied before a restored environment serv
 technical procedure and complete data inventory are in `docs/privacy-data-lifecycle.md`.
 
 Provider decision confirmed by Cze Yik on 9 September 2026: Z.AI with GLM-5.3-Flash is the only
-hosted pilot model; API content is processed in Singapore under Z.AI's API DPA, with the original approved-knowledge-only scope. SMART.md records the revised 10 September
-2026 implementation authorization for minimized questions and bounded sanitized context.
+hosted pilot model; API content is processed in Singapore under Z.AI's API DPA, with the original
+approved-knowledge-only scope. The revised 10 September 2026 implementation authorization for
+minimized questions and bounded sanitized context is recorded in [architecture.md](architecture.md);
+release evidence and activation state are recorded in [release-validation.md](release-validation.md).
 Publication/effective-date approval and confirmation that the provider DPA covers this revised
 scope remain activation requirements; `LLM_CUSTOMER_CONTEXT_ENABLED` defaults to false.
 

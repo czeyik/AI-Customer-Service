@@ -1,5 +1,4 @@
 import json
-import inspect
 import logging
 import re
 import threading
@@ -123,24 +122,6 @@ def ensure_evidence_group(conversation: Conversation) -> tuple[DialogueData, str
         else:
             dialogue.evidence_group = evidence_group
     return dialogue, evidence_group
-
-
-def current_evidence_group(conversation: Conversation) -> str | None:
-    dialogue = load_dialogue_data(conversation)
-    return dialogue.draft.evidence_group if dialogue.draft else dialogue.evidence_group
-
-
-def complete_evidence_association(
-    conversation: Conversation, evidence_group: str | None, case_reference: str
-) -> None:
-    dialogue = load_dialogue_data(conversation)
-    if dialogue.draft and dialogue.draft.evidence_group == evidence_group:
-        dialogue.draft.evidence_group = None
-    if dialogue.evidence_group == evidence_group:
-        dialogue.evidence_group = None
-    dialogue.last_case_reference = case_reference
-    dialogue.pending_case_update = None
-    store_dialogue_data(conversation, dialogue, evidence_changed=bool(evidence_group))
 
 
 def scrub_dialogue_private_data(
@@ -360,7 +341,6 @@ class DialogueRuntime:
     deadline: float
     input_char_limit: int = 15000
     initial_dialogue: DialogueData | None = None
-    current_input_applied: bool = False
     expected_fields: dict[str, str] = field(default_factory=dict)
     before_first_model: Callable[[float], float] | None = None
     dispatch_fenced: bool = False
@@ -1408,7 +1388,6 @@ def run_dialogue_agent(
         deadline=time.monotonic() + MAX_AGENT_SECONDS,
         input_char_limit=settings.llm_max_input_chars,
         initial_dialogue=runtime_dialogue.model_copy(deep=True),
-        current_input_applied=bool(context.state.get("current_input_applied")),
         expected_fields=_expected_current_fields(
             runtime_dialogue, references, request.text
         ),

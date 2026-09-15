@@ -195,6 +195,61 @@ def test_worker_readiness_requires_a_complete_cycle(tmp_path, monkeypatch, failu
     assert marker.exists() == (not failure)
 
 
+@pytest.mark.parametrize(
+    ("argv", "retention_failures", "reconciliation_failure"),
+    [
+        (["retention", "--once"], 0, False),
+        (["retention", "--dry-run"], 0, False),
+        (["retention", "--once"], 1, False),
+        (["retention", "--once"], 0, True),
+    ],
+    ids=["success", "dry-run", "retention-failure", "reconciliation-failure"],
+)
+def test_standalone_retention_lifecycle(
+    monkeypatch, argv, retention_failures, reconciliation_failure
+) -> None:
+    import sys
+    from contextlib import nullcontext
+    from types import SimpleNamespace
+
+    from app.workers import retention as worker
+
+    calls = []
+    monkeypatch.setattr(worker, "SessionLocal", lambda: nullcontext(None))
+    monkeypatch.setattr(
+        worker,
+        "run_retention",
+        lambda db, dry_run=False: (
+            calls.append(("retention", dry_run))
+            or SimpleNamespace(failures=retention_failures)
+        ),
+    )
+
+    def reconcile(_db):
+        calls.append(("reconcile",))
+        if reconciliation_failure:
+            raise RuntimeError("reconciliation failed")
+        return 2
+
+    monkeypatch.setattr(worker, "reconcile_orphaned_media", reconcile, raising=False)
+    monkeypatch.setattr(sys, "argv", argv)
+
+    if retention_failures:
+        with pytest.raises(SystemExit) as error:
+            worker.main()
+        assert error.value.code == 1
+    elif reconciliation_failure:
+        with pytest.raises(RuntimeError, match="reconciliation failed"):
+            worker.main()
+    else:
+        worker.main()
+
+    expected = [("retention", argv[1] == "--dry-run")]
+    if not retention_failures and not argv[1] == "--dry-run":
+        expected.append(("reconcile",))
+    assert calls == expected
+
+
 def test_readiness_fails_closed_without_database() -> None:
     class Database:
         def execute(self, statement):
@@ -371,3 +426,25 @@ def test_restore_requires_empty_target_and_keeps_password_out_of_arguments(tmp_p
             runner=restore,
             table_names=lambda: ["tickets"],
         )
+
+
+def test_release_inventory_runs_directly_outside_repository(tmp_path):
+    import json
+    import os
+    import subprocess
+    import sys
+
+    url = f'sqlite:///{tmp_path / "inventory.db"}'
+    database = create_engine(url)
+    Base.metadata.create_all(database)
+    database.dispose()
+    environment = {key: value for key, value in os.environ.items() if key != 'PYTHONPATH'}
+    environment.update(ENVIRONMENT='development', DATABASE_URL=url)
+    result = subprocess.run(
+        [sys.executable, str(Path(__file__).resolve().parents[1] / 'scripts/release_inventory.py'),
+         '--validate-dialogue'], cwd=tmp_path, env=environment, capture_output=True,
+        text=True, timeout=15,
+    )
+    assert result.returncode == 0, result.stderr
+    counts = json.loads(result.stdout)
+    assert counts['conversations'] == counts['tickets'] == counts['media_attachments'] == 0

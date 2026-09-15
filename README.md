@@ -1,6 +1,6 @@
 # DUDU Car AI Customer Service Chatbot
 
-MVP foundation for a secure, WhatsApp-first informational support chatbot for DUDU Car riders,
+WhatsApp-first informational support chatbot for DUDU Car riders,
 drivers, and organizations interested in business collaboration.
 
 The approved project direction is:
@@ -11,12 +11,16 @@ The approved project direction is:
 - Consent-first complaint, safety, human-escalation, and partnership ticket intake.
 - A purely informational bot: no refunds, cancellations, account changes, approvals, payments, or
   other business-state changes.
-- Hosted GLM-5.3-Flash, with a deterministic approved-knowledge outage fallback.
-- PostgreSQL, Docker Compose, secure media storage, and multiple named administrator accounts in
-  the launch target.
+- One bounded LangChain dialogue agent using hosted GLM-5.3-Flash, with a deterministic
+  approved-knowledge outage fallback.
+- PostgreSQL, Docker Compose, secure media storage, and multiple named administrator accounts.
 
 The complete, authoritative baseline is
-[`docs/requirements-summary.md`](docs/requirements-summary.md).
+[`docs/requirements-summary.md`](docs/requirements-summary.md). The durable dialogue design is in
+[`docs/architecture.md`](docs/architecture.md); current deployment evidence is in
+[`docs/release-validation.md`](docs/release-validation.md). See the
+[`docs/README.md`](docs/README.md) documentation index and
+[`docs/evaluation/README.md`](docs/evaluation/README.md) evidence index for the remaining records.
 
 ## Current Capabilities
 
@@ -113,6 +117,10 @@ alembic upgrade head
 
 The application does not create tables at startup. After changing SQLAlchemy models, add a
 migration and run `alembic check` against an up-to-date database before opening a pull request.
+For migration and concurrency checks, use disposable PostgreSQL databases: `DATABASE_URL` for the
+application and `TEST_POSTGRES_URL` for PostgreSQL integration tests. Install the `pg_trgm` extension
+and run `alembic upgrade head` before those checks. Never point fixture-driven or destructive tests at
+staging or production.
 
 The security workflow runs secret, dependency, static, source/configuration, container, and ZAP
 dynamic scans with the approved release gates. The threat model, exact policy, versions, and
@@ -258,30 +266,40 @@ curl -X POST http://localhost:8000/api/chat \
   }'
 ```
 
-## Hosted LLM Direction
+## Dialogue architecture and deployment
 
-The LangChain release candidate uses one bounded `create_agent` dialogue agent.
-Current acceptance and deployment status: [SMART.md](SMART.md). Model choices:
+The support dialogue uses one bounded LangChain `create_agent` with the approved hosted
+`glm-5.3-flash` model. Local controls, typed validation, atomic PostgreSQL writes and the
+deterministic approved-knowledge fallback remain the authority for consequential behavior. See the
+[architecture](docs/architecture.md) for the tool, privacy, transaction and recovery boundaries.
 
-1. GLM-5.3-Flash as the approved hosted model.
-2. The deterministic approved-knowledge responder during provider outages or rejected output.
-3. DeepSeek V4 Flash retained only as an evaluated alternative, not a pilot provider.
+The last recorded production activation on 15 September 2026 enables customer replies through
+30 September, Malaysia time; support notification sending remains disabled. See
+[`docs/release-validation.md`](docs/release-validation.md) for exact release evidence. Runtime
+examples and defaults do not describe live switches.
 
-Set `LLM_ENABLED=true` and provision `ZAI_API_KEY` outside Git. With customer context enabled,
+Provision `ZAI_API_KEY` outside Git. The agent path requires `LLM_ENABLED=true` and
+`LLM_CUSTOMER_CONTEXT_ENABLED=true` under the approved provider-data boundary. With those enabled,
 the agent receives approved knowledge, minimized messages and opaque field references. Seven
 Python business tools stage validated changes; PostgreSQL commits them after authorization checks.
 Each turn allows five model requests and ten native tool calls, including the structured final
 response, within 60 seconds; each request is capped at 30 seconds, 15,000 input characters and
 300 output tokens. Invalid, unsafe, ungrounded or failed output uses the local recovery path.
 
-Run the repeatable trilingual outage evaluation with:
+Run diagnostics into a temporary output directory; the retained reports and hosted-review inputs are
+listed in the [evaluation evidence index](docs/evaluation/README.md):
 
 ```bash
-python scripts/release_eval.py --suite smart --mode outage --input-price 0.15 --output-price 0.50
+evaluation_dir=$(mktemp -d)
+python scripts/release_eval.py --suite smart --mode outage \
+  --output "$evaluation_dir/outage.json"
+python scripts/smart_burst.py --output "$evaluation_dir/burst.json"
 ```
 
-The authorized hosted-model command, evidence fields, go/no-go record, and activation procedure
-are in [`docs/release-validation.md`](docs/release-validation.md).
+Hosted evaluation options and review inputs are in the [evaluation index](docs/evaluation/README.md).
+Release decisions and activation evidence are in [release status](docs/release-validation.md).
+Supply current verified pricing for an authorized live evaluation and keep diagnostic outputs in
+the temporary directory.
 
 ## Safety Gate
 

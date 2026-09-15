@@ -12,7 +12,6 @@ from sqlalchemy.pool import StaticPool
 from app.models import Base, Conversation, MediaAttachment, Message, Ticket, WhatsAppInboundMessage, WhatsAppOutboundMessage
 from app.services.dialogue import (
     build_dialogue_context,
-    complete_evidence_association,
     store_dialogue_data,
 )
 from app.services.ticket_drafts import DialogueData, Draft, DraftFields
@@ -21,7 +20,7 @@ from app.services.ticket_drafts import DialogueData, Draft, DraftFields
 migration = importlib.import_module(
     "migrations.versions.e5c1a2b3d4f6_add_dialogue_state"
 )
-NOW = datetime(2026, 9, 14, 12)
+NOW = datetime(2026, 9, 30, 12)
 
 
 @pytest.fixture()
@@ -148,7 +147,7 @@ def test_unproven_consent_keeps_fields_but_requires_renewal() -> None:
     assert dialogue.draft.consent is None
 
 
-@pytest.mark.parametrize("started_at", [NOW.isoformat(), "2026-09-14T20:00:00+08:00", None])
+@pytest.mark.parametrize("started_at", [NOW.isoformat(), "2026-09-30T20:00:00+08:00", None])
 def test_migration_binds_only_the_latest_consent_in_the_current_draft(started_at):
     prior = [dict(row, id="prior-" + row["id"], created_at=row["created_at"] - timedelta(days=1))
              for row in transcript(current_outbound=False)]
@@ -226,7 +225,7 @@ def test_idle_offer_media_and_owned_case_confirmation_convert() -> None:
     owned = {
         "ticket-1": {
             "id": "ticket-1",
-            "public_id": "DUDU-20260914-ABCDE",
+            "public_id": "DUDU-20260930-ABCDE",
             "channel": "whatsapp",
             "external_user_id": "60112223333",
         }
@@ -251,7 +250,7 @@ def test_idle_offer_media_and_owned_case_confirmation_convert() -> None:
     assert idle_dialogue.draft is None
     assert idle_dialogue.pending_offer.description == "Please ask support"
     assert idle_dialogue.evidence_group == "media-only"
-    assert idle_dialogue.last_case_reference == "DUDU-20260914-ABCDE"
+    assert idle_dialogue.last_case_reference == "DUDU-20260930-ABCDE"
 
     pending = migration.convert_legacy_dialogue(
         legacy_row(
@@ -268,7 +267,7 @@ def test_idle_offer_media_and_owned_case_confirmation_convert() -> None:
         owned,
     )
     pending_dialogue = DialogueData.model_validate(pending)
-    assert pending_dialogue.pending_case_update.case_reference == "DUDU-20260914-ABCDE"
+    assert pending_dialogue.pending_case_update.case_reference == "DUDU-20260930-ABCDE"
     assert pending_dialogue.pending_case_update.fields == {"trip_id": "TRIP-7"}
     assert pending_dialogue.pending_prompt.operation_id == (
         pending_dialogue.pending_case_update.operation_id
@@ -439,7 +438,5 @@ def test_revision_changes_for_state_and_evidence_events() -> None:
     assert store_dialogue_data(conversation, dialogue, evidence_changed=True)
     assert conversation.dialogue_revision == 2
 
-    complete_evidence_association(conversation, "group-1", "DUDU-20260914-ABCDE")
-    assert conversation.dialogue_data["evidence_group"] is None
-    assert conversation.dialogue_data["last_case_reference"] == "DUDU-20260914-ABCDE"
-    assert conversation.dialogue_revision == 3
+    assert conversation.dialogue_data["evidence_group"] == "group-1"
+    assert conversation.dialogue_revision == 2

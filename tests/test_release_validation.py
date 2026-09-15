@@ -293,11 +293,20 @@ def test_direct_reviews_keep_focused_grounding_score(tmp_path: Path):
     assert all(row["grounded_relevant"] is True for row in reviewed["focused_dialogues"])
 
 
-def test_review_cli_applies_saved_live_answers_without_live_pricing(tmp_path: Path, monkeypatch):
+def test_review_cli_uses_explicit_or_temporary_output_without_overwriting_source(
+    tmp_path: Path, monkeypatch, capsys
+):
     report = _saved_live_report()
     report_path = tmp_path / "saved.json"
     reviews_path = tmp_path / "reviews.json"
-    report_path.write_text(json.dumps(report), encoding="utf-8")
+    source = json.dumps(report)
+    report_path.write_text(source, encoding="utf-8")
+    real_mkdtemp = release_eval.tempfile.mkdtemp
+    monkeypatch.setattr(
+        release_eval.tempfile,
+        "mkdtemp",
+        lambda prefix: real_mkdtemp(prefix=prefix, dir=tmp_path),
+    )
     reviews_path.write_text(
         json.dumps(
             {
@@ -329,7 +338,125 @@ def test_review_cli_applies_saved_live_answers_without_live_pricing(tmp_path: Pa
         ],
     )
     release_eval.main()
-    assert json.loads(report_path.read_text(encoding="utf-8"))["rollout_ready"]
+    captured = capsys.readouterr()
+    assert json.loads(captured.out)["rollout_ready"]
+    default_output = Path(
+        next(
+            line.split(": ", 1)[1]
+            for line in captured.err.splitlines()
+            if line.startswith("Evaluation report: ")
+        )
+    )
+    assert default_output.name == "report.json"
+    assert default_output.parent.name.startswith("dudu-evaluation-")
+    assert json.loads(default_output.read_text(encoding="utf-8"))["rollout_ready"]
+    assert report_path.read_text(encoding="utf-8") == source
+
+    explicit_output = tmp_path / "reviewed.json"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "release_eval.py",
+            "--suite",
+            "smart",
+            "--report",
+            str(report_path),
+            "--reviews",
+            str(reviews_path),
+            "--output",
+            str(explicit_output),
+        ],
+    )
+    release_eval.main()
+    assert json.loads(explicit_output.read_text(encoding="utf-8"))["rollout_ready"]
+    assert report_path.read_text(encoding="utf-8") == source
+
+
+def test_fresh_default_output_is_temporary_and_resume_requires_a_path(
+    tmp_path: Path, monkeypatch, capsys
+):
+    docs_evaluation = Path(__file__).resolve().parents[1] / "docs" / "evaluation"
+    before = {path.name for path in docs_evaluation.iterdir()}
+    real_mkdtemp = release_eval.tempfile.mkdtemp
+    monkeypatch.setattr(
+        release_eval.tempfile,
+        "mkdtemp",
+        lambda prefix: real_mkdtemp(prefix=prefix, dir=tmp_path),
+    )
+
+    temporary_entries = set(tmp_path.iterdir())
+    calls = []
+    captured_kwargs = {}
+
+    def fake_run_smart(*args, **kwargs):
+        calls.append(args)
+        captured_kwargs.update(kwargs)
+        return {"mode": "outage", "rollout_ready": False}
+
+    monkeypatch.setattr(smart_eval, "run_smart", fake_run_smart)
+    monkeypatch.setattr(
+        sys, "argv", ["release_eval.py", "--suite", "smart", "--resume"]
+    )
+    with pytest.raises(SystemExit, match="--resume requires --checkpoint or --output"):
+        release_eval.main()
+    assert calls == []
+    assert set(tmp_path.iterdir()) == temporary_entries
+    assert {path.name for path in docs_evaluation.iterdir()} == before
+
+    checkpoint = tmp_path / "resume.checkpoint.json"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "release_eval.py",
+            "--suite",
+            "smart",
+            "--resume",
+            "--checkpoint",
+            str(checkpoint),
+        ],
+    )
+    release_eval.main()
+    captured = capsys.readouterr()
+    assert json.loads(captured.out)["mode"] == "outage"
+    assert len(calls) == 1
+    assert captured_kwargs["checkpoint_path"] == checkpoint
+    assert captured_kwargs["resume"] is True
+    assert {path.name for path in docs_evaluation.iterdir()} == before
+
+
+def test_legacy_outage_cli_passes_without_provider_calls(tmp_path: Path, monkeypatch, capsys):
+    real_mkdtemp = release_eval.tempfile.mkdtemp
+    monkeypatch.setattr(
+        release_eval.tempfile,
+        "mkdtemp",
+        lambda prefix: real_mkdtemp(prefix=prefix, dir=tmp_path),
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["release_eval.py", "--suite", "legacy", "--mode", "outage"],
+    )
+
+    release_eval.main()
+
+    captured = capsys.readouterr()
+    report = json.loads(captured.out)
+    assert report["scenarios"] == report["passed"] == 36
+    assert report["failures"] == []
+    assert report["provider_calls"] == report["provider_successes"] == 0
+    assert report["agent_failure_fallback_rate"] is None
+    assert report["thresholds"]["agent_failure_fallback_rate_at_most_0_05"] is True
+    report_path = Path(
+        next(
+            line.split(": ", 1)[1]
+            for line in captured.err.splitlines()
+            if line.startswith("Evaluation report: ")
+        )
+    )
+    assert report_path.parent.name.startswith("dudu-evaluation-")
+    assert json.loads(report_path.read_text(encoding="utf-8")) == report
 
 
 def test_smart_evaluation_accepts_an_independent_holdout_matrix(tmp_path: Path):

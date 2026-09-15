@@ -62,6 +62,24 @@ def test_production_send_requires_meta_transport_credentials() -> None:
     assert settings.meta_graph_api_version == "v26.0"
 
 
+def test_production_configuration_accepts_extended_beta_window_with_sending() -> None:
+    settings = Settings(
+        _env_file=None,
+        **(
+            PRODUCTION_SETTINGS
+            | {
+                "meta_send_enabled": True,
+                "public_beta_enabled": True,
+                "public_beta_end_date": "2026-09-30",
+            }
+        ),
+    )
+
+    assert settings.meta_send_enabled is True
+    assert settings.public_beta_enabled is True
+    assert settings.public_beta_end_date.isoformat() == "2026-09-30"
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [
@@ -81,7 +99,7 @@ def test_production_send_requires_meta_transport_credentials() -> None:
         ("llm_max_input_chars", 15001),
         ("llm_max_output_tokens", 301),
         ("public_beta_start_date", "2026-09-11"),
-        ("public_beta_end_date", "2026-09-15"),
+        ("public_beta_end_date", "2026-09-09"),
         ("public_beta_messages_per_user_day", 201),
         ("public_beta_messages_per_day", 2001),
         ("public_beta_messages_total", 10001),
