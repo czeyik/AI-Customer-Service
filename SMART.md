@@ -3,7 +3,7 @@
 Prepared: 13 September 2026.
 Repository: /home/czeyik/Documents/AI-Customer-Service.
 Reference revision: 6d2ce8d (Record SMART activation state).
-Status: **Waves 1–7 complete. Wave 8 source publication and staging preparation in progress; the LangChain candidate is not yet deployed.**
+Status: **Waves 1–8 complete. The LangChain candidate is deployed dark in production; integrity, smoke and the full 60-minute observation pass. Customer and notification sending remain disabled.**
 
 ## 1. Objective and scope
 
@@ -703,32 +703,31 @@ the owner. Do not invent working provider behavior or migrate unsafe data.
 | 5. Handler cutover | Complete | Staged execution, atomic commit, transport recovery and typed fallback pass |
 | 6. Evaluation | Complete | Automatic acceptance passes; corrected user review passes all 300 FAQ and nine focused answers, including 60 held-out paraphrases. Reviewed report has `rollout_ready=true`. |
 | 7. Release preparation | Complete | One dialogue owner; tested cutover, recovery and staging-success gates; 554 PostgreSQL tests pass. [Local evidence](docs/evaluation/langchain-wave7-local-20260915.json). |
-| 8. Production deployment | Preparation in progress | Publish the candidate, pass exact-SHA CI/Security, recreate and validate isolated staging, then deploy dark within the maintenance window and observe. |
+| 8. Production deployment | Complete | Candidate `2227b650` is deployed dark on the staging-tested pair. Migration, media integrity, smoke and the 18:14–19:14 MY observation pass. [Release evidence](docs/evaluation/langchain-production-wave8-20260915.json). |
 
 ### Latest checkpoint
 
-- Waves 1–7 are complete. Wave 8 preparation is in progress; the candidate is published in [PR #7](https://github.com/czeyik/AI-Customer-Service/pull/7), with staging and production pending.
-- Original branch `smart-release-20260911`, starting revision `52c6247571d460c5f8d0a3b3d5eb47ce1fed33ed`; prior uncommitted work and the local AGENTS.md deletion remain preserved.
-- Publication uses isolated branch `langchain-release-20260915` from current `origin/dev` (`7f8f13f74161aa6ba9064e558ad00ae9a6486ead`) at `/tmp/dudu-langchain-release-20260915`.
-- Wave 6 [reviewed acceptance](docs/evaluation/langchain-live-wave6-reviewed-20260915.json) remains authoritative: 348/348 dispositions, 30/30 intakes, 18/18 handoffs, 9/9 focused; all 309 answers and 60 held-out paraphrases pass semantic review; `rollout_ready=true`.
-- No hosted model calls were made in Wave 7. Conservative tracked spend remains approximately USD 4.27; full-run conservative projection remains USD 8.101 per 10,000 messages, with p95 22.444 seconds.
-- Active limits remain input 15,000/output 300, five model requests, ten native tools including final response, 30s/call, 60s/run and 90s lease.
-- Runtime cleanup found one dialogue owner and no obsolete adapter or unused direct dependency. Dormant legacy columns are only cleared for privacy retention; the regression now includes old phone/account/trip values.
-- Cutover validates candidate settings before downtime, stops/drains all writers, preserves backup references on retry failure, compares all table counts and validates typed dialogue before retention/start. Startup waits for API, ClamAV and a complete worker cycle.
-- Production workflow requires exact-SHA successful staging and an actually immutable ECR repository. Apply the foundation role's new repository-scoped `ecr:DescribeRepositories` permission first.
-- Final Python 3.11/PostgreSQL suite: **554 passed, 2 skipped**. Fresh migration to `e5c1a2b3d4f6`, `alembic check`, hash install, dependency integrity and shell checks pass. Final workflow gate tests: **9 passed**.
-- Docker AMD64 and ARM64 test targets each pass **545 tests, 8 skipped**; the three later ECR cases pass in the final PostgreSQL suite. ARM64 ClamAV build/version checks pass.
-- Local security passes: pip-audit has zero advisories, Bandit high/high has zero findings, Gitleaks history has zero leaks, Trivy source/container has zero high/critical findings, ZAP has zero high-risk alerts.
-- Cze Yik renewed AWS-0104/AWS-0136 through 17 September 2026 for staging/dark deployment only, with customer sending disabled. Trivy uses the conservative `exp:2026-09-17` cutoff. The public beta and notification waiver are not extended.
-- Runtime verification image: `dudu-support:wave7-runtime`, index `sha256:e4c5e58a4a56b94bcac9402ec7c7bbc0d3aabea9ab3a48b7f241d87df7e6ea9f`. [Wave 7 evidence and source hashes](docs/evaluation/langchain-wave7-local-20260915.json).
-- AWS authentication works via profile `dudu-production` in account `173454940059`, region `ap-southeast-5`. Foundation and production exist; staging is absent. GitHub access works; `dev` requires successful `test` and an up-to-date branch, with no review requirement.
-- Current production secret reports Meta sending true, notifications false, LLM true and customer context true; runtime container values remain to be checked. Preparation has not changed production. Staging/dark deployment must disable sending.
-- Publication follow-up fixed production validation rejecting the documented `LLM_ENABLED=false` recovery switch. Shared provider gating was independently reviewed; config/handler/platform checks pass **73 tests, 2 skipped**. Other provider settings remain unchanged.
-- Foundation update completed; the deploy role now has repository-scoped ECR immutability-read permission. GitHub release role variable and staging/production environments are configured.
-- Next: complete refreshed PR #7 CI/Security, merge into `dev`, and publish the validated source to default `main` through its protected PR flow so GitHub registers Release. Recreate isolated staging, then finish all Wave 8 gates within the 02:00–04:00 Asia/Kuala_Lumpur production window.
+- Waves 1–8 are complete. Production runs candidate `2227b650101384d35ac8d713851d584cae46e4f9`, fixed ref `langchain-20260915-r3`; customer and notification sending remain disabled.
+- Original workspace branch `smart-release-20260911`, starting revision `52c6247571d460c5f8d0a3b3d5eb47ce1fed33ed`; inherited changes and the AGENTS.md deletion remain preserved. Evidence publication uses the isolated `/tmp/dudu-langchain-release-20260915` worktree.
+- [Wave 6 reviewed acceptance](docs/evaluation/langchain-live-wave6-reviewed-20260915.json) remains authoritative: 348/348 dispositions, 30/30 intakes, 18/18 handoffs, 9/9 focused; all 309 answers and 60 paraphrases pass; `rollout_ready=true`.
+- Exact-candidate CI `34952053006` and Security `34952053066` pass: 558 PostgreSQL tests / two skips; 552 ARM64 / eight skips. Protected PRs #7–10 published the refactor and release fixes.
+- App digest `sha256:9feab254a8dd1b8926e55f0a4ea5f4f64c7b29aefb4ec72bb3ae8a55878cc9f0`; ClamAV `sha256:eace8421cd3d4910c454df520a5551cc15fc0a0efb40c122b56ab06bf6e7be42`. Staging and production use this identical immutable pair.
+- Staging Release `34952070500` / SSM `94a3ef1d-5038-494e-9fd5-31af1f717c1d` pass. Populated conversion preserves paused/pending/review/evidence and all counts. Empty-target backup restore/migration passes in 14s; 25 deployed checks and nine additional failure/recovery checks pass.
+- Cze Yik authorized the existing Meta configuration and waived dedicated test setup/recipient/window. Read-only phone-ID access and signed public-webhook processing/deduplication pass; live delivery was omitted, zero external test messages sent.
+- Hosted staging smoke SSM `ea58e628-8f49-4d35-be6e-c9631cd6ceb6` passes: three model calls, one tool, 21.250s, no fallback. LLM-off recovery Release `34953325146` and fallback smoke `e51576c4-ad39-4a65-8c2d-498f50969f07` pass with zero model calls and one idempotent ticket.
+- Same-image LLM-on roll-forward Release `34953739867` / SSM `0ae1f794-883f-49fd-85a3-387d0013eb54` and final staging verification `3fe2e842-8081-4d62-a814-8b428fc488af` pass. Latest GitHub staging deployment `6455972311` is successful for the exact candidate.
+- Cze Yik authorized immediate production deployment at approximately 18:06 MY on 15 September, overriding the usual maintenance window. AWS-0104/AWS-0136 remain renewed through 17 September for staging/dark deployment only; beta and notification waivers were not extended.
+- Production Release `34956214933` / SSM `daafc6f1-566f-44d1-bd84-caab4cd60915` succeed. Secret CAS applied version `19d61621-f311-4e18-87fb-3beb75d1b19c`: Meta/notifications off, LLM/context on, input 15,000/output 300 and timeout 30s; beta settings unchanged.
+- Migration `e5c1a2b3d4f6` preserves all 14 table counts at cutover: five conversations, two tickets, six media. Typed dialogue and all six approved private objects pass validation, with no media ownership mismatch. Fresh backup `backups/postgresql/2026/09/15/100905.dump` is retained.
+- Production smoke `6562da07-cfd7-4632-a201-a4d33dbbd732` passes: actual agent two calls/one tool, 3,691 input/117 completion tokens, 11.725s. Deterministic consent/replay creates exactly one synthetic ticket, one unsent notification, zero external sends. The initial harness phrase was corrected to the staging-tested phrase without app changes.
+- Post-smoke totals: nine conversations, three tickets, six media, 126 messages and 15 notifications. Post-observation SSM `ca27f2c2-b084-42d9-b60f-fdfd2d22ea14` confirms the same images/flags, healthy containers, valid dialogue and all six private media objects.
+- Observation **18:14:03–19:14:11 MY** (`10:14:03.814760–11:14:11.720743 UTC`), 3,607.906 seconds: 118/118 readiness checks, 60/60 five-alarm samples, 13/13 host checks; zero errors, restarts, duplicate rows or new customer inbound events. Dark deployment health is established.
+- CloudWatch peaks: memory 78.109% against the 85% alarm threshold; CPU 8.313%. The separate MemAvailable-based host snapshot peaks at 87.39%. An hourly backup of the new runtime succeeds at `backups/postgresql/2026/09/15/110940.dump`.
+- Tagged AWS budget remains USD 0.096 against USD 30, last updated 14:40 MY; it is delayed project-tagged spend. The prior Wave 6 tracked hosted spend is approximately USD 4.27; release-smoke usage is recorded separately, without repeating the full paid evaluation.
+- Final aggregate [Wave 8 evidence](docs/evaluation/langchain-production-wave8-20260915.json) and [release validation](docs/release-validation.md) record workflow/SSM IDs, digests, backups, checks and the full observation. Evidence commits are distinct from the deployed image SHA.
 
 ### Remaining work
 
-Wave 7 local implementation is complete. Continue Wave 8 from the checkpoint above. Preserve the
-accepted Wave 6 evidence and do not repeat unchanged paid evaluations or human review. Source
-publication, staging validation, production deployment and observation remain required.
+None within the authorized LangChain deployment scope. Production remains dark. Customer activation
+or a beta extension requires its own authorization; compatible-runtime recovery keeps the tested
+image pair and can disable the LLM without restoring an old database over new records.
