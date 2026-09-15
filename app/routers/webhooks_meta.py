@@ -1,6 +1,5 @@
 import hmac
 import json
-import uuid
 from datetime import datetime, time, timedelta, timezone
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -16,12 +15,13 @@ from app.models import (
     AuditLog,
     Conversation,
     MediaAttachment,
+    SupportNotification,
     WhatsAppInboundMessage,
     WhatsAppOutboundMessage,
 )
-from app.schemas import AttachmentPayload, ChatRequest, MetaWebhookResult
+from app.schemas import AttachmentPayload, MetaWebhookResult
 from app.security import verify_meta_signature
-from app.services.chatbot import chatbot_service
+from app.services.dialogue import ensure_evidence_group, store_dialogue_data
 from app.services.guardrails import assess_message
 from app.services.pii import redact_sensitive
 from app.services.rate_limit import rate_limiter
@@ -150,7 +150,7 @@ def _consume_public_beta_limits(
                 day_seconds,
             ),
             (
-                "beta-total:2026-09-10:2026-09-14",
+                "beta-total:2026-09-10:2026-09-30",
                 settings.public_beta_messages_total,
                 beta_seconds,
             ),
@@ -335,10 +335,7 @@ def _queue_media(
         conversation = Conversation(channel="whatsapp", external_user_id=item["sender"])
         db.add(conversation)
         db.flush()
-    data = dict(conversation.intake_data or {})
-    if not data.get("evidence_group"):
-        data["evidence_group"] = str(uuid.uuid4())
-        conversation.intake_data = data
+    dialogue, evidence_group = ensure_evidence_group(conversation)
     caption = redact_sensitive(item["text"]).text
     assessment = assess_message(
         caption,
@@ -355,7 +352,7 @@ def _queue_media(
         provider_media_id=item["media_id"],
         inbound_message_id=inbound.id,
         conversation_id=conversation.id,
-        evidence_group=data["evidence_group"],
+        evidence_group=evidence_group,
         media_type=item["type"],
         declared_mime_type=item["mime_type"],
         provider_sha256=item["sha256"] or None,
@@ -364,6 +361,7 @@ def _queue_media(
     )
     db.add(attachment)
     db.flush()
+    store_dialogue_data(conversation, dialogue, evidence_changed=True)
     if rejected:
         status = {
             "en": "I can’t accept sensitive documents or payment information. "
@@ -397,35 +395,123 @@ def _apply_status_updates(db: Session, payload: dict[str, Any]) -> int:
             for item in value.get("statuses", []):
                 if not isinstance(item, dict):
                     continue
-                message = (
-                    db.query(WhatsAppOutboundMessage)
-                    .filter_by(provider_message_id=str(item.get("id", "")))
-                    .one_or_none()
-                )
+                provider_message_id = str(item.get("id", ""))
                 delivery_status = item.get("status")
-                if not message or delivery_status not in {"sent", "delivered", "read", "failed"}:
-                    continue
-                event_time = _provider_timestamp(item.get("timestamp"))
-                if delivery_status == "sent":
-                    message.sent_at = message.sent_at or event_time
-                elif delivery_status == "delivered" and message.status not in {
+                if not provider_message_id or delivery_status not in {
+                    "sent",
+                    "delivered",
                     "read",
                     "failed",
                 }:
-                    message.status = "delivered"
-                    message.delivered_at = event_time
-                elif delivery_status == "read" and message.status != "failed":
-                    message.status = "read"
-                    message.read_at = event_time
-                elif delivery_status == "failed" and message.status not in {
+                    continue
+                callback_data = str(item.get("biz_opaque_callback_data", ""))
+                message = (
+                    db.query(WhatsAppOutboundMessage)
+                    .filter_by(provider_message_id=provider_message_id)
+                    .with_for_update()
+                    .populate_existing()
+                    .one_or_none()
+                )
+                notification = None
+                if callback_data:
+                    recipient_id = str(item.get("recipient_id", ""))
+                    if not recipient_id:
+                        continue
+                    kind, separator, record_id = callback_data.partition(":")
+                    if not separator or kind not in {"outbox", "notification"}:
+                        continue
+                    if kind == "outbox":
+                        callback_message = (
+                            db.query(WhatsAppOutboundMessage)
+                            .filter_by(id=record_id)
+                            .with_for_update()
+                            .populate_existing()
+                            .one_or_none()
+                        )
+                        if (
+                            not callback_message
+                            or callback_message.attempts < 1
+                            or callback_message.status
+                            not in {"uncertain", "sent", "delivered", "read", "failed"}
+                            or recipient_id.lstrip("+")
+                            != callback_message.recipient.lstrip("+")
+                            or (message and message.id != callback_message.id)
+                            or (
+                                callback_message.provider_message_id
+                                and callback_message.provider_message_id
+                                != provider_message_id
+                            )
+                        ):
+                            continue
+                        message = callback_message
+                    else:
+                        notification = (
+                            db.query(SupportNotification)
+                            .filter_by(id=record_id, channel="whatsapp")
+                            .with_for_update()
+                            .populate_existing()
+                            .one_or_none()
+                        )
+                        stored_provider_id = (
+                            str(notification.payload.get("provider_message_id", ""))
+                            if notification
+                            else ""
+                        )
+                        if (
+                            not notification
+                            or notification.attempts < 1
+                            or notification.status
+                            not in {"uncertain", "sent", "delivered", "read", "failed"}
+                            or recipient_id.lstrip("+")
+                            != notification.recipient.lstrip("+")
+                            or message
+                            or (
+                                stored_provider_id
+                                and stored_provider_id != provider_message_id
+                            )
+                        ):
+                            continue
+                target = message or notification
+                if not target:
+                    continue
+                if callback_data:
+                    if message:
+                        message.provider_message_id = provider_message_id
+                    else:
+                        notification.payload = dict(notification.payload) | {
+                            "provider_message_id": provider_message_id
+                        }
+                event_time = _provider_timestamp(item.get("timestamp"))
+                if delivery_status == "sent":
+                    if target.status == "uncertain":
+                        target.status = "sent"
+                    target.sent_at = target.sent_at or event_time
+                elif delivery_status == "delivered" and target.status not in {
+                    "read",
+                    "failed",
+                }:
+                    target.status = "delivered"
+                    if message:
+                        message.delivered_at = event_time
+                elif delivery_status == "read" and target.status != "failed":
+                    target.status = "read"
+                    if message:
+                        message.read_at = event_time
+                elif delivery_status == "failed" and target.status not in {
                     "delivered",
                     "read",
                 }:
-                    message.status = "failed"
-                    message.failed_at = event_time
+                    target.status = "failed"
+                    if message:
+                        message.failed_at = event_time
                     errors = item.get("errors") or []
                     if errors and isinstance(errors[0], dict):
-                        message.last_error_code = str(errors[0].get("code", "unknown"))[:80]
+                        error_code = str(errors[0].get("code", "unknown"))[:80]
+                        if message:
+                            message.last_error_code = error_code
+                        else:
+                            notification.last_error = error_code
+                db.flush()
                 updated += 1
     return updated
 

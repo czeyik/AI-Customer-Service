@@ -22,10 +22,14 @@ PRODUCTION_SETTINGS = {
 }
 
 
-def test_production_configuration_accepts_explicit_safe_values() -> None:
-    settings = Settings(_env_file=None, **PRODUCTION_SETTINGS)
+@pytest.mark.parametrize("llm_enabled", [True, False])
+def test_production_configuration_accepts_explicit_safe_values(llm_enabled: bool) -> None:
+    settings = Settings(_env_file=None, **(PRODUCTION_SETTINGS | {"llm_enabled": llm_enabled}))
 
     assert settings.is_production
+    assert settings.llm_enabled is llm_enabled
+    assert settings.llm_timeout_seconds == 30.0
+    assert settings.llm_max_input_chars == 15000
 
 
 def test_unknown_environment_is_rejected() -> None:
@@ -58,6 +62,24 @@ def test_production_send_requires_meta_transport_credentials() -> None:
     assert settings.meta_graph_api_version == "v26.0"
 
 
+def test_production_configuration_accepts_extended_beta_window_with_sending() -> None:
+    settings = Settings(
+        _env_file=None,
+        **(
+            PRODUCTION_SETTINGS
+            | {
+                "meta_send_enabled": True,
+                "public_beta_enabled": True,
+                "public_beta_end_date": "2026-09-30",
+            }
+        ),
+    )
+
+    assert settings.meta_send_enabled is True
+    assert settings.public_beta_enabled is True
+    assert settings.public_beta_end_date.isoformat() == "2026-09-30"
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [
@@ -71,14 +93,13 @@ def test_production_send_requires_meta_transport_credentials() -> None:
         ("media_bucket", ""),
         ("media_region", "ap-southeast-1"),
         ("media_signed_url_seconds", 3600),
-        ("llm_enabled", False),
         ("zai_api_key", ""),
         ("llm_model", "glm-5.3"),
-        ("llm_timeout_seconds", 9),
-        ("llm_max_input_chars", 8001),
+        ("llm_timeout_seconds", 31),
+        ("llm_max_input_chars", 15001),
         ("llm_max_output_tokens", 301),
         ("public_beta_start_date", "2026-09-11"),
-        ("public_beta_end_date", "2026-09-15"),
+        ("public_beta_end_date", "2026-09-09"),
         ("public_beta_messages_per_user_day", 201),
         ("public_beta_messages_per_day", 2001),
         ("public_beta_messages_total", 10001),

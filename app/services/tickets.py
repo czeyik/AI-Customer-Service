@@ -1,5 +1,4 @@
 import random
-import re
 import string
 from datetime import datetime
 
@@ -7,21 +6,8 @@ from sqlalchemy.orm import Session
 
 from app.models import Ticket
 from app.schemas import ChatRequest, TicketResponse
+from app.services.ticket_drafts import normalize_phone_number, validate_ticket_fields
 from app.services.ticket_operations import queue_new_ticket_notifications
-
-
-PHONE_RE = re.compile(r"^[+\d][\d ()-]{7,24}$")
-
-
-def normalize_phone_number(value: str | None) -> str | None:
-    if not value or not PHONE_RE.fullmatch(value.strip()):
-        return None
-    digits = re.sub(r"\D", "", value)
-    if not 8 <= len(digits) <= 15:
-        return None
-    if digits.startswith("0"):
-        digits = f"60{digits[1:]}"
-    return f"+{digits}"
 
 
 def generate_public_ticket_id() -> str:
@@ -38,15 +24,13 @@ def create_ticket(
     safety_flags: list[str],
 ) -> Ticket:
     phone_number = normalize_phone_number(request.phone_number)
-    if (
-        not request.consent_to_ticket
-        or not request.name
-        or not request.name.strip()
-        or not request.email
-        or not phone_number
-        or not description.strip()
-    ):
-        raise ValueError("consent, name, email, phone number, and description are required")
+    validate_ticket_fields(
+        consent=request.consent_to_ticket,
+        name=request.name,
+        email=str(request.email) if request.email else None,
+        phone_number=phone_number,
+        description=description,
+    )
 
     public_id = generate_public_ticket_id()
     while db.query(Ticket).filter(Ticket.public_id == public_id).first():

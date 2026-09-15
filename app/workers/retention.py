@@ -3,6 +3,7 @@ import logging
 import time
 
 from app.database import SessionLocal
+from app.services.media import reconcile_orphaned_media
 from app.services.retention import run_retention
 
 
@@ -21,7 +22,12 @@ def main() -> None:
         logging.info("retention run: %s", result)
         if result.failures:
             raise SystemExit(1)
-        if args.dry_run or args.once:
+        if args.dry_run:
+            return
+        with SessionLocal() as db:
+            removed = reconcile_orphaned_media(db)
+        logging.info("media reconciliation removed: %s", removed)
+        if args.once:
             return
         time.sleep(args.interval_hours * 3600)
 

@@ -1,4 +1,5 @@
 """Run a synthetic eight-sender burst against a disposable PostgreSQL database."""
+import argparse
 import json
 import os
 import sys
@@ -12,22 +13,19 @@ from sqlalchemy.orm import sessionmaker
 from app.config import Settings
 from app.models import WhatsAppInboundMessage, WhatsAppOutboundMessage
 from app.services import inbound
-from app.services.answer_generation import ApprovedKnowledgeResponder, ProviderResponse
 from app.services.chatbot import ChatbotService
+from scripts.release_eval import evaluation_metadata
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args()
     engine = create_engine(os.environ["TEST_POSTGRES_URL"])
     sessions = sessionmaker(bind=engine, autoflush=False)
     prefix = "synthetic-burst-" + uuid.uuid4().hex
-    class Provider:
-        name = "synthetic-latency"
-        model = "two-second-response"
-        def generate(self, messages, **kwargs):
-            time.sleep(2)
-            return ProviderResponse(json.dumps({"disposition":"clarify", "answer":"Which service do you mean?", "citations":[]}))
-    service = ChatbotService()
-    service.answer_generator = ApprovedKnowledgeResponder(Settings(_env_file=None, llm_customer_context_enabled=True), Provider())
+    settings = Settings(_env_file=None, llm_enabled=False, llm_customer_context_enabled=False)
+    service = ChatbotService(settings=settings)
     inbound.chatbot_service = service
     with sessions() as db:
         for index in range(8):
@@ -41,7 +39,21 @@ def main():
         rows=db.query(WhatsAppInboundMessage, WhatsAppOutboundMessage).join(WhatsAppOutboundMessage, WhatsAppOutboundMessage.inbound_message_id==WhatsAppInboundMessage.id).filter(WhatsAppInboundMessage.provider_message_id.like(prefix+"%")).all()
         latency=sorted((outgoing.created_at-incoming.created_at).total_seconds() for incoming,outgoing in rows)
         assert len(rows)==8 and latency[-1]<30
-        print(json.dumps({"senders":8,"workers":4,"simulated_provider_seconds":2,"reply_queued_p95_seconds":latency[-1],"total_seconds":elapsed,"duplicate_replies":len(rows)-8,"external_delivery":"not part of this synthetic queue check"}))
+        report = {
+            **evaluation_metadata(settings),
+            "mode": "outage",
+            "senders": 8,
+            "workers": 4,
+            "simulated_provider_seconds": 0,
+            "reply_queued_p95_seconds": latency[-1],
+            "total_seconds": elapsed,
+            "duplicate_replies": len(rows) - 8,
+            "external_delivery": "not part of this synthetic queue check",
+        }
+        rendered = json.dumps(report, indent=2, sort_keys=True)
+        if args.output:
+            args.output.write_text(rendered + "\n", encoding="utf-8")
+        print(rendered)
 
 
 if __name__ == "__main__":

@@ -72,6 +72,12 @@ services:
   worker:
     <<: *app
     command: ["python", "-m", "app.workers.all"]
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/worker-ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+      start_period: 90s
     depends_on:
       db:
         condition: service_healthy

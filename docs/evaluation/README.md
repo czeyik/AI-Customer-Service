@@ -33,6 +33,11 @@ The [main matrix](../../data/evaluation/smart-non-escalation.tsv) and
 
 Write diagnostics outside this evidence directory:
 
+Without `--output`, the evaluator writes to a unique system temporary directory and prints the
+report path to stderr; stdout remains JSON. Reviewing a saved `--report` also creates a separate
+output. Supply `--output` to choose a permanent destination. To resume a run, specify its existing
+`--checkpoint`, or `--output` to locate the adjacent `.checkpoint.json` file.
+
 ```bash
 evaluation_dir=$(mktemp -d)
 python scripts/release_eval.py --suite smart --mode outage \

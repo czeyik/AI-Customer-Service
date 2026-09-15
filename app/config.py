@@ -50,14 +50,14 @@ class Settings(BaseSettings):
     website_knowledge_urls: list[str] = Field(default_factory=list)
     zai_api_key: str = ""
     llm_model: str = "glm-5.3-flash"
-    llm_timeout_seconds: float = 8.0
-    llm_max_input_chars: int = 8000
+    llm_timeout_seconds: float = 30.0
+    llm_max_input_chars: int = 15000
     llm_max_output_tokens: int = 300
 
     rate_limit_messages_per_minute: int = 20
     public_beta_enabled: bool = False
     public_beta_start_date: date = date(2026, 9, 10)
-    public_beta_end_date: date = date(2026, 9, 14)
+    public_beta_end_date: date = date(2026, 9, 30)
     public_beta_messages_per_user_day: int = 200
     public_beta_messages_per_day: int = 2_000
     public_beta_messages_total: int = 10_000
@@ -165,16 +165,14 @@ class Settings(BaseSettings):
         if not 1 <= self.clamav_timeout_seconds <= 30:
             errors.append("CLAMAV_TIMEOUT_SECONDS must be between 1 and 30")
 
-        if not self.llm_enabled:
-            errors.append("LLM_ENABLED must be true")
         if len(self.zai_api_key) < 16:
             errors.append("ZAI_API_KEY must be set")
         if self.llm_model != "glm-5.3-flash":
             errors.append("LLM_MODEL must be the approved glm-5.3-flash")
-        if not 1 <= self.llm_timeout_seconds <= 8:
-            errors.append("LLM_TIMEOUT_SECONDS must be between 1 and 8")
-        if not 1 <= self.llm_max_input_chars <= 8000:
-            errors.append("LLM_MAX_INPUT_CHARS must be between 1 and 8000")
+        if not 1 <= self.llm_timeout_seconds <= 30:
+            errors.append("LLM_TIMEOUT_SECONDS must be between 1 and 30")
+        if not 1 <= self.llm_max_input_chars <= 15000:
+            errors.append("LLM_MAX_INPUT_CHARS must be between 1 and 15000")
         if not 1 <= self.llm_max_output_tokens <= 300:
             errors.append("LLM_MAX_OUTPUT_TOKENS must be between 1 and 300")
 
@@ -186,8 +184,8 @@ class Settings(BaseSettings):
             errors.append("RATE_LIMIT_MESSAGES_PER_MINUTE must be between 1 and 120")
         if self.public_beta_start_date != date(2026, 9, 10):
             errors.append("PUBLIC_BETA_START_DATE must be 2026-09-10")
-        if self.public_beta_end_date != date(2026, 9, 14):
-            errors.append("PUBLIC_BETA_END_DATE must be 2026-09-14")
+        if self.public_beta_end_date < self.public_beta_start_date:
+            errors.append("PUBLIC_BETA_END_DATE must be on or after PUBLIC_BETA_START_DATE")
         if self.public_beta_messages_per_user_day != 200:
             errors.append("PUBLIC_BETA_MESSAGES_PER_USER_DAY must be 200")
         if self.public_beta_messages_per_day != 2_000:

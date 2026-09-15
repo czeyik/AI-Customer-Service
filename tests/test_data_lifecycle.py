@@ -174,6 +174,48 @@ def test_dry_run_then_deletes_all_chat_copies_and_detaches_retained_ticket(
     assert db_session.query(Conversation).filter_by(external_user_id="60110000002").one()
 
 
+def test_retention_batch_deletes_inbound_dependencies_first(db_session: Session) -> None:
+    expired = NOW - timedelta(days=100)
+    inbound = [
+        WhatsAppInboundMessage(
+            provider_message_id=f"wamid.batch-{index}",
+            sender=f"batch-user-{index}",
+            phone_number_id="123",
+            message_type="text",
+            created_at=created_at,
+        )
+        for index, created_at in enumerate((expired, NOW))
+    ]
+    db_session.add_all(inbound)
+    db_session.flush()
+    outbound = [
+        WhatsAppOutboundMessage(
+            inbound_message_id=message.id,
+            recipient=message.sender,
+            body="batch reply",
+            created_at=created_at,
+        )
+        for message, created_at in zip(inbound, (NOW, expired))
+    ]
+    db_session.add_all(outbound)
+    db_session.commit()
+    inbound_ids = [message.id for message in inbound]
+    outbound_ids = [message.id for message in outbound]
+    settings = Settings(retention_batch_size=1)
+
+    first = run_retention(db_session, now=NOW, settings=settings)
+    assert first.transport_messages == 2
+    assert db_session.get(WhatsAppInboundMessage, inbound_ids[0]) is None
+    assert db_session.get(WhatsAppOutboundMessage, outbound_ids[0]) is None
+    assert db_session.get(WhatsAppInboundMessage, inbound_ids[1])
+    assert db_session.get(WhatsAppOutboundMessage, outbound_ids[1])
+
+    second = run_retention(db_session, now=NOW, settings=settings)
+    assert second.transport_messages == 1
+    assert db_session.get(WhatsAppInboundMessage, inbound_ids[1])
+    assert db_session.get(WhatsAppOutboundMessage, outbound_ids[1]) is None
+
+
 def test_ticket_media_dependencies_and_indexes_expire_at_36_months(
     db_session: Session,
 ) -> None:
@@ -233,6 +275,14 @@ def test_privacy_owner_hold_blocks_expiry_until_audited_release(db_session: Sess
     conversation = Conversation(
         channel="whatsapp",
         external_user_id="held-user",
+        dialogue_data={
+            "schema_version": 1,
+            "pending_offer": {
+                "description": "Held private narrative",
+                "issue_type": "unconfirmed_question",
+                "originating_turn": "held-message",
+            },
+        },
         created_at=NOW - timedelta(days=100),
         updated_at=NOW - timedelta(days=100),
     )
@@ -246,9 +296,27 @@ def test_privacy_owner_hold_blocks_expiry_until_audited_release(db_session: Sess
         created_at=NOW - timedelta(days=100),
         updated_at=NOW - timedelta(days=100),
     )
-    db_session.add(message)
+    inbound = WhatsAppInboundMessage(
+        provider_message_id="wamid.held",
+        sender=conversation.external_user_id,
+        phone_number_id="123",
+        message_type="text",
+        created_at=NOW - timedelta(days=100),
+        updated_at=NOW - timedelta(days=100),
+    )
+    db_session.add_all([message, inbound])
+    db_session.flush()
+    outbound = WhatsAppOutboundMessage(
+        inbound_message_id=inbound.id,
+        recipient=conversation.external_user_id,
+        body="held reply",
+        created_at=NOW - timedelta(days=100),
+        updated_at=NOW - timedelta(days=100),
+    )
+    db_session.add(outbound)
     db_session.commit()
     conversation_id, ticket_id = conversation.id, held_ticket.id
+    inbound_id, outbound_id = inbound.id, outbound.id
 
     with pytest.raises(PermissionError):
         create_legal_hold(
@@ -286,18 +354,100 @@ def test_privacy_owner_hold_blocks_expiry_until_audited_release(db_session: Sess
     )
 
     held = run_retention(db_session, now=NOW, settings=SETTINGS)
-    assert (held.messages, held.tickets) == (0, 0)
+    assert (held.messages, held.transport_messages, held.tickets) == (0, 0, 0)
+    assert db_session.get(WhatsAppInboundMessage, inbound_id)
+    assert db_session.get(WhatsAppOutboundMessage, outbound_id)
+    assert db_session.get(Conversation, conversation_id).dialogue_data["pending_offer"]
     release_legal_hold(db_session, actor=owner, hold=ticket_hold, now=NOW, settings=SETTINGS)
     release_legal_hold(db_session, actor=owner, hold=conversation_hold, now=NOW, settings=SETTINGS)
     assert db_session.query(AuditLog).filter_by(event_type="legal_hold_created").count() == 2
     assert db_session.query(AuditLog).filter_by(event_type="legal_hold_released").count() == 2
 
     expired = run_retention(db_session, now=NOW, settings=SETTINGS)
-    assert (expired.messages, expired.tickets) == (1, 1)
+    assert (expired.messages, expired.transport_messages, expired.tickets) == (1, 2, 1)
+    assert db_session.get(WhatsAppInboundMessage, inbound_id) is None
+    assert db_session.get(WhatsAppOutboundMessage, outbound_id) is None
     assert db_session.get(Ticket, ticket_id) is None
     assert db_session.get(Conversation, conversation_id) is None
     assert db_session.query(LegalHold).count() == 0
     assert db_session.query(AuditLog).filter(AuditLog.event_type.like("legal_hold_%")).count() == 0
+
+
+def test_retained_unlinked_media_keeps_ownership_but_scrubs_expired_dialogue(
+    db_session: Session,
+) -> None:
+    expired = NOW - timedelta(days=100)
+    evidence_group = "71d54ccf-f79e-46fd-81de-84481226e2fc"
+    conversation = Conversation(
+        channel="whatsapp",
+        external_user_id="retained-media-user",
+        intake_state="awaiting_email",
+        intake_data={
+            "name": "Private Name",
+            "email": "private@example.com",
+            "phone_number": "+60123456789",
+            "account_id": "private-account",
+            "trip_id": "private-trip",
+            "evidence_group": evidence_group,
+        },
+        dialogue_data={
+            "schema_version": 1,
+            "pending_offer": {
+                "description": "A private issue narrative",
+                "issue_type": "unconfirmed_question",
+                "originating_turn": "old-message",
+            },
+            "evidence_group": evidence_group,
+            "last_case_reference": "DUDU-20260930-ABCDE",
+        },
+        dialogue_revision=4,
+        created_at=expired,
+        updated_at=expired,
+    )
+    db_session.add(conversation)
+    db_session.flush()
+    db_session.add_all(
+        [
+            Message(
+                id="old-message",
+                conversation_id=conversation.id,
+                direction="inbound",
+                content="A private issue narrative",
+                created_at=expired,
+                updated_at=expired,
+            ),
+            MediaAttachment(
+                provider_media_id="recent-unlinked-media",
+                conversation_id=conversation.id,
+                evidence_group=evidence_group,
+                media_type="image",
+                declared_mime_type="image/png",
+                status="queued",
+                created_at=NOW - timedelta(days=1),
+                updated_at=NOW - timedelta(days=1),
+            ),
+        ]
+    )
+    db_session.commit()
+    conversation_id = conversation.id
+
+    result = run_retention(db_session, now=NOW, settings=SETTINGS)
+
+    assert (result.messages, result.conversations, result.attachments) == (1, 0, 0)
+    retained = db_session.get(Conversation, conversation_id)
+    assert retained.intake_state == "idle"
+    assert retained.intake_data == {"evidence_group": evidence_group}
+    assert retained.dialogue_data == {
+        "schema_version": 1,
+        "draft": None,
+        "pending_offer": None,
+        "pending_prompt": None,
+        "evidence_group": evidence_group,
+        "last_case_reference": "DUDU-20260930-ABCDE",
+        "pending_case_update": None,
+        "last_receipt": None,
+    }
+    assert retained.dialogue_revision == 5
 
 
 def test_object_failure_alerts_and_next_run_retries(
@@ -419,3 +569,74 @@ def test_postgresql_migration_and_lifecycle_boundary() -> None:
         assert db.query(AuditLog).filter_by(event_type="ticket_note_added").count() == 0
     finally:
         db.close()
+
+
+def test_postgresql_conversation_hold_preserves_transport_copies() -> None:
+    database_url = os.getenv("TEST_POSTGRES_URL") or os.getenv(
+        "LIFECYCLE_INTEGRATION_DATABASE_URL"
+    )
+    if not database_url:
+        pytest.skip("set TEST_POSTGRES_URL to a migrated disposable database")
+    import uuid
+
+    engine = create_engine(database_url)
+    db = sessionmaker(bind=engine, autocommit=False, autoflush=False)()
+    suffix = uuid.uuid4().hex[:12]
+    owner = admin(f"hold-owner-{suffix}")
+    conversation = Conversation(
+        channel="whatsapp",
+        external_user_id=f"pg-held-{suffix}",
+        created_at=NOW - timedelta(days=100),
+        updated_at=NOW - timedelta(days=100),
+    )
+    db.add_all([owner, conversation])
+    db.flush()
+    inbound = WhatsAppInboundMessage(
+        provider_message_id=f"wamid.pg-held-{suffix}",
+        sender=conversation.external_user_id,
+        phone_number_id="123",
+        message_type="text",
+        created_at=NOW - timedelta(days=100),
+        updated_at=NOW - timedelta(days=100),
+    )
+    db.add(inbound)
+    db.flush()
+    outbound = WhatsAppOutboundMessage(
+        inbound_message_id=inbound.id,
+        recipient=conversation.external_user_id,
+        body="held reply",
+        created_at=NOW - timedelta(days=100),
+        updated_at=NOW - timedelta(days=100),
+    )
+    db.add(outbound)
+    db.commit()
+    inbound_id, outbound_id = inbound.id, outbound.id
+    settings = Settings(
+        retention_batch_size=100,
+        privacy_owner_username=owner.username,
+    )
+    try:
+        hold = create_legal_hold(
+            db,
+            actor=owner,
+            subject_type="conversation",
+            subject_id=conversation.id,
+            reason="PostgreSQL transport retention check",
+            reference=f"PG-{suffix}",
+            expires_at=NOW + timedelta(days=30),
+            now=NOW,
+            settings=settings,
+        )
+        held = run_retention(db, now=NOW, settings=settings)
+        assert held.transport_messages == 0
+        assert db.get(WhatsAppInboundMessage, inbound_id)
+        assert db.get(WhatsAppOutboundMessage, outbound_id)
+
+        release_legal_hold(db, actor=owner, hold=hold, now=NOW, settings=settings)
+        expired = run_retention(db, now=NOW, settings=settings)
+        assert expired.transport_messages == 2
+        assert db.get(WhatsAppInboundMessage, inbound_id) is None
+        assert db.get(WhatsAppOutboundMessage, outbound_id) is None
+    finally:
+        db.close()
+        engine.dispose()

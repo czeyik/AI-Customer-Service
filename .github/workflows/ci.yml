@@ -28,6 +28,8 @@ jobs:
 
     env:
       DATABASE_URL: postgresql+psycopg://dudu:dudu_test_password@localhost:5432/dudu_support_test
+      TEST_POSTGRES_URL: postgresql+psycopg://dudu:dudu_test_password@localhost:5432/dudu_support_test
+      LIFECYCLE_INTEGRATION_DATABASE_URL: postgresql+psycopg://dudu:dudu_test_password@localhost:5432/dudu_support_test
       PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
 
     steps:

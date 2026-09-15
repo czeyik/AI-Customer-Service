@@ -95,6 +95,25 @@ def reopen_closed_ticket_for_customer(
     return ticket
 
 
+def get_owned_case(
+    db: Session,
+    *,
+    channel: str,
+    external_user_id: str,
+    public_id: str | None = None,
+    ticket_id: str | None = None,
+    for_update: bool = False,
+) -> Ticket | None:
+    if not public_id and not ticket_id:
+        return None
+    query = db.query(Ticket).filter_by(channel=channel, external_user_id=external_user_id)
+    if public_id:
+        query = query.filter_by(public_id=public_id)
+    else:
+        query = query.filter_by(id=ticket_id)
+    return (query.with_for_update() if for_update else query).first()
+
+
 def assign_ticket(db: Session, *, ticket: Ticket, assignee: AdminUser, actor: AdminUser) -> None:
     if not actor.is_active or not assignee.is_active:
         raise ValueError("acting and assigned administrators must be active")

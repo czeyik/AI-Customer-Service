@@ -165,16 +165,22 @@ class PrivateObjectStore:
         )
 
     def put(self, key: str, stream: BinaryIO, mime_type: str, sha256: str) -> None:
+        from botocore.exceptions import ClientError
+
         stream.seek(0)
-        self.client.upload_fileobj(
-            stream,
-            self.settings.media_bucket,
-            key,
-            ExtraArgs={
-                "ContentType": mime_type,
-                "Metadata": {"sha256": sha256},
-            },
-        )
+        try:
+            self.client.put_object(
+                Bucket=self.settings.media_bucket, Key=key, Body=stream,
+                ContentType=mime_type, Metadata={"sha256": sha256}, IfNoneMatch="*",
+            )
+        except ClientError as exc:
+            if exc.response.get("ResponseMetadata", {}).get("HTTPStatusCode") != 412:
+                raise
+            # A crash after S3 acceptance reuses the same attachment key, including
+            # on versioned buckets. Verify the previous object before linking it.
+            existing = self.client.head_object(Bucket=self.settings.media_bucket, Key=key)
+            if existing.get("Metadata", {}).get("sha256") != sha256 or existing.get("ContentType") != mime_type:
+                raise MediaRejected("stored_object_mismatch") from exc
 
     def signed_url(self, key: str) -> str:
         return self.client.generate_presigned_url(
@@ -217,7 +223,7 @@ def reconcile_orphaned_media(
     }
     removed = 0
     failures = 0
-    # ponytail: scan the prefix directly for the pilot; use S3 Inventory above 10,000 objects.
+    # ponytail: scan the prefix directly; use S3 Inventory above 10,000 objects.
     for item in storage.list("approved/"):
         modified = item["LastModified"]
         if modified.tzinfo is None:
@@ -367,40 +373,6 @@ def process_next_media(
                 pass
         raise
     return True
-
-
-def delete_attachment(
-    db: Session,
-    attachment: MediaAttachment,
-    actor: str,
-    storage: PrivateObjectStore | None = None,
-) -> None:
-    if attachment.status == "deleted":
-        return
-    if attachment.object_key:
-        (storage or PrivateObjectStore()).delete(attachment.object_key)
-    ticket = attachment.ticket
-    attachment.status = "deleted"
-    attachment.deleted_at = datetime.utcnow()
-    attachment.object_key = None
-    if ticket:
-        ticket.attachment_count = len(
-            [
-                item
-                for item in ticket.attachments
-                if item.status == "approved" and item != attachment
-            ]
-        )
-    db.add(
-        AuditLog(
-            actor=actor,
-            event_type="media_deleted",
-            subject_type="attachment",
-            subject_id=attachment.id,
-            details={"attachment_id": attachment.id, "ticket_id": attachment.ticket_id},
-        )
-    )
-    db.commit()
 
 
 def validate_media(content: bytes) -> str:

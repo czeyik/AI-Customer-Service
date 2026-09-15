@@ -30,10 +30,11 @@ def process_next_inbound(db, *, now=None):
     token = str(uuid.uuid4())
     event.status = "processing"
     event.claim_token = token
-    event.lease_until = now + timedelta(seconds=60)
+    event.lease_until = now + timedelta(seconds=90)
     event_id, sender, kind, payload = event.id, event.sender, event.message_type, dict(event.payload)
-    provider_allowed = not payload.get("provider_attempted", False)
-    event.payload = {**payload, "provider_attempted": True}
+    provider_allowed = not (
+        payload.get("agent_attempted", False) or payload.get("provider_attempted", False)
+    )
     db.commit()
     try:
         attachment_status = None
@@ -65,7 +66,16 @@ def process_inbox(session_factory, workers=4):
         with session_factory() as db:
             return process_next_inbound(db)
 
-    # Four concurrent provider requests bound memory and keep burst queue time below
+    # One cheap probe avoids constructing four workers and four claims while idle.
+    with session_factory() as db:
+        ready = db.query(WhatsAppInboundMessage.id).filter(
+            or_(WhatsAppInboundMessage.status == "queued",
+                (WhatsAppInboundMessage.status == "processing") &
+                (WhatsAppInboundMessage.lease_until < datetime.utcnow())),
+        ).first()
+    if ready is None:
+        return 0
+    # Four concurrent agent turns bound memory and keep burst queue time below
     # the response budget; the SQL claim still serializes each individual sender.
     with ThreadPoolExecutor(max_workers=workers) as pool:
         return sum(pool.map(process, range(workers)))

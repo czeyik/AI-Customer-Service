@@ -101,7 +101,7 @@ class DatabaseRateLimiter:
 
         if dialect == "postgresql":
             # ponytail: new identities briefly share one lock; split the cap into shards if
-            # first-contact throughput grows beyond the invitation-only pilot.
+            # first-contact contention becomes a throughput bottleneck.
             db.execute(text("SELECT pg_advisory_xact_lock(873204911)"))
             bucket = db.get(RateLimitBucket, key_hash)
             if bucket:

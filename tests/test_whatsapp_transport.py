@@ -21,6 +21,7 @@ from app.models import (
     Base,
     Message,
     RateLimitBucket,
+    SupportNotification,
     Ticket,
     WhatsAppInboundMessage,
     WhatsAppOutboundMessage,
@@ -224,6 +225,27 @@ def test_public_beta_limits_are_calendar_aligned_and_atomic(
     get_settings.cache_clear()
 
 
+@pytest.mark.parametrize(
+    ("now", "allowed"),
+    [
+        (datetime(2026, 9, 15, tzinfo=timezone.utc), True),
+        (datetime(2026, 9, 30, 15, 59, 59, tzinfo=timezone.utc), True),
+        (datetime(2026, 9, 30, 16, tzinfo=timezone.utc), False),
+    ],
+)
+def test_extended_beta_keeps_limits_and_expires_at_malaysia_midnight(
+    db_session: Session, monkeypatch: pytest.MonkeyPatch, now: datetime, allowed: bool
+) -> None:
+    monkeypatch.setenv("PUBLIC_BETA_ENABLED", "true")
+    monkeypatch.setenv("PUBLIC_BETA_END_DATE", "2026-09-30")
+    monkeypatch.setenv("PUBLIC_BETA_MESSAGES_PER_USER_DAY", "1")
+    get_settings.cache_clear()
+
+    counts = _consume_public_beta_limits(db_session, "extension-user", now)
+    assert counts == ([1, 1, 1, 1] if allowed else None)
+    assert _consume_public_beta_limits(db_session, "extension-user", now) is None
+
+
 def test_public_beta_sends_only_one_capacity_notice_per_user_day(
     db_session: Session, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -251,7 +273,7 @@ def test_webhook_preserves_durable_inbox_when_chat_processing_fails(
     def fail(*args, **kwargs):
         raise RuntimeError("chat failed")
 
-    monkeypatch.setattr("app.routers.webhooks_meta.chatbot_service.handle", fail)
+    monkeypatch.setattr("app.services.inbound.chatbot_service.handle", fail)
 
     call_webhook(db_session, payload("wamid.rollback", "Hello"))
 
@@ -289,9 +311,13 @@ class FakeClient:
     def __init__(self, results: list[object]) -> None:
         self.results = results
         self.calls = 0
+        self.callback_data = []
 
-    def send_text(self, recipient: str, body: str) -> str:
+    def send_text(
+        self, recipient: str, body: str, *, callback_data: str | None = None
+    ) -> str:
         self.calls += 1
+        self.callback_data.append(callback_data)
         result = self.results.pop(0)
         if isinstance(result, Exception):
             raise result
@@ -361,6 +387,64 @@ def test_transient_send_retries_then_records_provider_id(db_session: Session) ->
         2,
         "wamid.outbound",
     )
+    assert client.callback_data == [f"outbox:{message.id}"] * 2
+
+
+def test_crash_after_provider_acceptance_leaves_uncertain_and_blocks_recipient(
+    db_session: Session,
+) -> None:
+    message = queue_message(db_session)
+    later_inbound = WhatsAppInboundMessage(
+        provider_message_id="wamid.later",
+        status="done",
+        sender=message.recipient,
+        phone_number_id=PHONE_NUMBER_ID,
+        message_type="text",
+    )
+    db_session.add(later_inbound)
+    db_session.flush()
+    db_session.add(
+        WhatsAppOutboundMessage(
+            inbound_message_id=later_inbound.id,
+            recipient=message.recipient,
+            body="Later reply",
+        )
+    )
+    db_session.commit()
+
+    class AcceptedThenCrashed:
+        def send_text(self, recipient, body, *, callback_data=None):
+            current = db_session.get(WhatsAppOutboundMessage, message.id)
+            assert (current.status, current.attempts) == ("uncertain", 1)
+            assert callback_data == f"outbox:{message.id}"
+            raise RuntimeError("simulated process death after acceptance")
+
+    with pytest.raises(RuntimeError, match="simulated process death"):
+        process_next_outbound(
+            db_session, AcceptedThenCrashed(), settings=send_settings()
+        )
+    db_session.rollback()
+    db_session.refresh(message)
+    replacement = FakeClient(["wamid.duplicate"])
+
+    assert (message.status, message.attempts) == ("uncertain", 1)
+    assert not process_next_outbound(
+        db_session, replacement, settings=send_settings()
+    )
+    assert replacement.calls == 0
+
+
+def test_unknown_meta_outcome_is_not_automatically_retried(db_session: Session) -> None:
+    message = queue_message(db_session)
+    client = FakeClient(
+        [MetaSendError("TimeoutError", False, uncertain=True), "wamid.duplicate"]
+    )
+
+    assert process_next_outbound(db_session, client, settings=send_settings())
+    db_session.refresh(message)
+    assert (message.status, message.last_error_code) == ("uncertain", "TimeoutError")
+    assert not process_next_outbound(db_session, client, settings=send_settings())
+    assert client.calls == 1
 
 
 def test_send_failure_is_dead_lettered_at_bound(db_session: Session) -> None:
@@ -428,6 +512,196 @@ def test_signed_delivery_status_updates_outbox(db_session: Session) -> None:
     assert message.delivered_at is not None
 
 
+def test_signed_callback_reconciles_only_its_bound_uncertain_outbox(
+    db_session: Session,
+) -> None:
+    message = queue_message(db_session)
+    message.status = "uncertain"
+    message.attempts = 1
+    db_session.commit()
+    status_payload = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+                "changes": [
+                    {
+                        "field": "messages",
+                        "value": {
+                            "statuses": [
+                                {
+                                    "id": "wamid.accepted",
+                                    "status": "sent",
+                                    "timestamp": "1788596000",
+                                    "recipient_id": message.recipient,
+                                    "biz_opaque_callback_data": f"outbox:{message.id}",
+                                }
+                            ]
+                        },
+                    }
+                ]
+            }
+        ],
+    }
+
+    with pytest.raises(HTTPException):
+        call_webhook(db_session, status_payload, "sha256=bad")
+    db_session.refresh(message)
+    assert (message.status, message.provider_message_id) == ("uncertain", None)
+
+    status = status_payload["entry"][0]["changes"][0]["value"]["statuses"][0]
+    status["recipient_id"] = "60999999999"
+    assert call_webhook(db_session, status_payload).status_updates == 0
+    status.pop("recipient_id")
+    assert call_webhook(db_session, status_payload).status_updates == 0
+    status["recipient_id"] = message.recipient
+    status["status"] = "unknown"
+    assert call_webhook(db_session, status_payload).status_updates == 0
+    db_session.refresh(message)
+    assert (message.status, message.provider_message_id) == ("uncertain", None)
+
+    status["status"] = "sent"
+    message.status = "queued"
+    message.attempts = 0
+    db_session.commit()
+    assert call_webhook(db_session, status_payload).status_updates == 0
+    db_session.refresh(message)
+    assert (message.status, message.provider_message_id) == ("queued", None)
+    message.status = "uncertain"
+    message.attempts = 1
+    db_session.commit()
+
+    status_payload["entry"][0]["changes"][0]["value"]["statuses"][0][
+        "biz_opaque_callback_data"
+    ] = "outbox:missing"
+    assert call_webhook(db_session, status_payload).status_updates == 0
+    db_session.refresh(message)
+    assert (message.status, message.provider_message_id) == ("uncertain", None)
+
+    status_payload["entry"][0]["changes"][0]["value"]["statuses"][0][
+        "biz_opaque_callback_data"
+    ] = f"outbox:{message.id}"
+    assert call_webhook(db_session, status_payload).status_updates == 1
+    db_session.refresh(message)
+    assert (message.status, message.provider_message_id) == (
+        "sent",
+        "wamid.accepted",
+    )
+
+
+def test_signed_callback_reconciles_bound_whatsapp_notification(
+    db_session: Session,
+) -> None:
+    notification = SupportNotification(
+        ticket_id="ticket-id",
+        channel="whatsapp",
+        recipient="+60108865432",
+        event_type="ticket_created",
+        status="uncertain",
+        attempts=1,
+        payload={"public_id": "DUDU-1"},
+    )
+    db_session.add(notification)
+    db_session.commit()
+    status_payload = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+                "changes": [
+                    {
+                        "field": "messages",
+                        "value": {
+                            "statuses": [
+                                {
+                                    "id": "wamid.notification",
+                                    "status": "sent",
+                                    "timestamp": "1788596000",
+                                    "recipient_id": "60108865432",
+                                    "biz_opaque_callback_data": (
+                                        f"notification:{notification.id}"
+                                    ),
+                                }
+                            ]
+                        },
+                    }
+                ]
+            }
+        ],
+    }
+
+    assert call_webhook(db_session, status_payload).status_updates == 1
+    db_session.refresh(notification)
+    assert notification.status == "sent"
+    assert notification.payload["provider_message_id"] == "wamid.notification"
+
+
+def test_batched_callback_statuses_preserve_outbox_delivery_state(
+    db_session: Session,
+) -> None:
+    message = queue_message(db_session)
+    message.status = "uncertain"
+    message.attempts = 1
+    db_session.commit()
+    statuses = [
+        {
+            "id": "wamid.batched",
+            "status": status,
+            "timestamp": "1788596000",
+            "recipient_id": message.recipient,
+            "biz_opaque_callback_data": f"outbox:{message.id}",
+        }
+        for status in ("delivered", "sent")
+    ]
+    status_payload = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {"changes": [{"field": "messages", "value": {"statuses": statuses}}]}
+        ],
+    }
+
+    assert call_webhook(db_session, status_payload).status_updates == 2
+    db_session.refresh(message)
+    assert message.status == "delivered"
+    assert message.provider_message_id == "wamid.batched"
+    assert message.delivered_at is not None
+
+
+def test_batched_callback_statuses_preserve_notification_delivery_state(
+    db_session: Session,
+) -> None:
+    notification = SupportNotification(
+        ticket_id="ticket-id",
+        channel="whatsapp",
+        recipient="+60108865432",
+        event_type="ticket_created",
+        status="uncertain",
+        attempts=1,
+        payload={"public_id": "DUDU-1"},
+    )
+    db_session.add(notification)
+    db_session.commit()
+    statuses = [
+        {
+            "id": "wamid.notification-batch",
+            "status": status,
+            "timestamp": "1788596000",
+            "recipient_id": "60108865432",
+            "biz_opaque_callback_data": f"notification:{notification.id}",
+        }
+        for status in ("delivered", "sent")
+    ]
+    status_payload = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {"changes": [{"field": "messages", "value": {"statuses": statuses}}]}
+        ],
+    }
+
+    assert call_webhook(db_session, status_payload).status_updates == 2
+    db_session.refresh(notification)
+    assert notification.status == "delivered"
+    assert notification.payload["provider_message_id"] == "wamid.notification-batch"
+
+
 def test_signed_failure_status_records_only_error_code(db_session: Session) -> None:
     message = queue_message(db_session)
     message.provider_message_id = "wamid.failed"
@@ -491,18 +765,29 @@ def test_meta_client_uses_approved_version_and_returns_message_id(
         captured["url"] = request.full_url
         captured["authorization"] = request.headers["Authorization"]
         captured["timeout"] = timeout
+        captured["payload"] = json.loads(request.data)
         return Response()
 
     monkeypatch.setattr(whatsapp_module, "urlopen", fake_urlopen)
     settings = send_settings()
 
-    result = whatsapp_module.MetaWhatsAppClient(settings).send_text("60108865432", "Hello")
+    result = whatsapp_module.MetaWhatsAppClient(settings).send_text(
+        "60108865432", "Hello", callback_data="outbox:local-id"
+    )
 
     assert result == "wamid.accepted"
     assert captured == {
         "url": f"https://graph.facebook.com/v26.0/{PHONE_NUMBER_ID}/messages",
         "authorization": f"Bearer {settings.meta_access_token}",
         "timeout": 10.0,
+        "payload": {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": "60108865432",
+            "type": "text",
+            "text": {"preview_url": False, "body": "Hello"},
+            "biz_opaque_callback_data": "outbox:local-id",
+        },
     }
 
 
@@ -524,6 +809,89 @@ def test_meta_temporary_error_code_is_retryable_even_on_http_400(
         whatsapp_module.MetaWhatsAppClient(send_settings()).send_text("60108865432", "Hello")
 
     assert (exc.value.code, exc.value.retryable) == ("131016", True)
+
+
+def test_unstructured_meta_server_error_is_an_uncertain_outcome(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fail(*args, **kwargs):
+        raise HTTPError(
+            "https://graph.facebook.com/v26.0/messages",
+            502,
+            "Bad Gateway",
+            {},
+            io.BytesIO(b"upstream connection lost"),
+        )
+
+    monkeypatch.setattr(whatsapp_module, "urlopen", fail)
+
+    with pytest.raises(MetaSendError) as exc:
+        whatsapp_module.MetaWhatsAppClient(send_settings()).send_text(
+            "60108865432", "Hello"
+        )
+
+    assert (exc.value.code, exc.value.retryable, exc.value.uncertain) == (
+        "http_502",
+        False,
+        True,
+    )
+
+
+@pytest.mark.parametrize("error_body", [b"[]", b'{"error":[]}'])
+def test_worker_audits_malformed_meta_server_error_as_uncertain(
+    db_session: Session,
+    monkeypatch: pytest.MonkeyPatch,
+    error_body: bytes,
+) -> None:
+    message = queue_message(db_session)
+
+    def fail(*args, **kwargs):
+        raise HTTPError(
+            "https://graph.facebook.com/v26.0/messages",
+            502,
+            "Bad Gateway",
+            {},
+            io.BytesIO(error_body),
+        )
+
+    monkeypatch.setattr(whatsapp_module, "urlopen", fail)
+
+    assert process_next_outbound(db_session, settings=send_settings())
+    db_session.refresh(message)
+    audit = (
+        db_session.query(AuditLog)
+        .filter_by(event_type="whatsapp_message_send_uncertain")
+        .one()
+    )
+    assert (message.status, message.last_error_code) == ("uncertain", "http_502")
+    assert audit.details["error_code"] == "http_502"
+
+
+def test_meta_invalid_response_is_an_uncertain_outcome(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Response:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+        def read(self) -> bytes:
+            return b"{}"
+
+    monkeypatch.setattr(whatsapp_module, "urlopen", lambda *args, **kwargs: Response())
+
+    with pytest.raises(MetaSendError) as exc:
+        whatsapp_module.MetaWhatsAppClient(send_settings()).send_text(
+            "60108865432", "Hello"
+        )
+
+    assert (exc.value.code, exc.value.retryable, exc.value.uncertain) == (
+        "invalid_meta_response",
+        False,
+        True,
+    )
 
 
 def test_equal_timestamp_replies_wait_for_earlier_retry(db_session):
